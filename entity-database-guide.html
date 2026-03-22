@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Entity & Dữ Liệu DB – WebBanSach</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+:root{--bg:#0f1117;--bg2:#1a1d27;--bg3:#22263a;--accent:#6c63ff;--accent2:#00d4aa;--red:#ff6b6b;--yellow:#f6e05e;--green:#68d391;--text:#e2e8f0;--text2:#94a3b8;--border:#2d3748}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;display:flex}
+/* SIDEBAR */
+nav{width:240px;min-height:100vh;background:var(--bg2);border-right:1px solid var(--border);padding:20px 0;position:fixed;top:0;left:0;overflow-y:auto}
+.logo{padding:0 20px 16px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.logo h1{font-size:.9rem;color:var(--accent);font-weight:700}
+.logo p{font-size:.72rem;color:var(--text2);margin-top:2px}
+.grp-title{font-size:.62rem;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;padding:8px 20px 4px;font-weight:600}
+nav a{display:block;padding:7px 20px;color:var(--text2);text-decoration:none;font-size:.82rem;border-left:3px solid transparent;transition:.15s}
+nav a:hover,nav a.on{color:var(--text);border-left-color:var(--accent);background:rgba(108,99,255,.08)}
+/* MAIN */
+main{margin-left:240px;padding:36px 44px;flex:1}
+/* HERO */
+.hero{background:linear-gradient(135deg,#1a1d27,#16213e,#0f1117);border:1px solid var(--border);border-radius:14px;padding:36px 40px;margin-bottom:36px}
+.hero h2{font-size:1.7rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--text2);margin-top:10px;font-size:.9rem;max-width:580px}
+/* ORDER GUIDE */
+.order{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}
+.ob{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:.8rem;display:flex;align-items:center;gap:8px}
+.ob .n{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0}
+.ob span{color:var(--text2)}
+.ob strong{color:var(--text);display:block;font-size:.82rem}
+/* ENTITY CARD */
+.ent{background:var(--bg2);border:1px solid var(--border);border-radius:12px;margin-bottom:28px;overflow:hidden}
+.ent-header{padding:16px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.ent-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.ent-header h3{font-size:1rem;font-weight:600}
+.ent-header .db{font-size:.75rem;color:var(--text2);margin-top:2px}
+.ent-body{padding:16px 22px}
+/* Field table */
+table{width:100%;border-collapse:collapse;margin-bottom:12px}
+th{background:var(--bg3);padding:9px 12px;text-align:left;font-size:.78rem;font-weight:600;color:var(--text2);border-bottom:1px solid var(--border)}
+td{padding:9px 12px;font-size:.82rem;border-bottom:1px solid rgba(45,55,72,.5)}
+tr:last-child td{border-bottom:none}
+code{background:var(--bg3);color:var(--accent2);padding:1px 5px;border-radius:3px;font-family:'Fira Code',monospace;font-size:.78rem}
+.t-pk{color:var(--yellow);font-size:.72rem;font-weight:600;background:rgba(246,224,94,.12);padding:2px 7px;border-radius:10px}
+.t-fk{color:#fc8181;font-size:.72rem;font-weight:600;background:rgba(252,129,129,.12);padding:2px 7px;border-radius:10px}
+.t-req{color:var(--accent2);font-size:.72rem}
+.t-opt{color:var(--text2);font-size:.72rem}
+/* Tip box */
+.tip{background:rgba(0,212,170,.07);border-left:3px solid var(--accent2);border-radius:0 8px 8px 0;padding:11px 15px;margin-top:10px;font-size:.82rem}
+.tip strong{color:var(--accent2);display:block;margin-bottom:4px}
+.tip p,.tip li{color:var(--text2)}
+.tip ul{padding-left:16px;margin-top:4px}
+.tip li{margin-bottom:2px}
+.warn{background:rgba(246,224,94,.07);border-left:3px solid var(--yellow);border-radius:0 8px 8px 0;padding:11px 15px;margin-top:10px;font-size:.82rem}
+.warn strong{color:var(--yellow);display:block;margin-bottom:4px}
+.warn p{color:var(--text2)}
+/* Section title */
+.sec-title{font-size:1.15rem;font-weight:700;margin:32px 0 14px;display:flex;align-items:center;gap:10px;color:var(--text)}
+.sec-title .ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+/* SQL block */
+.sql{background:#0d1117;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin:10px 0}
+.sql-h{background:var(--bg3);padding:6px 14px;font-size:.72rem;color:var(--text2);border-bottom:1px solid var(--border);font-family:'Fira Code',monospace}
+pre{padding:14px;font-family:'Fira Code',monospace;font-size:.78rem;overflow-x:auto;line-height:1.7}
+.kw{color:#c792ea}.str{color:#c3e88d}.cm{color:#546e7a;font-style:italic}.num{color:#f78c6c}
+/* Relation badge */
+.rel{display:inline-block;font-size:.7rem;font-weight:600;padding:2px 8px;border-radius:10px;margin-right:4px}
+.r-1n{background:rgba(108,99,255,.15);color:var(--accent)}
+.r-nm{background:rgba(0,212,170,.15);color:var(--accent2)}
+.r-n1{background:rgba(252,129,129,.15);color:var(--red)}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+@media(max-width:700px){nav{display:none}main{margin-left:0;padding:20px}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo"><h1>📦 Entity Guide</h1><p>WebBanSach Backend</p></div>
+  <div class="grp-title">Danh mục</div>
+  <a href="#order">🗺️ Thứ tự nhập liệu</a>
+  <div class="grp-title">Entities độc lập</div>
+  <a href="#the-loai">1. TheLoai</a>
+  <a href="#quyen">2. Quyen</a>
+  <a href="#hinh-thuc-thanh-toan">3. HinhThucThanhToan</a>
+  <a href="#hinh-thuc-giao-hang">4. HinhThucGiaoHang</a>
+  <div class="grp-title">Entities chính</div>
+  <a href="#nguoi-dung">5. NguoiDung</a>
+  <a href="#sach">6. Sach</a>
+  <div class="grp-title">Entities phụ thuộc</div>
+  <a href="#hinh-anh">7. HinhAnh</a>
+  <a href="#don-hang">8. DonHang</a>
+  <a href="#chi-tiet-don-hang">9. ChiTietDonHang</a>
+  <a href="#su-danh-gia">10. SuDanhGia</a>
+  <a href="#sach-yeu-thich">11. SachYeuThich</a>
+  <div class="grp-title">SQL mẫu</div>
+  <a href="#sql-sample">🗄️ Dữ liệu mẫu SQL</a>
+</nav>
+
+<main>
+<!-- HERO -->
+<div class="hero">
+  <h2>Entity & Hướng Dẫn Nhập Dữ Liệu</h2>
+  <p>Tài liệu liệt kê <strong>11 entity</strong> trong dự án WebBanSach, cấu trúc từng bảng và hướng dẫn chi tiết cách thu thập, điền dữ liệu vào cơ sở dữ liệu theo đúng thứ tự quan hệ.</p>
+</div>
+
+<!-- ORDER -->
+<section id="order">
+  <div class="sec-title"><div class="ico" style="background:rgba(246,224,94,.15)">🗺️</div>Thứ Tự Nhập Dữ Liệu (Quan Trọng!)</div>
+  <p style="color:var(--text2);font-size:.88rem;margin-bottom:14px">Do các bảng có quan hệ khóa ngoại, phải nhập theo thứ tự sau — nhập bảng <em>không có FK</em> trước:</p>
+  <div class="order">
+    <div class="ob"><div class="n">1</div><div><strong>the_loai</strong><span>Không có FK</span></div></div>
+    <div class="ob"><div class="n">2</div><div><strong>quyen</strong><span>Không có FK</span></div></div>
+    <div class="ob"><div class="n">3</div><div><strong>hinh_thuc_thanh_toan</strong><span>Không có FK</span></div></div>
+    <div class="ob"><div class="n">4</div><div><strong>hinh_thuc_giao_hang</strong><span>Không có FK</span></div></div>
+    <div class="ob"><div class="n">5</div><div><strong>nguoi_dung</strong><span>Không có FK trực tiếp</span></div></div>
+    <div class="ob"><div class="n">6</div><div><strong>nguoidung_quyen</strong><span>FK: nguoi_dung, quyen</span></div></div>
+    <div class="ob"><div class="n">7</div><div><strong>sach</strong><span>Không có FK trực tiếp</span></div></div>
+    <div class="ob"><div class="n">8</div><div><strong>sach_theloai</strong><span>FK: sach, the_loai</span></div></div>
+    <div class="ob"><div class="n">9</div><div><strong>hinh_anh</strong><span>FK: sach</span></div></div>
+    <div class="ob"><div class="n">10</div><div><strong>don_hang</strong><span>FK: nguoi_dung, httt, htgh</span></div></div>
+    <div class="ob"><div class="n">11</div><div><strong>chi_tiet_don_hang</strong><span>FK: sach, don_hang</span></div></div>
+    <div class="ob"><div class="n">12</div><div><strong>su_danh_gia</strong><span>FK: sach, nguoi_dung</span></div></div>
+    <div class="ob"><div class="n">13</div><div><strong>sach_yeu_thich</strong><span>FK: sach, nguoi_dung</span></div></div>
+  </div>
+</section>
+
+<!-- THE LOAI -->
+<section id="the-loai">
+  <div class="sec-title"><div class="ico" style="background:rgba(108,99,255,.15)">🏷️</div>1. TheLoai – Thể Loại Sách</div>
+  <div class="ent">
+    <div class="ent-header">
+      <div class="ent-icon" style="background:rgba(108,99,255,.15)">🏷️</div>
+      <div><h3>TheLoai</h3><div class="db">Bảng: <code>the_loai</code> | Quan hệ: <span class="rel r-nm">N-M với Sach</span></div></div>
+    </div>
+    <div class="ent-body">
+      <table>
+        <tr><th>Cột DB</th><th>Field Java</th><th>Kiểu</th><th>Bắt buộc</th><th>Ý nghĩa</th></tr>
+        <tr><td><code>ma_the_loai</code></td><td><code>maTheLoai</code></td><td><span class="t-pk">PK AUTO</span></td><td>—</td><td>Tự động tăng, không cần nhập</td></tr>
+        <tr><td><code>ten_the_loai</code></td><td><code>tenTheLoai</code></td><td>VARCHAR(256)</td><td><span class="t-req">✓ Bắt buộc</span></td><td>Tên thể loại: "Văn học", "Khoa học"…</td></tr>
+      </table>
+      <div class="tip">
+        <strong>💡 Cách thu thập dữ liệu</strong>
+        <ul>
+          <li>Tham khảo các trang như Tiki, Fahasa để lấy danh sách thể loại phổ biến</li>
+          <li>Ví dụ: Văn học, Kinh tế, Thiếu nhi, Khoa học kỹ thuật, Tâm lý – Kỹ năng sống, Lịch sử, Ngoại ngữ</li>
+          <li>Thêm vào DB trước tất cả bảng khác</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUYEN -->
+<section id="quyen">
+  <div class="sec-title"><div class="ico" style="background:rgba(252,129,129,.15)">🔑</div>2. Quyen – Quyền Truy Cập</div>
+  <div class="ent">
+    <div class="ent-header">
+      <div class="ent-icon" style="background:rgba(252,129,129,.15)">🔑</div>
+      <div><h3>Quyen</h3><div class="db">Bảng: <code>quyen</code> | Quan hệ: <span class="rel r-nm">N-M với NguoiDung</span></div></div>
+    </div>
+    <div class="ent-body">
+      <table>
+        <tr><th>Cột DB</th><th>Field Java</th><th>Kiểu</th><th>Bắt buộc</th><th>Ý nghĩa</th></tr>
+        <tr><td><code>ma_quyen</code></td><td><code>maQuyen</code></td><td><span class="t-pk">PK AUTO</span></td><td>—</td><td>Tự động tăng</td></tr>
+        <tr><td><code>ten_quyen</code></td><td><code>tenQuyen</code></td><td>VARCHAR</td><td><span class="t-req">✓ Bắt buộc</span></td><td>Tên quyền, bắt đầu bằng <code>ROLE_</code></td></tr>
+      </table>
+      <div class="warn">
+        <strong>⚠️ Quy tắc đặt tên bắt buộc</strong>
+        <p>Spring Security yêu cầu tên quyền phải có tiền tố <code>ROLE_</code>. Chỉ cần 2 bản ghi: <code>ROLE_USER</code> và <code>ROLE_ADMIN</code>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HINH THUC THANH TOAN -->
+<section id="hinh-thuc-thanh-toan">
+  <div class="sec-title"><div class="ico" style="background:rgba(0,212,170,.15)">💳</div>3. HinhThucThanhToan – Hình Thức Thanh Toán</div>
+  <div class="ent">
+    <div class="ent-header">
+      <div class="ent-icon" style="background:rgba(0,212,170,.15)">💳</div>
+      <div><h3>HinhThucThanhToan</h3><div class="db">Bảng: <code>hinh_thuc_thanh_toan</code> | Quan hệ: <span class="rel r-1n">1-N với DonHang</span></div></div>
+    </div>
+    <div class="ent-body">
+      <table>
+        <tr><th>Cột DB</th><th>Field Java</th><th>Kiểu</th><th>Bắt buộc</th><th>Ý nghĩa</th></tr>
+        <tr><td><code>ma_hinh_thuc_thanh_toan</code></td><td><code>maHinhThucThanhToan</code></td><td><span class="t-pk">PK AUTO</span></td><td>—</td><td>Tự động tăng</td></tr>
+        <tr><td><code>ten_hinh_thuc_thanh_toan</code></td><td><code>tenHinhThucThanhToan</code></td><td>VARCHAR</td><td><span class="t-req">✓</span></td><td>Tên hình thức: "COD", "Thẻ tín dụng"…</td></tr>
+        <tr><td><code>mo_ta</code></td><td><code>moTa</code></td><td>VARCHAR</td><td><span class="t-opt">Tùy chọn</span></td><td>Mô tả thêm về hình thức</td></tr>
+        <tr><td><code>chi_phi_thanh_toan</code></td><td><code>chiPhiThanhToan</code></td><td>DOUBLE</td><td><span class="t-req">✓</span></td><td>Phí thanh toán (VD: 0, 10000, 15000)</td></tr>
+      </table>
+      <div class="tip">
+        <strong>💡 Dữ liệu mẫu gợi ý</strong>
+        <ul>
+          <li>COD (Tiền mặt khi nhận hàng) – phí 0đ</li>
+          <li>Thẻ tín dụng/ghi nợ – phí 15,000đ</li>
+          <li>Ví MoMo – phí 10,000đ</li>
+          <li>Chuyển khoản ngân hàng – phí 0đ</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HINH THUC GIAO HANG -->
+<section id="hinh-thuc-giao-hang">
+  <div class="sec-title"><div class="ico" style="background:rgba(246,224,94,.15)">🚚</div>4. HinhThucGiaoHang – Hình Thức Giao Hàng</div>
+  <div class="ent">
+    <div class="ent-header">
+      <div class="ent-icon" style="background:rgba(246,224,94,.15)">🚚</div>
+      <div><h3>HinhThucGiaoHang</h3><div class="db">Bảng: <code>hinh_thuc_giao_hang</code> | Quan hệ: <span class="rel r-1n">1-N với DonHang</span></div></div>
+    </div>
+    <div class="ent-body">
+      <table>
+        <tr><th>Cột DB</th><th>Field Java</th><th>Kiểu</th><th>Bắt buộc</th><th>Ý nghĩa</th></tr>
+        <tr><td><code>ma_hinh_thuc_giao_hang</code></td><td><code>maHinhThucGiaoHang</code></td><td><span class="t-pk">PK AUTO</span></td><td>—</td><td>Tự động tăng</td></tr>
+        <tr><td><code>ten_hinh_thuc_giao_hang</code></td><td><code>tenHinhThucGiaoHang</code></td><td>VARCHAR</td><td><span class="t-req">✓</span></td><td>Tên: "Giao hàng tiêu chuẩn", "Giao nhanh"…</td></tr>
+        <tr><td><code>mo_ta</code></td><td><code>moTa</code></td><td>VARCHAR</td><td><span class="t-opt">Tùy chọn</span></td><td>Mô tả thêm, VD: "3-5 ngày làm việc"</td></tr>
+        <tr><td><code>chi_phi_giao_hang</code></td><td><code>chiPhiGiaoHang</code></td><td>DOUBLE</td><td><span class="t-req">✓</span></td><td>Phí vận chuyển (VD: 25000, 35000)</td></tr>
+      </table>
+      <div class="tip">
+        <strong>💡 Dữ liệu mẫu gợi ý</strong>
+        <ul>
+          <li>Giao hàng tiêu chuẩn (3–5 ngày) – 25,000đ</li>
+          <li>Giao hàng nhanh (1–2 ngày) – 35,000đ</li>
+          <li>Giao hàng hỏa tốc (trong ngày) – 50,000đ</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NGUOI DUNG -->
+<section id="nguoi-dung">
+  <div class="sec-title"><div class="ico" style="background:rgba(108,99,255,.15)">👤</div>5. NguoiDung – Người Dùng</div>
+  <div class="ent">
+    <div class="ent-header">
+      <div class="ent-icon" style="background:rgba(108,99,255,.15)">👤</div>
+      <div><h3>NguoiDung</h3><div class="db">Bảng: <code>nguoi_dung</code> | Quan hệ: <span class="rel r-nm">N-M với Quyen</span> <span class="rel r-1n">1-N với DonHang, SuDanhGia, SachYeuThich</span></div></div>
+    </div>
+    <div class="ent-body">
+      <table>
+        <tr><th>Cột DB</th><th>Field Java</th><th>Kiểu</th><th>Bắt buộc</th><th>Ý nghĩa</th></tr>
+        <tr><td><code>ma_nguoi_dung</code></td><td><code>maNguoiDung</code></td><td><span class="t-pk">PK AUTO</span></td><td>—</td><td>Tự động tăng</td></tr>
+        <tr><td><code>ho_dem</code></td><td><code>hoDem</code></td><td>VARCHAR</td><td><span class="t-req">✓</span></td><td>Họ và tên đệm, VD: "Nguyễn Văn"</td></tr>
+        <tr><td><code>ten</code></td><td><code>ten</code></td><td>VARCHAR</td><td><span class="t-req">✓</span></td><td>Tên, VD: "An"</td></tr>
+        <tr><td><code>ten_dang_nhap</code></td><td><code>tenDangNhap</code></td><td>VARCHAR</td><td><span class="t-req">✓ Unique</span></td><td>Username đăng nhập, không trùng</td></tr>
+        <tr><td><code>mat_khau</code></td><td><code>matKhau</code></td><td>VARCHAR(512)</td><td><span class="t-req">✓</span></td><td>Mật khẩu <strong>đã BCrypt hash</strong> (không nhập plain text)</td></tr>
+        <tr><td><code>gioi_tinh</code></td><td><code>gioiTinh</code></td><td>VARCHAR</td><td><span class="t-opt">Tùy chọn</span></td><td>"Nam", "Nữ", "Khác"</td></tr>
+        <tr><td><code>email</code></td><td><code>email</code></td><td>VARCHAR</td><td><span class="t-req">✓ Unique</span></td><td>Email, phải duy nhất</td></tr>
+        <tr><td><code>so_dien_thoai</code></td><td><code>soDienThoai</code></td><td>VARCHAR</td><td><span class="t-opt">Tùy chọn</span></td><td>Số điện thoại liên hệ</td></tr>
+        <tr><td><code>dia_chi_mua_hang</code></td><td><code>diaChiMuaHang</code></td><td>VARCHAR</td><td><span class="t-opt">Tùy chọn</span></td><td>Địa chỉ thanh toán/hóa đơn</td></tr>
+        <tr><td><code>dia_chi_giao_hang</code></td><td><code>diaChiGiaoHang</code></td><td>VARCHAR</td><td><span class="t-opt">Tùy chọn</span></td><td>Địa chỉ nhận hàng mặc định</td></tr>
+      </table>
+      <div class="warn">
+        <strong>⚠️ Mật khẩu phải được mã hóa BCrypt!</strong>
+        <p>Không bao giờ nhập plain text vào cột <code>mat_khau</code>. Dùng API <code>POST /tai-khoan/dang-ky</code> để tạo user — service sẽ tự dùng <code>BCryptPasswordEncoder</code> trước khi lưu. Hoặc dùng tool online: <strong>bcrypt-generator.com</strong> để tạo hash thủ công.</p>
+      </div>
+      <div class="tip">
+        <strong>💡 Cách tạo dữ liệu nhanh</strong>
+        <ul>
+          <li>Dùng Postman gọi <code>POST /tai-khoan/dang-ky</code> với JSON body — an toàn nhất</li>
+          <li>Sau khi tạo user, gán quyền bằng cách INSERT vào bảng <code>nguoidung_quyen</code></li>
+          <li>Admin đầu tiên: tạo user qua API, sau đó INSERT thủ công vào <code>nguoidung_quyen</code></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SACH -->
+<section id="sach">
+  <div class="sec-title"><div class="ico" style="background:rgba(0,212,170,.15)">📚</div>6. Sach – Sách</div>
+  <div class="ent">
+    <div class="ent-header">
+      <div class="ent-icon" style="background:rgba(0,212,170,.15)">📚</div>
+      <div><h3>Sach</h3><div class="db">Bảng: <code>sach</code> | Quan hệ: <span class="rel r-nm">N-M với TheLoai</span> <span class="rel r-1n">1-N với HinhAnh, SuDanhGia, SachYeuThich, ChiTietDonHang</span></div></div>
+    </div>
+    <div class="ent-body">
+      <table>
+        <tr><th>Cột DB</th><th>Field Java</th><th>Kiểu</th><th>Bắt buộc</th><th>Ý nghĩa</th></tr>
+        <tr><td><code>ma_sach</code></td><td><code>maSach</code></td><td><span class="t-pk">PK AUTO</span></td><td>—</td><td>Tự động tăng</td></tr>
+        <tr><td><code>ten_sach</code></td><td><code>tenSach</code></td><td>VARCHAR(256)</td><td><span class="t-req">✓</span></td><td>Tên đầy đủ của sách</td></tr>
+        <tr><td><code>ten_tac_gia</code></td><td><code>tenTacGia</code></td><td>VARCHAR(256)</td><td><span class="t-req">✓</span></td><td>Họ tên tác giả</td></tr>
+        <tr><td><code>isbn</code></td><td><code>ISBN</code></td><td>VARCHAR(256)</td><td><span class="t-opt">Tùy chọn</span></td><td>Mã sách quốc tế, 13 chữ số (ISBN-13)</td></tr>
+        <tr><td><code>mo_ta</code></td><td><code>moTa</code></td><td>TEXT</td><td><span class="t-opt">Tùy chọn</span></td><td>Mô tả ngắn, tóm tắt nội dung sách</td></tr>
+        <tr><td><code>thong-tin-chi-tiet</code></td><td><code>thongTinChiTiet</code></td><td>TEXT</td><td><span class="t-opt">Tùy chọn</span></td><td>Thông tin chi tiết: số trang, NXB, năm XB…</td></tr>
+        <tr><td><code>gia_niem_yet</code></td><td><code>giaNiemYet</code></td><td>DOUBLE</td><td><span class="t-req">✓</span></td><td>Giá bìa gốc (VD: 120000)</td></tr>
+        <tr><td><code>gia_ban</code></td><td><code>giaBan</code></td><td>DOUBLE</td><td><span class="t-req">✓</span></td><td>Giá bán thực tế (có thể thấp hơn giá bìa)</td></tr>
+        <tr><td><code>so_luong</code></td><td><code>soLuong</code></td><td>INT</td><td><span class="t-req">✓</span></td><td>Số lượng tồn kho</td></tr>
+        <tr><td><code>trung_binh_xep_hang</code></td><td><code>trungBinhXepHang</code></td><td>DOUBLE</td><td><span class="t-opt">Tùy chọn</span></td><td>Điểm đánh giá trung bình (0.0 – 5.0), mặc định 0</td></tr>
+      </table>
+      <div class="tip">
+        <strong>💡 Nguồn thu thập dữ liệu sách</strong>
+        <ul>
+          <li><strong>Google Books API</strong> (miễn phí): <code>https://www.googleapis.com/books/v1/volumes?q=isbn:&lt;ISBN&gt;</code></li>
+          <li><strong>Tiki / Fahasa / Shopee Sách</strong>: copy thủ công tên, tác giả, giá bán, mô tả</li>
+          <li><strong>ISBN Search</strong>: isbnsearch.org để tra mã ISBN</li>
+          <li>Trường <code>trung_binh_xep_hang</code> nên để 0, sẽ được cập nhật khi có đánh giá</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HINH ANH -->
+<section id="hinh-anh">
+  <div class="sec-title"><div class="ico" style="background:rgba(252,129,129,.15)">🖼️</div>7. HinhAnh – Hình Ảnh Sách</div>
+  <div class="ent">
+    <div class="ent-header">
+      <div class="ent-icon" style="background:rgba(252,129,129,.15)">🖼️</div>
+      <div><h3>HinhAnh</h3><div class="db">Bảng: <code>hinh_anh</code> | Quan hệ: <span class="rel r-n1">N-1 với Sach</span></div></div>
+    </div>
+    <div class="ent-body">
+      <table>
+        <tr><th>Cột DB</th><th>Field Java</th><th>Kiểu</th><th>Bắt buộc</th><th>Ý nghĩa</th></tr>
+        <tr><td><code>ma_hinh_anh</code></td><td><code>maHinhAnh</code></td><td><span class="t-pk">PK AUTO</span></td><td>—</td><td>Tự động tăng</td></tr>
+        <tr><td><code>ten_hinh_anh</code></td><td><code>tenHinAnh</code></td><td>VARCHAR(256)</td><td><span class="t-opt">Tùy chọn</span></td><td>Tên file ảnh, VD: "bia-truoc.jpg"</td></tr>
+        <tr><td><code>la_icon</code></td><td><code>laIcon</code></td><td>TINYINT (bool)</td><td><span class="t-req">✓</span></td><td><code>1</code> = ảnh đại diện chính (thumbnail), <code>0</code> = ảnh phụ</td></tr>
+        <tr><td><code>duong_dan</code></td><td><code>duongDan</code></td><td>VARCHAR</td><td><span class="t-opt">Tùy chọn</span></td><td>URL ảnh online, VD: "https://cdn.../anh.jpg"</td></tr>
+        <tr><td><code>du_lieu_anh</code></td><td><code>duLieuAnh</code></td><td>LONGTEXT</td><td><span class="t-opt">Tùy chọn</span></td><td>Ảnh dạng Base64 (nếu không dùng URL)</td></tr>
+        <tr><td><code>ma_sach</code></td><td><code>sach</code></td><td><span class="t-fk">FK → sach</span></td><td><span class="t-req">✓ NOT NULL</span></td><td>Sách mà ảnh này thuộc về</td></tr>
+      </table>
+      <div class="warn">
+        <strong>⚠️ Chỉ dùng một trong hai: duong_dan hoặc du_lieu_anh</strong>
+        <p>Nếu lưu URL thì để <code>du_lieu_anh</code> NULL. Nếu lưu Base64 thì để <code>duong_dan</code> NULL. Mỗi sách nên có <strong>đúng 1 ảnh</strong> với <code>la_icon = 1</code> làm ảnh đại diện.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DON HANG -->
+<section id="don-hang">
+  <div class="sec-title"><div class="ico" style="background:rgba(246,224,94,.15)">🛒</div>8. DonHang – Đơn Hàng</div>
+  <div class="ent">
+    <div class="ent-header">
+      <div class="ent-icon" style="background:rgba(246,224,94,.15)">🛒</div>
+      <div><h3>DonHang</h3><div class="db">Bảng: <code>don_hang</code> | Quan hệ: <span class="rel r-n1">N-1 với NguoiDung, HinhThucThanhToan, HinhThucGiaoHang</span> <span class="rel r-1n">1-N với ChiTietDonHang</span></div></div>
+    </div>
+    <div class="ent-body">
+      <table>
+        <tr><th>Cột DB</th><th>Field Java</th><th>Kiểu</th><th>Bắt buộc</th><th>Ý nghĩa</th></tr>
+        <tr><td><code>ma_don_hang</code></td><td><code>maDonHang</code></td><td><span class="t-pk">PK AUTO</span></td><td>—</td><td>Tự động tăng</td></tr>
+        <tr><td><code>ngay_tao</code></td><td><code>ngayTao</code></td><td>DATE/DATETIME</td><td><span class="t-req">✓</span></td><td>Ngày đặt hàng, VD: <code>2025-03-22</code></td></tr>
+        <tr><td><code>dia_chi_mua_hang</code></td><td><code>diaChiMuaHang</code></td><td>VARCHAR(512)</td><td><span class="t-opt">Tùy chọn</span></td><td>Địa chỉ xuất hóa đơn</td></tr>
+        <tr><td><code>dia_chi_nhan_hang</code></td><td><code>diaChiNhanHang</code></td><td>VARCHAR(512)</td><td><span class="t-opt">Tùy chọn</span></td><td>Địa chỉ giao hàng</td></tr>
+        <tr><td><code>tong_tien_san_pham</code></td><td><code>tongTienSanPham</code></td><td>DOUBLE</td><td><span class="t-req">✓</span></td><td>Tổng tiền hàng (chưa gồm phí)</td></tr>
+        <tr><td><code>chi_phi_giao_hang</code></td><td><code>chiPhiGiaoHang</code></td><td>DOUBLE</td><td><span class="t-req">✓</span></td><td>Phí vận chuyển (lấy từ HinhThucGiaoHang)</td></tr>
+        <tr><td><code>chi_phi_thanh_toan</code></td><td><code>chiPhiThanhToan</code></td><td>DOUBLE</td><td><span class="t-req">✓</span></td><td>Phí thanh toán (lấy từ HinhThucThanhToan)</td></tr>
+        <tr><td><code>tong_tien</code></td><td><code>tongTien</code></td><td>DOUBLE</td><td><span class="t-req">✓</span></td><td>Tổng thanh toán = tiền hàng + phí GH + phí TT</td></tr>
+        <tr><td><code>ma_nguoi_dung</code></td><td><code>nguoiDung</code></td><td><span class="t-fk">FK → nguoi_dung</span></td><td><span class="t-req">✓ NOT NULL</span></td><td>Người đặt hàng</td></tr>
+        <tr><td><code>ma_hinh_thuc_thanh_toan</code></td><td><code>hinhThucThanhToan</code></td><td><span class="t-fk">FK → httt</span></td><td><span class="t-opt">nullable</span></td><td>Phương thức thanh toán được chọn</td></tr>
+        <tr><td><code>ma_hinh_thuc_giao_hang</code></td><td><code>hinhThucGiaoHang</code></td><td><span class="t-fk">FK → htgh</span></td><td><span class="t-opt">nullable</span></td><td>Phương thức vận chuyển được chọn</td></tr>
+      </table>
+      <div class="tip">
+        <strong>💡 Lưu ý tính toán tổng tiền</strong>
+        <p><code>tong_tien = tong_tien_san_pham + chi_phi_giao_hang + chi_phi_thanh_toan</code>. Hãy đảm bảo tính đúng khi nhập dữ liệu mẫu.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHI TIET DON HANG -->
+<section id="chi-tiet-don-hang">
+  <div class="sec-title"><div class="ico" style="background:rgba(108,99,255,.15)">📋</div>9. ChiTietDonHang – Chi Tiết Đơn Hàng</div>
+  <div class="ent">
+    <div class="ent-header">
+      <div class="ent-icon" style="background:rgba(108,99,255,.15)">📋</div>
+      <div><h3>ChiTietDonHang</h3><div class="db">Bảng: <code>chi_tiet_don_hang</code> | Quan hệ: <span class="rel r-n1">N-1 với Sach, DonHang</span></div></div>
+    </div>
+    <div class="ent-body">
+      <table>
+        <tr><th>Cột DB</th><th>Field Java</th><th>Kiểu</th><th>Bắt buộc</th><th>Ý nghĩa</th></tr>
+        <tr><td><code>ma_chi_tiet_don_hang</code></td><td><code>maChiTietDonHang</code></td><td><span class="t-pk">PK AUTO</span></td><td>—</td><td>Tự động tăng (kiểu long)</td></tr>
+        <tr><td><code>so_luong</code></td><td><code>soLuong</code></td><td>INT</td><td><span class="t-req">✓</span></td><td>Số lượng quyển đặt mua</td></tr>
+        <tr><td><code>gia_ban</code></td><td><code>giaBan</code></td><td>DOUBLE</td><td><span class="t-req">✓</span></td><td>Giá tại thời điểm đặt hàng (snapshot giá)</td></tr>
+        <tr><td><code>ma_sach</code></td><td><code>sach</code></td><td><span class="t-fk">FK → sach</span></td><td><span class="t-req">✓ NOT NULL</span></td><td>Sách được đặt mua</td></tr>
+        <tr><td><code>ma_don_hang</code></td><td><code>donHang</code></td><td><span class="t-fk">FK → don_hang</span></td><td><span class="t-req">✓ NOT NULL</span></td><td>Đơn hàng chứa dòng này</td></tr>
+      </table>
+      <div class="warn">
+        <strong>⚠️ Lưu giá tại thời điểm mua</strong>
+        <p><code>gia_ban</code> trong ChiTietDonHang là <strong>snapshot</strong> — giá sách lúc khách đặt. Không nên dùng FK để tham chiếu giá từ bảng Sach vì giá có thể thay đổi sau này.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SU DANH GIA -->
+<section id="su-danh-gia">
+  <div class="sec-title"><div class="ico" style="background:rgba(246,224,94,.15)">⭐</div>10. SuDanhGia – Đánh Giá Sách</div>
+  <div class="ent">
+    <div class="ent-header">
+      <div class="ent-icon" style="background:rgba(246,224,94,.15)">⭐</div>
+      <div><h3>SuDanhGia</h3><div class="db">Bảng: <code>su_danh_gia</code> | Quan hệ: <span class="rel r-n1">N-1 với Sach, NguoiDung</span></div></div>
+    </div>
+    <div class="ent-body">
+      <table>
+        <tr><th>Cột DB</th><th>Field Java</th><th>Kiểu</th><th>Bắt buộc</th><th>Ý nghĩa</th></tr>
+        <tr><td><code>ma_danh_gia</code></td><td><code>maDanhGia</code></td><td><span class="t-pk">PK AUTO</span></td><td>—</td><td>Tự động tăng (kiểu long)</td></tr>
+        <tr><td><code>diem_xep_hang</code></td><td><code>diemXepHang</code></td><td>FLOAT</td><td><span class="t-req">✓</span></td><td>Điểm 1.0 – 5.0, VD: 4.5</td></tr>
+        <tr><td><code>nhan_xet</code></td><td><code>nhanXet</code></td><td>VARCHAR</td><td><span class="t-opt">Tùy chọn</span></td><td>Nhận xét dạng text tự do</td></tr>
+        <tr><td><code>ma_sach</code></td><td><code>sach</code></td><td><span class="t-fk">FK → sach</span></td><td><span class="t-req">✓ NOT NULL</span></td><td>Sách được đánh giá</td></tr>
+        <tr><td><code>ma_nguoi_dung</code></td><td><code>nguoiDung</code></td><td><span class="t-fk">FK → nguoi_dung</span></td><td><span class="t-req">✓ NOT NULL</span></td><td>Người viết đánh giá</td></tr>
+      </table>
+      <div class="tip">
+        <strong>💡 Sau khi thêm đánh giá</strong>
+        <p>Cần cập nhật lại trường <code>trung_binh_xep_hang</code> trong bảng <code>sach</code>: <code>UPDATE sach SET trung_binh_xep_hang = (SELECT AVG(diem_xep_hang) FROM su_danh_gia WHERE ma_sach = ?) WHERE ma_sach = ?</code></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SACH YEU THICH -->
+<section id="sach-yeu-thich">
+  <div class="sec-title"><div class="ico" style="background:rgba(252,129,129,.15)">❤️</div>11. SachYeuThich – Sách Yêu Thích</div>
+  <div class="ent">
+    <div class="ent-header">
+      <div class="ent-icon" style="background:rgba(252,129,129,.15)">❤️</div>
+      <div><h3>SachYeuThich</h3><div class="db">Bảng: <code>sach_yeu_thich</code> | Quan hệ: <span class="rel r-n1">N-1 với Sach, NguoiDung</span></div></div>
+    </div>
+    <div class="ent-body">
+      <table>
+        <tr><th>Cột DB</th><th>Field Java</th><th>Kiểu</th><th>Bắt buộc</th><th>Ý nghĩa</th></tr>
+        <tr><td><code>ma_sach_yeu_thich</code></td><td><code>maSachYeuThich</code></td><td><span class="t-pk">PK AUTO</span></td><td>—</td><td>Tự động tăng</td></tr>
+        <tr><td><code>ma_nguoi_dung</code></td><td><code>nguoiDung</code></td><td><span class="t-fk">FK → nguoi_dung</span></td><td><span class="t-req">✓ NOT NULL</span></td><td>Người đã yêu thích sách</td></tr>
+        <tr><td><code>ma_sach</code></td><td><code>sach</code></td><td><span class="t-fk">FK → sach</span></td><td><span class="t-req">✓ NOT NULL</span></td><td>Sách được yêu thích</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- SQL SAMPLE -->
+<section id="sql-sample">
+  <div class="sec-title"><div class="ico" style="background:rgba(0,212,170,.15)">🗄️</div>Dữ Liệu Mẫu SQL (Chạy theo thứ tự)</div>
+
+  <div class="sql"><div class="sql-h">1_the_loai.sql</div>
+  <pre><span class="kw">INSERT INTO</span> the_loai (ten_the_loai) <span class="kw">VALUES</span>
+(<span class="str">'Văn học'</span>), (<span class="str">'Kinh tế'</span>), (<span class="str">'Thiếu nhi'</span>),
+(<span class="str">'Khoa học kỹ thuật'</span>), (<span class="str">'Tâm lý - Kỹ năng sống'</span>),
+(<span class="str">'Lịch sử'</span>), (<span class="str">'Ngoại ngữ'</span>);</pre></div>
+
+  <div class="sql"><div class="sql-h">2_quyen.sql</div>
+  <pre><span class="kw">INSERT INTO</span> quyen (ten_quyen) <span class="kw">VALUES</span>
+(<span class="str">'ROLE_USER'</span>),    <span class="cm">-- ma_quyen = 1</span>
+(<span class="str">'ROLE_ADMIN'</span>);   <span class="cm">-- ma_quyen = 2</span></pre></div>
+
+  <div class="sql"><div class="sql-h">3_hinh_thuc_thanh_toan.sql</div>
+  <pre><span class="kw">INSERT INTO</span> hinh_thuc_thanh_toan (ten_hinh_thuc_thanh_toan, mo_ta, chi_phi_thanh_toan) <span class="kw">VALUES</span>
+(<span class="str">'COD'</span>, <span class="str">'Thanh toán khi nhận hàng'</span>, <span class="num">0</span>),
+(<span class="str">'Thẻ tín dụng'</span>, <span class="str">'Visa, Mastercard'</span>, <span class="num">15000</span>),
+(<span class="str">'Ví MoMo'</span>, <span class="str">'Thanh toán qua ví điện tử MoMo'</span>, <span class="num">10000</span>),
+(<span class="str">'Chuyển khoản'</span>, <span class="str">'Internet Banking'</span>, <span class="num">0</span>);</pre></div>
+
+  <div class="sql"><div class="sql-h">4_hinh_thuc_giao_hang.sql</div>
+  <pre><span class="kw">INSERT INTO</span> hinh_thuc_giao_hang (ten_hinh_thuc_giao_hang, mo_ta, chi_phi_giao_hang) <span class="kw">VALUES</span>
+(<span class="str">'Giao hàng tiêu chuẩn'</span>, <span class="str">'3-5 ngày làm việc'</span>, <span class="num">25000</span>),
+(<span class="str">'Giao hàng nhanh'</span>, <span class="str">'1-2 ngày làm việc'</span>, <span class="num">35000</span>),
+(<span class="str">'Hỏa tốc'</span>, <span class="str">'Giao trong ngày'</span>, <span class="num">50000</span>);</pre></div>
+
+  <div class="sql"><div class="sql-h">5_gán_admin.sql (sau khi tạo user qua API)</div>
+  <pre><span class="cm">-- Giả sử user admin có ma_nguoi_dung = 1</span>
+<span class="kw">INSERT INTO</span> nguoidung_quyen (ma_nguoi_dung, ma_quyen) <span class="kw">VALUES</span>
+(<span class="num">1</span>, <span class="num">1</span>),  <span class="cm">-- Gán ROLE_USER</span>
+(<span class="num">1</span>, <span class="num">2</span>);  <span class="cm">-- Gán ROLE_ADMIN</span></pre></div>
+
+  <div class="sql"><div class="sql-h">6_sach_the_loai.sql (sau khi có sach và the_loai)</div>
+  <pre><span class="cm">-- Gán thể loại cho sách (VD: sách 1 thuộc thể loại 1 và 5)</span>
+<span class="kw">INSERT INTO</span> sach_theloai (ma_sach, ma_the_loai) <span class="kw">VALUES</span>
+(<span class="num">1</span>, <span class="num">1</span>),
+(<span class="num">1</span>, <span class="num">5</span>);</pre></div>
+
+  <div class="sql"><div class="sql-h">7_update_rating.sql (chạy sau khi thêm đánh giá)</div>
+  <pre><span class="cm">-- Cập nhật điểm trung bình cho tất cả sách</span>
+<span class="kw">UPDATE</span> sach s
+<span class="kw">SET</span> trung_binh_xep_hang = (
+    <span class="kw">SELECT</span> COALESCE(AVG(diem_xep_hang), <span class="num">0</span>)
+    <span class="kw">FROM</span> su_danh_gia
+    <span class="kw">WHERE</span> ma_sach = s.ma_sach
+);</pre></div>
+</section>
+
+<div style="text-align:center;padding:40px 0 20px;color:var(--text2);font-size:.8rem;border-top:1px solid var(--border);margin-top:40px">
+  WebBanSach Backend · Entity & Database Guide · 11 Entities
+</div>
+</main>
+
+<script>
+const links = document.querySelectorAll('nav a');
+const secs = document.querySelectorAll('section[id]');
+window.addEventListener('scroll', () => {
+  let cur = '';
+  secs.forEach(s => { if (window.scrollY >= s.offsetTop - 80) cur = s.id; });
+  links.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + cur));
+});
+links.forEach(a => a.addEventListener('click', e => {
+  e.preventDefault();
+  const t = document.querySelector(a.getAttribute('href'));
+  if (t) t.scrollIntoView({behavior:'smooth'});
+}));
+</script>
+</body>
+</html>
