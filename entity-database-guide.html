@@ -63,6 +63,20 @@ code{background:var(--bg3);color:var(--accent2);padding:1px 5px;border-radius:3p
 .sql-h{background:var(--bg3);padding:6px 14px;font-size:.72rem;color:var(--text2);border-bottom:1px solid var(--border);font-family:'Fira Code',monospace}
 pre{padding:14px;font-family:'Fira Code',monospace;font-size:.78rem;overflow-x:auto;line-height:1.7}
 .kw{color:#c792ea}.str{color:#c3e88d}.cm{color:#546e7a;font-style:italic}.num{color:#f78c6c}
+/* Data mẫu */
+.dm-section{margin-bottom:28px}
+.dm-title{font-size:.92rem;font-weight:600;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.dm-title .ico{font-size:1rem}
+.dm-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px}
+.dm-table{width:100%;border-collapse:collapse;min-width:500px}
+.dm-table th{background:var(--bg3);padding:8px 12px;text-align:left;font-size:.75rem;font-weight:600;color:var(--text2);border-bottom:1px solid var(--border);white-space:nowrap}
+.dm-table td{padding:8px 12px;font-size:.8rem;border-bottom:1px solid rgba(45,55,72,.4);white-space:nowrap}
+.dm-table tr:last-child td{border:none}
+.dm-table tr:hover td{background:rgba(255,255,255,.02)}
+.fk-val{color:var(--red);font-weight:600}
+.pk-val{color:var(--yellow);font-weight:600}
+.note-val{color:var(--text2);font-style:italic;font-size:.75rem}
+.dm-note{font-size:.8rem;color:var(--text2);margin-top:8px;padding:8px 12px;background:rgba(108,99,255,.06);border-radius:6px;border-left:2px solid var(--accent)}
 /* Relation badge */
 .rel{display:inline-block;font-size:.7rem;font-weight:600;padding:2px 8px;border-radius:10px;margin-right:4px}
 .r-1n{background:rgba(108,99,255,.15);color:var(--accent)}
@@ -91,6 +105,8 @@ pre{padding:14px;font-family:'Fira Code',monospace;font-size:.78rem;overflow-x:a
   <a href="#chi-tiet-don-hang">9. ChiTietDonHang</a>
   <a href="#su-danh-gia">10. SuDanhGia</a>
   <a href="#sach-yeu-thich">11. SachYeuThich</a>
+  <div class="grp-title">Data mẫu</div>
+  <a href="#data-mau">📊 Data mẫu chi tiết</a>
   <div class="grp-title">SQL mẫu</div>
   <a href="#sql-sample">🗄️ Dữ liệu mẫu SQL</a>
 </nav>
@@ -424,6 +440,149 @@ pre{padding:14px;font-family:'Fira Code',monospace;font-size:.78rem;overflow-x:a
         <tr><td><code>ma_sach</code></td><td><code>sach</code></td><td><span class="t-fk">FK → sach</span></td><td><span class="t-req">✓ NOT NULL</span></td><td>Sách được yêu thích</td></tr>
       </table>
     </div>
+  </div>
+</section>
+
+<!-- DATA MAU CHI TIET -->
+<section id="data-mau">
+  <div class="sec-title"><div class="ico" style="background:rgba(108,99,255,.15)">📊</div>Data Mẫu Chi Tiết — Kịch Bản Thực Tế</div>
+  <p style="color:var(--text2);font-size:.88rem;margin-bottom:20px">Dưới đây là <strong>bộ data mẫu đầy đủ liên kết nhau</strong>: 2 người dùng, 3 quyển sách, 1 đơn hàng, đánh giá và yêu thích. Các ID được tô màu để dễ theo dõi quan hệ.</p>
+
+  <div class="dm-section">
+    <div class="dm-title"><span class="ico">🏷️</span> Bảng <code>the_loai</code></div>
+    <div class="dm-wrap"><table class="dm-table">
+      <tr><th>ma_the_loai</th><th>ten_the_loai</th></tr>
+      <tr><td><span class="pk-val">1</span></td><td>Văn học</td></tr>
+      <tr><td><span class="pk-val">2</span></td><td>Tâm lý - Kỹ năng sống</td></tr>
+      <tr><td><span class="pk-val">3</span></td><td>Kinh tế</td></tr>
+      <tr><td><span class="pk-val">4</span></td><td>Thiếu nhi</td></tr>
+      <tr><td><span class="pk-val">5</span></td><td>Khoa học kỹ thuật</td></tr>
+    </table></div>
+  </div>
+
+  <div class="dm-section">
+    <div class="dm-title"><span class="ico">🔑</span> Bảng <code>quyen</code></div>
+    <div class="dm-wrap"><table class="dm-table">
+      <tr><th>ma_quyen</th><th>ten_quyen</th></tr>
+      <tr><td><span class="pk-val">1</span></td><td>ROLE_USER</td></tr>
+      <tr><td><span class="pk-val">2</span></td><td>ROLE_ADMIN</td></tr>
+    </table></div>
+  </div>
+
+  <div class="dm-section">
+    <div class="dm-title"><span class="ico">💳</span> Bảng <code>hinh_thuc_thanh_toan</code></div>
+    <div class="dm-wrap"><table class="dm-table">
+      <tr><th>ma_hinh_thuc_thanh_toan</th><th>ten_hinh_thuc_thanh_toan</th><th>mo_ta</th><th>chi_phi_thanh_toan</th></tr>
+      <tr><td><span class="pk-val">1</span></td><td>COD</td><td>Thanh toán khi nhận hàng</td><td>0</td></tr>
+      <tr><td><span class="pk-val">2</span></td><td>Thẻ tín dụng</td><td>Visa, Mastercard</td><td>15000</td></tr>
+      <tr><td><span class="pk-val">3</span></td><td>Ví MoMo</td><td>Ví điện tử MoMo</td><td>10000</td></tr>
+    </table></div>
+  </div>
+
+  <div class="dm-section">
+    <div class="dm-title"><span class="ico">🚚</span> Bảng <code>hinh_thuc_giao_hang</code></div>
+    <div class="dm-wrap"><table class="dm-table">
+      <tr><th>ma_hinh_thuc_giao_hang</th><th>ten_hinh_thuc_giao_hang</th><th>mo_ta</th><th>chi_phi_giao_hang</th></tr>
+      <tr><td><span class="pk-val">1</span></td><td>Giao hàng tiêu chuẩn</td><td>3-5 ngày làm việc</td><td>25000</td></tr>
+      <tr><td><span class="pk-val">2</span></td><td>Giao hàng nhanh</td><td>1-2 ngày làm việc</td><td>35000</td></tr>
+      <tr><td><span class="pk-val">3</span></td><td>Hỏa tốc</td><td>Giao trong ngày</td><td>50000</td></tr>
+    </table></div>
+  </div>
+
+  <div class="dm-section">
+    <div class="dm-title"><span class="ico">👤</span> Bảng <code>nguoi_dung</code></div>
+    <div class="dm-wrap"><table class="dm-table">
+      <tr><th>ma_nguoi_dung</th><th>ho_dem</th><th>ten</th><th>ten_dang_nhap</th><th>mat_khau (BCrypt)</th><th>gioi_tinh</th><th>email</th><th>so_dien_thoai</th><th>dia_chi_giao_hang</th></tr>
+      <tr><td><span class="pk-val">1</span></td><td>Nguyễn Văn</td><td>An</td><td>admin</td><td><span class="note-val">$2a$10$hash... (plain: 123456)</span></td><td>Nam</td><td>admin@gmail.com</td><td>0901234567</td><td>123 Lê Lợi, Q.1, TP.HCM</td></tr>
+      <tr><td><span class="pk-val">2</span></td><td>Trần Thị</td><td>Bình</td><td>user01</td><td><span class="note-val">$2a$10$hash... (plain: abc123)</span></td><td>Nữ</td><td>binh@gmail.com</td><td>0912345678</td><td>456 Nguyễn Huệ, Q.1, TP.HCM</td></tr>
+    </table></div>
+    <div class="dm-note">⚠️ Cột <code>mat_khau</code> KHÔNG lưu plain text. Tạo user bằng <code>POST /tai-khoan/dang-ky</code> để được tự động hash. Hash ví dụ của "123456" là: <code>$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy</code></div>
+  </div>
+
+  <div class="dm-section">
+    <div class="dm-title"><span class="ico">🔗</span> Bảng trung gian <code>nguoidung_quyen</code></div>
+    <div class="dm-wrap"><table class="dm-table">
+      <tr><th>ma_nguoi_dung</th><th>ma_quyen</th><th>Ý nghĩa</th></tr>
+      <tr><td><span class="fk-val">1</span></td><td><span class="fk-val">1</span></td><td>admin → ROLE_USER</td></tr>
+      <tr><td><span class="fk-val">1</span></td><td><span class="fk-val">2</span></td><td>admin → ROLE_ADMIN</td></tr>
+      <tr><td><span class="fk-val">2</span></td><td><span class="fk-val">1</span></td><td>user01 → ROLE_USER</td></tr>
+    </table></div>
+    <div class="dm-note">User ID=1 (admin) có cả 2 quyền. User ID=2 chỉ có ROLE_USER nên không truy cập được <code>/nguoi-dung</code>.</div>
+  </div>
+
+  <div class="dm-section">
+    <div class="dm-title"><span class="ico">📚</span> Bảng <code>sach</code></div>
+    <div class="dm-wrap"><table class="dm-table">
+      <tr><th>ma_sach</th><th>ten_sach</th><th>ten_tac_gia</th><th>isbn</th><th>gia_niem_yet</th><th>gia_ban</th><th>so_luong</th><th>trung_binh_xep_hang</th></tr>
+      <tr><td><span class="pk-val">1</span></td><td>Đắc Nhân Tâm</td><td>Dale Carnegie</td><td>9780671027032</td><td>120000</td><td>89000</td><td>150</td><td>4.8</td></tr>
+      <tr><td><span class="pk-val">2</span></td><td>Nhà Giả Kim</td><td>Paulo Coelho</td><td>9786041182523</td><td>95000</td><td>72000</td><td>80</td><td>4.6</td></tr>
+      <tr><td><span class="pk-val">3</span></td><td>Tư Duy Nhanh Và Chậm</td><td>Daniel Kahneman</td><td>9786041060715</td><td>180000</td><td>140000</td><td>45</td><td>4.7</td></tr>
+    </table></div>
+    <div class="dm-note">Trường <code>mo_ta</code> và <code>thong-tin-chi-tiet</code> là TEXT dài nên không hiển thị ở đây. Ví dụ <code>mo_ta</code> sách 1: "Cuốn sách kinh điển về nghệ thuật giao tiếp và thuyết phục người khác..."</div>
+  </div>
+
+  <div class="dm-section">
+    <div class="dm-title"><span class="ico">🔗</span> Bảng trung gian <code>sach_theloai</code></div>
+    <div class="dm-wrap"><table class="dm-table">
+      <tr><th>ma_sach</th><th>ma_the_loai</th><th>Ý nghĩa</th></tr>
+      <tr><td><span class="fk-val">1</span></td><td><span class="fk-val">2</span></td><td>Đắc Nhân Tâm → Tâm lý - Kỹ năng sống</td></tr>
+      <tr><td><span class="fk-val">2</span></td><td><span class="fk-val">1</span></td><td>Nhà Giả Kim → Văn học</td></tr>
+      <tr><td><span class="fk-val">3</span></td><td><span class="fk-val">3</span></td><td>Tư Duy Nhanh Và Chậm → Kinh tế</td></tr>
+      <tr><td><span class="fk-val">3</span></td><td><span class="fk-val">5</span></td><td>Tư Duy Nhanh Và Chậm → Khoa học kỹ thuật</td></tr>
+    </table></div>
+    <div class="dm-note">Sách 3 (Tư Duy Nhanh Và Chậm) thuộc 2 thể loại — đây là ví dụ của quan hệ Many-to-Many.</div>
+  </div>
+
+  <div class="dm-section">
+    <div class="dm-title"><span class="ico">🖼️</span> Bảng <code>hinh_anh</code></div>
+    <div class="dm-wrap"><table class="dm-table">
+      <tr><th>ma_hinh_anh</th><th>ten_hinh_anh</th><th>la_icon</th><th>duong_dan</th><th>du_lieu_anh</th><th>ma_sach (FK)</th></tr>
+      <tr><td><span class="pk-val">1</span></td><td>dac-nhan-tam-bia.jpg</td><td>1 ✓</td><td>https://cdn.tiki.vn/dac-nhan-tam.jpg</td><td>NULL</td><td><span class="fk-val">1</span></td></tr>
+      <tr><td><span class="pk-val">2</span></td><td>nha-gia-kim-bia.jpg</td><td>1 ✓</td><td>https://cdn.tiki.vn/nha-gia-kim.jpg</td><td>NULL</td><td><span class="fk-val">2</span></td></tr>
+      <tr><td><span class="pk-val">3</span></td><td>tu-duy-nhanh-cham.jpg</td><td>1 ✓</td><td>https://cdn.tiki.vn/tu-duy.jpg</td><td>NULL</td><td><span class="fk-val">3</span></td></tr>
+      <tr><td><span class="pk-val">4</span></td><td>dac-nhan-tam-chi-tiet.jpg</td><td>0</td><td>https://cdn.tiki.vn/dac-nhan-tam-2.jpg</td><td>NULL</td><td><span class="fk-val">1</span></td></tr>
+    </table></div>
+    <div class="dm-note">Mỗi sách có đúng 1 ảnh với <code>la_icon=1</code> làm thumbnail. Sách 1 có thêm 1 ảnh phụ (la_icon=0). Dùng URL thay vì Base64 để tiết kiệm dung lượng DB.</div>
+  </div>
+
+  <div class="dm-section">
+    <div class="dm-title"><span class="ico">🛒</span> Bảng <code>don_hang</code></div>
+    <div class="dm-wrap"><table class="dm-table">
+      <tr><th>ma_don_hang</th><th>ngay_tao</th><th>dia_chi_nhan_hang</th><th>tong_tien_san_pham</th><th>chi_phi_giao_hang</th><th>chi_phi_thanh_toan</th><th>tong_tien</th><th>ma_nguoi_dung (FK)</th><th>ma_httt (FK)</th><th>ma_htgh (FK)</th></tr>
+      <tr><td><span class="pk-val">1</span></td><td>2025-03-22</td><td>456 Nguyễn Huệ, Q.1</td><td>161000</td><td>25000</td><td>0</td><td>186000</td><td><span class="fk-val">2</span></td><td><span class="fk-val">1</span> (COD)</td><td><span class="fk-val">1</span> (Tiêu chuẩn)</td></tr>
+    </table></div>
+    <div class="dm-note">Đơn hàng của user02 (Trần Thị Bình) mua 1 sách Đắc Nhân Tâm + 1 sách Nhà Giả Kim bằng COD, giao hàng tiêu chuẩn.<br>Tính: 89000 + 72000 = 161000 (tiền hàng) + 25000 (giao hàng) + 0 (COD) = <strong>186000đ tổng</strong></div>
+  </div>
+
+  <div class="dm-section">
+    <div class="dm-title"><span class="ico">📋</span> Bảng <code>chi_tiet_don_hang</code></div>
+    <div class="dm-wrap"><table class="dm-table">
+      <tr><th>ma_chi_tiet_don_hang</th><th>so_luong</th><th>gia_ban (snapshot)</th><th>ma_sach (FK)</th><th>ma_don_hang (FK)</th></tr>
+      <tr><td><span class="pk-val">1</span></td><td>1</td><td>89000</td><td><span class="fk-val">1</span> (Đắc Nhân Tâm)</td><td><span class="fk-val">1</span></td></tr>
+      <tr><td><span class="pk-val">2</span></td><td>1</td><td>72000</td><td><span class="fk-val">2</span> (Nhà Giả Kim)</td><td><span class="fk-val">1</span></td></tr>
+    </table></div>
+    <div class="dm-note">2 dòng chi tiết thuộc cùng 1 đơn hàng (ma_don_hang=1). <code>gia_ban</code> là giá tại thời điểm đặt — dù giá sách sau này có thay đổi, con số này vẫn giữ nguyên.</div>
+  </div>
+
+  <div class="dm-section">
+    <div class="dm-title"><span class="ico">⭐</span> Bảng <code>su_danh_gia</code></div>
+    <div class="dm-wrap"><table class="dm-table">
+      <tr><th>ma_danh_gia</th><th>diem_xep_hang</th><th>nhan_xet</th><th>ma_sach (FK)</th><th>ma_nguoi_dung (FK)</th></tr>
+      <tr><td><span class="pk-val">1</span></td><td>5.0</td><td>Sách rất hay, thay đổi cách nhìn của tôi!</td><td><span class="fk-val">1</span> (Đắc Nhân Tâm)</td><td><span class="fk-val">2</span> (user01)</td></tr>
+      <tr><td><span class="pk-val">2</span></td><td>4.5</td><td>Câu chuyện đẹp, triết lý sâu sắc.</td><td><span class="fk-val">2</span> (Nhà Giả Kim)</td><td><span class="fk-val">2</span> (user01)</td></tr>
+      <tr><td><span class="pk-val">3</span></td><td>4.0</td><td>Khá hay nhưng hơi khó đọc.</td><td><span class="fk-val">3</span> (Tư Duy Nhanh Chậm)</td><td><span class="fk-val">1</span> (admin)</td></tr>
+    </table></div>
+    <div class="dm-note">Sau khi thêm đánh giá, chạy UPDATE để tính lại <code>trung_binh_xep_hang</code>: sách 1 → 5.0, sách 2 → 4.5, sách 3 → 4.0.</div>
+  </div>
+
+  <div class="dm-section">
+    <div class="dm-title"><span class="ico">❤️</span> Bảng <code>sach_yeu_thich</code></div>
+    <div class="dm-wrap"><table class="dm-table">
+      <tr><th>ma_sach_yeu_thich</th><th>ma_nguoi_dung (FK)</th><th>ma_sach (FK)</th><th>Ý nghĩa</th></tr>
+      <tr><td><span class="pk-val">1</span></td><td><span class="fk-val">2</span> (user01)</td><td><span class="fk-val">1</span> (Đắc Nhân Tâm)</td><td>user01 yêu thích Đắc Nhân Tâm</td></tr>
+      <tr><td><span class="pk-val">2</span></td><td><span class="fk-val">2</span> (user01)</td><td><span class="fk-val">3</span> (Tư Duy Nhanh Chậm)</td><td>user01 yêu thích Tư Duy Nhanh Và Chậm</td></tr>
+      <tr><td><span class="pk-val">3</span></td><td><span class="fk-val">1</span> (admin)</td><td><span class="fk-val">2</span> (Nhà Giả Kim)</td><td>admin yêu thích Nhà Giả Kim</td></tr>
+    </table></div>
   </div>
 </section>
 
