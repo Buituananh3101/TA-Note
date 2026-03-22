@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hướng Dẫn Phân Quyền - WebBanSach Backend</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+  :root {
+    --bg: #0f1117; --bg2: #1a1d27; --bg3: #22263a;
+    --accent: #6c63ff; --accent2: #00d4aa; --accent3: #ff6b6b;
+    --text: #e2e8f0; --text2: #94a3b8; --border: #2d3748;
+    --green: #68d391; --yellow: #f6e05e; --orange: #fc8181;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; line-height:1.7; }
+  /* Sidebar */
+  .sidebar {
+    position:fixed; left:0; top:0; width:260px; height:100vh;
+    background:var(--bg2); border-right:1px solid var(--border);
+    overflow-y:auto; padding:24px 0; z-index:100;
+  }
+  .sidebar-logo { padding:0 24px 24px; border-bottom:1px solid var(--border); margin-bottom:16px; }
+  .sidebar-logo h1 { font-size:1rem; font-weight:700; color:var(--accent); }
+  .sidebar-logo p { font-size:.75rem; color:var(--text2); margin-top:4px; }
+  .nav-group { margin-bottom:8px; }
+  .nav-group-title { font-size:.65rem; font-weight:600; color:var(--text2); text-transform:uppercase; letter-spacing:.1em; padding:4px 24px; }
+  .nav-item { display:block; padding:8px 24px; color:var(--text2); text-decoration:none; font-size:.85rem; border-left:3px solid transparent; transition:.2s; }
+  .nav-item:hover, .nav-item.active { color:var(--text); border-left-color:var(--accent); background:rgba(108,99,255,.1); }
+  /* Main */
+  .main { margin-left:260px; padding:40px 48px; max-width:calc(100% - 260px); }
+  /* Hero */
+  .hero { background:linear-gradient(135deg,#1a1d27 0%,#16213e 50%,#0f1117 100%); border:1px solid var(--border); border-radius:16px; padding:48px; margin-bottom:40px; position:relative; overflow:hidden; }
+  .hero::before { content:''; position:absolute; top:-50px; right:-50px; width:300px; height:300px; background:radial-gradient(circle,rgba(108,99,255,.15),transparent 70%); border-radius:50%; }
+  .hero h2 { font-size:2rem; font-weight:700; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .hero p { color:var(--text2); margin-top:12px; max-width:600px; }
+  .badge { display:inline-block; background:rgba(108,99,255,.2); color:var(--accent); border:1px solid rgba(108,99,255,.3); border-radius:20px; padding:4px 12px; font-size:.75rem; font-weight:600; margin-bottom:16px; }
+  /* Section */
+  .section { margin-bottom:48px; }
+  .section-title { font-size:1.4rem; font-weight:700; color:var(--text); margin-bottom:8px; display:flex; align-items:center; gap:12px; }
+  .section-title .icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; }
+  .section-desc { color:var(--text2); margin-bottom:24px; }
+  /* Steps */
+  .steps { display:flex; flex-direction:column; gap:0; }
+  .step { display:flex; gap:20px; position:relative; }
+  .step:not(:last-child)::before { content:''; position:absolute; left:19px; top:48px; width:2px; height:calc(100% - 20px); background:var(--border); }
+  .step-num { width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.9rem; flex-shrink:0; margin-top:4px; }
+  .step-body { flex:1; background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:20px 24px; margin-bottom:20px; }
+  .step-body h3 { font-size:1rem; font-weight:600; margin-bottom:8px; color:var(--text); }
+  .step-body p { color:var(--text2); font-size:.9rem; margin-bottom:12px; }
+  /* Code */
+  .code-block { background:#0d1117; border:1px solid var(--border); border-radius:10px; overflow:hidden; margin:12px 0; }
+  .code-header { background:var(--bg3); padding:8px 16px; display:flex; align-items:center; gap:8px; border-bottom:1px solid var(--border); }
+  .code-header .dot { width:12px; height:12px; border-radius:50%; }
+  .code-header .filename { font-size:.75rem; color:var(--text2); margin-left:auto; font-family:'Fira Code',monospace; }
+  pre { padding:16px; overflow-x:auto; font-family:'Fira Code',monospace; font-size:.82rem; line-height:1.8; }
+  .kw { color:#c792ea; } .cls { color:#82aaff; } .fn { color:#82aaff; }
+  .str { color:#c3e88d; } .cm { color:#546e7a; font-style:italic; }
+  .ann { color:#ffcb6b; } .num { color:#f78c6c; }
+  /* Flow diagram */
+  .flow { display:flex; align-items:center; gap:0; flex-wrap:wrap; margin:20px 0; }
+  .flow-box { background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:12px 18px; text-align:center; font-size:.82rem; }
+  .flow-box strong { display:block; color:var(--accent); font-size:.9rem; margin-bottom:4px; }
+  .flow-box span { color:var(--text2); font-size:.75rem; }
+  .flow-arrow { color:var(--accent); font-size:1.4rem; padding:0 8px; }
+  /* Table */
+  table { width:100%; border-collapse:collapse; margin:16px 0; }
+  th { background:var(--bg3); color:var(--text); padding:12px 16px; text-align:left; font-size:.85rem; font-weight:600; border-bottom:2px solid var(--border); }
+  td { padding:12px 16px; color:var(--text2); font-size:.85rem; border-bottom:1px solid var(--border); }
+  tr:hover td { background:rgba(255,255,255,.02); }
+  .tag { display:inline-block; border-radius:6px; padding:2px 8px; font-size:.75rem; font-weight:600; }
+  .tag-pub { background:rgba(104,211,145,.15); color:var(--green); }
+  .tag-auth { background:rgba(246,224,94,.15); color:var(--yellow); }
+  .tag-admin { background:rgba(252,129,129,.15); color:var(--orange); }
+  /* Card grid */
+  .card-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; margin:20px 0; }
+  .card { background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:20px; }
+  .card h4 { font-size:.95rem; font-weight:600; margin-bottom:8px; }
+  .card p { font-size:.85rem; color:var(--text2); }
+  .card .icon-lg { font-size:2rem; margin-bottom:12px; }
+  /* Alert */
+  .alert { border-radius:10px; padding:16px 20px; margin:16px 0; border-left:4px solid; }
+  .alert-info { background:rgba(108,99,255,.1); border-color:var(--accent); }
+  .alert-warn { background:rgba(246,224,94,.1); border-color:var(--yellow); }
+  .alert-tip { background:rgba(0,212,170,.1); border-color:var(--accent2); }
+  .alert strong { display:block; margin-bottom:4px; font-size:.9rem; }
+  .alert p { font-size:.85rem; color:var(--text2); }
+  /* Highlight inline code */
+  code { background:var(--bg3); color:var(--accent2); padding:2px 6px; border-radius:4px; font-family:'Fira Code',monospace; font-size:.82rem; }
+  /* Checklist */
+  .checklist { list-style:none; margin:12px 0; }
+  .checklist li { padding:6px 0; font-size:.9rem; color:var(--text2); display:flex; align-items:flex-start; gap:10px; }
+  .checklist li::before { content:'✓'; color:var(--accent2); font-weight:700; flex-shrink:0; margin-top:1px; }
+  /* Responsive */
+  @media(max-width:768px){
+    .sidebar{display:none;} .main{margin-left:0;padding:24px;}
+    .flow{flex-direction:column;align-items:flex-start;}
+  }
+  /* Scrollbar */
+  ::-webkit-scrollbar{width:6px;} ::-webkit-scrollbar-track{background:var(--bg);} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <h1>🔐 Phân Quyền</h1>
+    <p>WebBanSach Backend</p>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Tổng quan</div>
+    <a href="#overview" class="nav-item active">📋 Kiến trúc tổng quan</a>
+    <a href="#flow" class="nav-item">🔄 Luồng xác thực</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Thành phần</div>
+    <a href="#s1" class="nav-item">1. Entity Quyen & NguoiDung</a>
+    <a href="#s2" class="nav-item">2. Repository</a>
+    <a href="#s3" class="nav-item">3. UserService</a>
+    <a href="#s4" class="nav-item">4. SecurityConfiguration</a>
+    <a href="#s5" class="nav-item">5. Endpoints</a>
+    <a href="#s6" class="nav-item">6. TaiKhoanService</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Thực hành</div>
+    <a href="#db" class="nav-item">🗄️ Cơ sở dữ liệu</a>
+    <a href="#test" class="nav-item">🧪 Test API</a>
+    <a href="#extend" class="nav-item">🚀 Mở rộng</a>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="badge">Spring Security · JWT-less · Role-Based</div>
+    <h2>Hướng Dẫn Phân Quyền Chi Tiết</h2>
+    <p>Tài liệu step-by-step giải thích toàn bộ hệ thống phân quyền trong dự án <strong>webbansach_backend</strong> — từ database, entity, service cho đến cấu hình Security Filter Chain.</p>
+  </div>
+
+  <!-- OVERVIEW -->
+  <section class="section" id="overview">
+    <div class="section-title">
+      <div class="icon" style="background:rgba(108,99,255,.2)">📋</div>
+      Kiến Trúc Tổng Quan
+    </div>
+    <p class="section-desc">Dự án sử dụng <strong>Spring Security</strong> với xác thực <code>HTTP Basic Auth</code> (username + password) và phân quyền theo <strong>Role</strong>. Không dùng JWT token.</p>
+    <div class="card-grid">
+      <div class="card">
+        <div class="icon-lg">🗄️</div>
+        <h4>Database Layer</h4>
+        <p>Bảng <code>quyen</code>, <code>nguoi_dung</code> và bảng trung gian <code>nguoidung_quyen</code> lưu trữ quan hệ nhiều-nhiều giữa user và quyền.</p>
+      </div>
+      <div class="card">
+        <div class="icon-lg">⚙️</div>
+        <h4>Service Layer</h4>
+        <p><code>UserServiceImpl</code> implement interface <code>UserDetailsService</code> của Spring Security — đây là cầu nối để Spring biết cách nạp thông tin user từ DB.</p>
+      </div>
+      <div class="card">
+        <div class="icon-lg">🛡️</div>
+        <h4>Security Layer</h4>
+        <p><code>SecurityConfiguration</code> cấu hình <strong>SecurityFilterChain</strong> — quy định endpoint nào được truy cập tự do, endpoint nào cần đăng nhập, endpoint nào cần role ADMIN.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FLOW -->
+  <section class="section" id="flow">
+    <div class="section-title">
+      <div class="icon" style="background:rgba(0,212,170,.2)">🔄</div>
+      Luồng Xác Thực & Phân Quyền
+    </div>
+    <p class="section-desc">Khi client gửi request, Spring Security xử lý theo thứ tự sau:</p>
+    <div class="flow">
+      <div class="flow-box"><strong>Client</strong><span>Gửi request<br>+ Basic Auth header</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box"><strong>SecurityFilterChain</strong><span>Kiểm tra endpoint<br>có cần auth không</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box"><strong>DaoAuthenticationProvider</strong><span>Lấy UserDetails<br>từ UserService</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box"><strong>UserServiceImpl</strong><span>Tìm NguoiDung<br>trong DB theo username</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box"><strong>BCrypt verify</strong><span>Xác minh mật khẩu<br>đã mã hóa</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box"><strong>Kiểm tra Role</strong><span>So sánh Authority<br>với endpoint rule</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box" style="border-color:var(--accent2)"><strong style="color:var(--accent2)">✓ Response</strong><span>Trả về dữ liệu</span></div>
+    </div>
+  </section>
+
+  <!-- STEP 1 -->
+  <section class="section" id="s1">
+    <div class="section-title">
+      <div class="icon" style="background:rgba(255,107,107,.2)">1️⃣</div>
+      Entity: Quyen &amp; NguoiDung
+    </div>
+    <p class="section-desc">Đây là nền tảng của hệ thống phân quyền. Hai entity này liên kết với nhau qua quan hệ <strong>Many-to-Many</strong> — một user có thể có nhiều quyền, một quyền có thể thuộc nhiều user.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">A</div>
+        <div class="step-body">
+          <h3>Entity <code>Quyen.java</code> — Bảng lưu danh sách quyền</h3>
+          <p>Mỗi bản ghi trong bảng <code>quyen</code> là một role, ví dụ: <code>ROLE_ADMIN</code>, <code>ROLE_USER</code>. Quy tắc Spring Security: tên quyền <strong>phải bắt đầu bằng</strong> <code>ROLE_</code> khi dùng <code>hasAnyAuthority()</code>.</p>
+          <div class="code-block">
+            <div class="code-header"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><span class="filename">Quyen.java</span></div>
+            <pre><span class="ann">@Entity</span>
+<span class="ann">@Data</span>
+<span class="ann">@Table</span>(name = <span class="str">"quyen"</span>)
+<span class="kw">public class</span> <span class="cls">Quyen</span> {
+
+    <span class="ann">@Id</span>
+    <span class="ann">@GeneratedValue</span>(strategy = GenerationType.IDENTITY)
+    <span class="ann">@Column</span>(name = <span class="str">"ma_quyen"</span>)
+    <span class="kw">private int</span> maQuyen;
+
+    <span class="ann">@Column</span>(name = <span class="str">"ten_quyen"</span>)
+    <span class="kw">private</span> String tenQuyen; <span class="cm">// VD: "ROLE_ADMIN", "ROLE_USER"</span>
+
+    <span class="cm">// Quan hệ ngược (inverse side) - Many-to-Many với NguoiDung</span>
+    <span class="ann">@ManyToMany</span>(fetch = FetchType.LAZY, cascade = {...})
+    <span class="ann">@JoinTable</span>(name = <span class="str">"nguoidung_quyen"</span>,
+        joinColumns = <span class="ann">@JoinColumn</span>(name = <span class="str">"ma_quyen"</span>),
+        inverseJoinColumns = <span class="ann">@JoinColumn</span>(name = <span class="str">"ma_nguoi_dung"</span>))
+    <span class="kw">private</span> List&lt;NguoiDung&gt; danhSachNguoiDung;
+}</pre>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">B</div>
+        <div class="step-body">
+          <h3>Entity <code>NguoiDung.java</code> — Bảng người dùng</h3>
+          <p>Đây là <strong>owning side</strong> của quan hệ Many-to-Many. Chú ý <code>fetch = FetchType.EAGER</code> — khi load NguoiDung thì danhSachQuyen sẽ được load <strong>ngay lập tức</strong>, điều này cần thiết vì Spring Security phải đọc quyền ngay khi xác thực.</p>
+          <div class="code-block">
+            <div class="code-header"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><span class="filename">NguoiDung.java (trích)</span></div>
+            <pre><span class="cm">// ⭐ Quan trọng: EAGER loading - bắt buộc cho phân quyền</span>
+<span class="ann">@ManyToMany</span>(fetch = FetchType.<span class="kw">EAGER</span>, cascade = {...})
+<span class="ann">@JoinTable</span>(name = <span class="str">"nguoidung_quyen"</span>,
+    joinColumns = <span class="ann">@JoinColumn</span>(name = <span class="str">"ma_nguoi_dung"</span>),
+    inverseJoinColumns = <span class="ann">@JoinColumn</span>(name = <span class="str">"ma_quyen"</span>))
+<span class="kw">private</span> List&lt;Quyen&gt; danhSachQuyen;</pre>
+          </div>
+          <div class="alert alert-warn">
+            <strong>⚠️ Tại sao phải EAGER?</strong>
+            <p>Nếu để <code>LAZY</code>, khi Spring Security gọi <code>loadUserByUsername()</code> xong thì Hibernate session đã đóng → không thể load quyền → lỗi <code>LazyInitializationException</code>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="section" id="s2">
+    <div class="section-title">
+      <div class="icon" style="background:rgba(246,224,94,.2)">2️⃣</div>
+      Repository Layer
+    </div>
+    <p class="section-desc">Hai repository quan trọng nhất cho phân quyền:</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">A</div>
+        <div class="step-body">
+          <h3><code>NguoiDungRepository.java</code></h3>
+          <p>Method <code>findByTenDangNhap()</code> là <strong>trái tim</strong> của phân quyền — Spring Security gọi method này để tìm user khi xác thực.</p>
+          <div class="code-block">
+            <div class="code-header"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><span class="filename">NguoiDungRepository.java</span></div>
+            <pre><span class="ann">@RepositoryRestResource</span>(path=<span class="str">"nguoi-dung"</span>)
+<span class="kw">public interface</span> <span class="cls">NguoiDungRepository</span> <span class="kw">extends</span> JpaRepository&lt;NguoiDung, Integer&gt; {
+
+    <span class="cm">// Kiểm tra trùng lặp khi đăng ký</span>
+    <span class="kw">boolean</span> <span class="fn">existsByTenDangNhap</span>(String tenDangNhap);
+    <span class="kw">boolean</span> <span class="fn">existsByEmail</span>(String email);
+
+    <span class="cm">// ⭐ Phân quyền: Spring Security gọi method này</span>
+    NguoiDung <span class="fn">findByTenDangNhap</span>(String tenDangNhap);
+}</pre>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">B</div>
+        <div class="step-body">
+          <h3><code>QuyenRepository.java</code></h3>
+          <p>Có thể dùng để tìm quyền theo tên, ví dụ khi gán quyền mặc định cho user mới đăng ký.</p>
+          <div class="code-block">
+            <div class="code-header"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><span class="filename">QuyenRepository.java</span></div>
+            <pre><span class="ann">@RepositoryRestResource</span>(path=<span class="str">"quyen"</span>)
+<span class="kw">public interface</span> <span class="cls">QuyenRepository</span> <span class="kw">extends</span> JpaRepository&lt;Quyen, Integer&gt; {
+
+    <span class="cm">// Dùng để tìm Quyen theo tên, VD: findByTenQuyen("ROLE_USER")</span>
+    Quyen <span class="fn">findByTenQuyen</span>(String tenQuyen);
+}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="section" id="s3">
+    <div class="section-title">
+      <div class="icon" style="background:rgba(0,212,170,.2)">3️⃣</div>
+      UserService — Cầu Nối Với Spring Security
+    </div>
+    <p class="section-desc">Đây là bước <strong>quan trọng nhất</strong>. Spring Security không biết cách lấy user từ DB của bạn — bạn phải "dạy" nó bằng cách implement <code>UserDetailsService</code>.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">A</div>
+        <div class="step-body">
+          <h3>Interface <code>UserService.java</code></h3>
+          <p>Kế thừa <code>UserDetailsService</code> — interface chuẩn của Spring Security. Bắt buộc phải override method <code>loadUserByUsername()</code>.</p>
+          <div class="code-block">
+            <div class="code-header"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><span class="filename">UserService.java</span></div>
+            <pre><span class="kw">public interface</span> <span class="cls">UserService</span> <span class="kw">extends</span> <span class="cls">UserDetailsService</span> {
+    <span class="cm">// Thêm method riêng của project</span>
+    NguoiDung <span class="fn">finByUsername</span>(String username);
+}</pre>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">B</div>
+        <div class="step-body">
+          <h3>Implementation <code>UserServiceImpl.java</code></h3>
+          <p>Đây là nơi logic xác thực thực sự xảy ra. Method <code>loadUserByUsername</code> được Spring Security tự động gọi khi có request cần xác thực.</p>
+          <div class="code-block">
+            <div class="code-header"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><span class="filename">UserServiceImpl.java</span></div>
+            <pre><span class="ann">@Service</span>
+<span class="kw">public class</span> <span class="cls">UserServiceImpl</span> <span class="kw">implements</span> <span class="cls">UserService</span> {
+
+    <span class="cm">// ⭐ Spring Security tự động gọi method này</span>
+    <span class="ann">@Override</span>
+    <span class="kw">public</span> UserDetails <span class="fn">loadUserByUsername</span>(String username) {
+        <span class="cm">// 1. Tìm user trong DB</span>
+        NguoiDung nguoiDung = nguoiDungRepository
+            .<span class="fn">findByTenDangNhap</span>(username);
+
+        <span class="kw">if</span> (nguoiDung == <span class="kw">null</span>) {
+            <span class="kw">throw new</span> UsernameNotFoundException(<span class="str">"Tài khoản không tồn tại"</span>);
+        }
+
+        <span class="cm">// 2. Trả về UserDetails (gồm username, password, authorities)</span>
+        <span class="kw">return new</span> User(
+            nguoiDung.<span class="fn">getTenDangNhap</span>(),
+            nguoiDung.<span class="fn">getMatKhau</span>(),       <span class="cm">// Mật khẩu đã BCrypt</span>
+            <span class="fn">rolesToAuthorities</span>(nguoiDung.<span class="fn">getDanhSachQuyen</span>())
+        );
+    }
+
+    <span class="cm">// 3. Chuyển List&lt;Quyen&gt; → Collection&lt;GrantedAuthority&gt;</span>
+    <span class="kw">private</span> Collection&lt;? <span class="kw">extends</span> GrantedAuthority&gt; <span class="fn">rolesToAuthorities</span>(
+            Collection&lt;Quyen&gt; quyens) {
+        <span class="kw">return</span> quyens.stream()
+            .map(q -&gt; <span class="kw">new</span> SimpleGrantedAuthority(q.<span class="fn">getTenQuyen</span>()))
+            .<span class="fn">collect</span>(Collectors.toList());
+    }
+}</pre>
+          </div>
+          <div class="alert alert-info">
+            <strong>💡 Hiểu method <code>rolesToAuthorities()</code></strong>
+            <p>Spring Security cần danh sách quyền ở dạng <code>GrantedAuthority</code>. Method này dùng Java Stream để convert: mỗi object <code>Quyen</code> (có field <code>tenQuyen</code> = "ROLE_ADMIN") → tạo <code>new SimpleGrantedAuthority("ROLE_ADMIN")</code>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="section" id="s4">
+    <div class="section-title">
+      <div class="icon" style="background:rgba(108,99,255,.2)">4️⃣</div>
+      SecurityConfiguration — Bộ Não Phân Quyền
+    </div>
+    <p class="section-desc">File cấu hình này quyết định <strong>ai được làm gì</strong>. Có 3 Bean quan trọng:</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">A</div>
+        <div class="step-body">
+          <h3>Bean <code>BCryptPasswordEncoder</code></h3>
+          <p>Dùng để mã hóa mật khẩu. BCrypt là thuật toán <strong>one-way hash</strong> — không thể giải mã ngược. Khi đăng nhập, Spring sẽ mã hóa password nhập vào rồi so sánh với hash trong DB.</p>
+          <div class="code-block">
+            <div class="code-header"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><span class="filename">SecurityConfiguration.java</span></div>
+            <pre><span class="ann">@Bean</span>
+<span class="kw">public</span> BCryptPasswordEncoder <span class="fn">passwordEncoder</span>() {
+    <span class="kw">return new</span> BCryptPasswordEncoder();
+}
+<span class="cm">// Dùng trong TaiKhoanService để hash password khi đăng ký:
+// String hash = passwordEncoder.encode(nguoiDung.getMatKhau());</span></pre>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">B</div>
+        <div class="step-body">
+          <h3>Bean <code>DaoAuthenticationProvider</code></h3>
+          <p>Đây là "cục ghép nối" giữa UserService và PasswordEncoder. Spring Security dùng Bean này để thực hiện xác thực: lấy user từ <code>UserService</code>, kiểm tra password bằng <code>BCryptPasswordEncoder</code>.</p>
+          <div class="code-block">
+            <div class="code-header"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><span class="filename">SecurityConfiguration.java</span></div>
+            <pre><span class="ann">@Bean</span>
+<span class="kw">public</span> DaoAuthenticationProvider <span class="fn">authenticationProvider</span>(UserService userService) {
+    DaoAuthenticationProvider dap = <span class="kw">new</span> DaoAuthenticationProvider(userService);
+    dap.<span class="fn">setPasswordEncoder</span>(<span class="fn">passwordEncoder</span>());
+    <span class="kw">return</span> dap;
+    <span class="cm">// UserService được inject tự động (Spring tìm Bean có type UserService)</span>
+}</pre>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">C</div>
+        <div class="step-body">
+          <h3>Bean <code>SecurityFilterChain</code> — Quy tắc phân quyền</h3>
+          <p>Đây là nơi định nghĩa <strong>ai được truy cập endpoint nào</strong>. Các rule được áp dụng theo thứ tự từ trên xuống dưới — rule đầu tiên match sẽ được áp dụng.</p>
+          <div class="code-block">
+            <div class="code-header"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><span class="filename">SecurityConfiguration.java</span></div>
+            <pre><span class="ann">@Bean</span>
+<span class="kw">public</span> SecurityFilterChain <span class="fn">SecurityFilterChain</span>(HttpSecurity http) <span class="kw">throws</span> Exception {
+    http.<span class="fn">authorizeHttpRequests</span>(config -&gt; config
+        <span class="cm">// 1. Endpoint công khai (GET)</span>
+        .<span class="fn">requestMatchers</span>(HttpMethod.GET, Endpoints.PUBLIC_GET_ENDPOINTS)
+            .<span class="fn">permitAll</span>()
+
+        <span class="cm">// 2. Endpoint công khai (POST)</span>
+        .<span class="fn">requestMatchers</span>(HttpMethod.POST, Endpoints.PUBLIC_POST_ENDPOINTS)
+            .<span class="fn">permitAll</span>()
+
+        <span class="cm">// 3. Endpoint chỉ ADMIN mới được GET</span>
+        .<span class="fn">requestMatchers</span>(HttpMethod.GET, Endpoints.ADMIN_GET_ENDPOINTS)
+            .<span class="fn">hasAnyAuthority</span>(<span class="str">"ROLE_ADMIN"</span>)
+
+        <span class="cm">// 4. Tất cả request còn lại: phải đăng nhập</span>
+        .<span class="fn">anyRequest</span>().<span class="fn">authenticated</span>()
+    );
+
+    <span class="cm">// Dùng HTTP Basic Auth (gửi username:password trong header)</span>
+    http.<span class="fn">httpBasic</span>(Customizer.<span class="fn">withDefaults</span>());
+
+    <span class="cm">// Tắt CSRF (vì đây là REST API, không dùng form)</span>
+    http.<span class="fn">csrf</span>(csrf -&gt; csrf.<span class="fn">disable</span>());
+
+    <span class="kw">return</span> http.<span class="fn">build</span>();
+}</pre>
+          </div>
+          <div class="alert alert-tip">
+            <strong>💡 Tại sao tắt CSRF?</strong>
+            <p>CSRF protection dùng cho web app có form HTML. REST API (frontend riêng biệt như React) không cần — việc tắt đi giúp Postman và React gọi API bình thường.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 5 -->
+  <section class="section" id="s5">
+    <div class="section-title">
+      <div class="icon" style="background:rgba(252,129,129,.2)">5️⃣</div>
+      Endpoints.java — Danh Sách URL Phân Quyền
+    </div>
+    <p class="section-desc">File này tập trung tất cả URL rules vào một chỗ — giúp dễ bảo trì và không phải sửa SecurityConfiguration mỗi khi thêm endpoint.</p>
+    <div class="code-block">
+      <div class="code-header"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><span class="filename">Endpoints.java</span></div>
+      <pre><span class="kw">public class</span> <span class="cls">Endpoints</span> {
+
+    <span class="cm">// Frontend URL được phép gọi (CORS)</span>
+    <span class="kw">public static final</span> String front_end_host = <span class="str">"http://localhost:3000"</span>;
+
+    <span class="cm">// ✅ Ai cũng gọi được (GET)</span>
+    <span class="kw">public static final</span> String[] PUBLIC_GET_ENDPOINTS = {
+        <span class="str">"/sach"</span>, <span class="str">"/sach/**"</span>,          <span class="cm">// Xem sách</span>
+        <span class="str">"/hinh-anh"</span>, <span class="str">"/hinh-anh/**"</span>,  <span class="cm">// Xem hình ảnh</span>
+        <span class="str">"/nguoi-dung/search/existsByTenDangNhap/**"</span>, <span class="cm">// Kiểm tra username</span>
+        <span class="str">"/nguoi-dung/search/existsByEmail/**"</span>,       <span class="cm">// Kiểm tra email</span>
+    };
+
+    <span class="cm">// ✅ Ai cũng gọi được (POST)</span>
+    <span class="kw">public static final</span> String[] PUBLIC_POST_ENDPOINTS = {
+        <span class="str">"/tai-khoan/dang-ky"</span>,   <span class="cm">// Đăng ký tài khoản</span>
+    };
+
+    <span class="cm">// 🔴 Chỉ ROLE_ADMIN được GET</span>
+    <span class="kw">public static final</span> String[] ADMIN_GET_ENDPOINTS = {
+        <span class="str">"/nguoi-dung"</span>,      <span class="cm">// Xem danh sách user</span>
+        <span class="str">"/nguoi-dung/**"</span>,   <span class="cm">// Xem chi tiết user</span>
+    };
+}</pre>
+    </div>
+    <h4 style="margin:20px 0 12px;font-size:1rem">Bảng tóm tắt quyền truy cập:</h4>
+    <table>
+      <tr><th>Endpoint</th><th>Method</th><th>Quyền truy cập</th></tr>
+      <tr><td><code>/sach</code>, <code>/sach/**</code></td><td>GET</td><td><span class="tag tag-pub">Public</span></td></tr>
+      <tr><td><code>/hinh-anh</code>, <code>/hinh-anh/**</code></td><td>GET</td><td><span class="tag tag-pub">Public</span></td></tr>
+      <tr><td><code>/nguoi-dung/search/existsBy...</code></td><td>GET</td><td><span class="tag tag-pub">Public</span></td></tr>
+      <tr><td><code>/tai-khoan/dang-ky</code></td><td>POST</td><td><span class="tag tag-pub">Public</span></td></tr>
+      <tr><td><code>/nguoi-dung</code>, <code>/nguoi-dung/**</code></td><td>GET</td><td><span class="tag tag-admin">ROLE_ADMIN only</span></td></tr>
+      <tr><td>Tất cả endpoints còn lại</td><td>Any</td><td><span class="tag tag-auth">Phải đăng nhập</span></td></tr>
+    </table>
+  </section>
+
+  <!-- STEP 6 -->
+  <section class="section" id="s6">
+    <div class="section-title">
+      <div class="icon" style="background:rgba(0,212,170,.2)">6️⃣</div>
+      TaiKhoanService — Đăng Ký Người Dùng
+    </div>
+    <p class="section-desc">Service xử lý đăng ký tài khoản, bao gồm validation và mã hóa mật khẩu.</p>
+    <div class="code-block">
+      <div class="code-header"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><span class="filename">TaiKhoanService.java</span></div>
+      <pre><span class="kw">public</span> ResponseEntity&lt;?&gt; <span class="fn">dangKyNguoiDung</span>(NguoiDung nguoiDung) {
+
+    <span class="cm">// Bước 1: Kiểm tra username chưa tồn tại</span>
+    <span class="kw">if</span> (nguoiDungRepository.<span class="fn">existsByTenDangNhap</span>(nguoiDung.<span class="fn">getTenDangNhap</span>()))
+        <span class="kw">return</span> ResponseEntity.<span class="fn">badRequest</span>()
+            .body(<span class="kw">new</span> ThongBao(<span class="str">"Tên đăng nhập đã tồn tại"</span>));
+
+    <span class="cm">// Bước 2: Kiểm tra email chưa tồn tại</span>
+    <span class="kw">if</span> (nguoiDungRepository.<span class="fn">existsByEmail</span>(nguoiDung.<span class="fn">getEmail</span>()))
+        <span class="kw">return</span> ResponseEntity.<span class="fn">badRequest</span>()
+            .body(<span class="kw">new</span> ThongBao(<span class="str">"Email đã tồn tại"</span>));
+
+    <span class="cm">// Bước 3: Mã hóa mật khẩu với BCrypt trước khi lưu</span>
+    String encryptPassword = passwordEncoder.<span class="fn">encode</span>(nguoiDung.<span class="fn">getMatKhau</span>());
+    nguoiDung.<span class="fn">setMatKhau</span>(encryptPassword);
+
+    <span class="cm">// Bước 4: Lưu vào DB</span>
+    nguoiDungRepository.<span class="fn">save</span>(nguoiDung);
+    <span class="kw">return</span> ResponseEntity.<span class="fn">ok</span>(<span class="str">"Đăng ký thành công"</span>);
+}</pre>
+    </div>
+    <div class="alert alert-warn">
+      <strong>⚠️ Vấn đề hiện tại: Chưa gán quyền khi đăng ký!</strong>
+      <p>Khi user đăng ký, <code>danhSachQuyen</code> sẽ là rỗng → user không có quyền gì → không truy cập được các endpoint yêu cầu xác thực. Xem phần "Mở rộng" để biết cách fix.</p>
+    </div>
+  </section>
+
+  <!-- DATABASE -->
+  <section class="section" id="db">
+    <div class="section-title">
+      <div class="icon" style="background:rgba(246,224,94,.2)">🗄️</div>
+      Cơ Sở Dữ Liệu — Cấu Trúc Bảng
+    </div>
+    <p class="section-desc">3 bảng cần thiết cho hệ thống phân quyền:</p>
+    <div class="code-block">
+      <div class="code-header"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><span class="filename">SQL Schema</span></div>
+      <pre><span class="cm">-- Bảng quyền (Roles)</span>
+<span class="kw">CREATE TABLE</span> quyen (
+    ma_quyen <span class="kw">INT AUTO_INCREMENT PRIMARY KEY</span>,
+    ten_quyen VARCHAR(<span class="num">50</span>) <span class="kw">NOT NULL</span>   <span class="cm">-- VD: 'ROLE_ADMIN', 'ROLE_USER'</span>
+);
+
+<span class="cm">-- Bảng trung gian (Join Table) - Many-to-Many</span>
+<span class="kw">CREATE TABLE</span> nguoidung_quyen (
+    ma_nguoi_dung <span class="kw">INT</span>,
+    ma_quyen      <span class="kw">INT</span>,
+    <span class="kw">PRIMARY KEY</span> (ma_nguoi_dung, ma_quyen),
+    <span class="kw">FOREIGN KEY</span> (ma_nguoi_dung) <span class="kw">REFERENCES</span> nguoi_dung(ma_nguoi_dung),
+    <span class="kw">FOREIGN KEY</span> (ma_quyen) <span class="kw">REFERENCES</span> quyen(ma_quyen)
+);
+
+<span class="cm">-- Dữ liệu mẫu</span>
+<span class="kw">INSERT INTO</span> quyen (ten_quyen) <span class="kw">VALUES</span> (<span class="str">'ROLE_USER'</span>);
+<span class="kw">INSERT INTO</span> quyen (ten_quyen) <span class="kw">VALUES</span> (<span class="str">'ROLE_ADMIN'</span>);
+
+<span class="cm">-- Gán ROLE_ADMIN cho user có ma_nguoi_dung = 1</span>
+<span class="kw">INSERT INTO</span> nguoidung_quyen <span class="kw">VALUES</span> (<span class="num">1</span>, <span class="num">2</span>);</pre>
+    </div>
+  </section>
+
+  <!-- TEST -->
+  <section class="section" id="test">
+    <div class="section-title">
+      <div class="icon" style="background:rgba(104,211,145,.2)">🧪</div>
+      Test API — Kiểm Tra Phân Quyền
+    </div>
+    <p class="section-desc">Dùng Postman hoặc curl để test các scenario phân quyền:</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Test endpoint Public (không cần đăng nhập)</h3>
+          <div class="code-block">
+            <div class="code-header"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><span class="filename">curl</span></div>
+            <pre><span class="cm"># Lấy danh sách sách - không cần auth</span>
+curl -X GET http://localhost:8080/sach
+<span class="cm"># Kết quả: 200 OK + dữ liệu sách</span></pre>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Test endpoint cần đăng nhập (Basic Auth)</h3>
+          <div class="code-block">
+            <div class="code-header"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><span class="filename">curl</span></div>
+            <pre><span class="cm"># Gọi không có auth → 401 Unauthorized</span>
+curl -X GET http://localhost:8080/don-hang
+
+<span class="cm"># Gọi với Basic Auth → 200 OK</span>
+curl -X GET http://localhost:8080/don-hang \
+  -u <span class="str">"username:password"</span></pre>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Test endpoint ADMIN_ONLY</h3>
+          <div class="code-block">
+            <div class="code-header"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><span class="filename">curl</span></div>
+            <pre><span class="cm"># User thường gọi → 403 Forbidden</span>
+curl -X GET http://localhost:8080/nguoi-dung \
+  -u <span class="str">"user_thuong:password"</span>
+
+<span class="cm"># Admin gọi → 200 OK</span>
+curl -X GET http://localhost:8080/nguoi-dung \
+  -u <span class="str">"admin_account:password"</span></pre>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h3>Cách gửi Basic Auth trong React (Axios)</h3>
+          <div class="code-block">
+            <div class="code-header"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><span class="filename">React / Axios</span></div>
+            <pre><span class="cm">// Cách 1: Dùng auth option của axios</span>
+axios.get(<span class="str">'http://localhost:8080/nguoi-dung'</span>, {
+  auth: { username: <span class="str">'admin'</span>, password: <span class="str">'123456'</span> }
+});
+
+<span class="cm">// Cách 2: Encode Base64 thủ công</span>
+<span class="kw">const</span> token = btoa(<span class="str">'admin:123456'</span>);
+axios.get(<span class="str">'http://localhost:8080/nguoi-dung'</span>, {
+  headers: { Authorization: <span class="str">`Basic ${token}`</span> }
+});</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXTEND -->
+  <section class="section" id="extend">
+    <div class="section-title">
+      <div class="icon" style="background:rgba(108,99,255,.2)">🚀</div>
+      Mở Rộng Hệ Thống Phân Quyền
+    </div>
+    <p class="section-desc">Các bước nâng cấp thông thường:</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">A</div>
+        <div class="step-body">
+          <h3>Gán quyền mặc định khi đăng ký</h3>
+          <p>Sửa <code>TaiKhoanService.java</code> để tự động gán <code>ROLE_USER</code> cho người dùng mới.</p>
+          <div class="code-block">
+            <div class="code-header"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><span class="filename">TaiKhoanService.java — thêm vào dangKyNguoiDung()</span></div>
+            <pre><span class="cm">// Inject QuyenRepository</span>
+<span class="ann">@Autowired</span>
+<span class="kw">private</span> QuyenRepository quyenRepository;
+
+<span class="cm">// Trong dangKyNguoiDung(), trước khi save:</span>
+Quyen quyenUser = quyenRepository.<span class="fn">findByTenQuyen</span>(<span class="str">"ROLE_USER"</span>);
+nguoiDung.<span class="fn">setDanhSachQuyen</span>(List.of(quyenUser));
+nguoiDungRepository.<span class="fn">save</span>(nguoiDung);</pre>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">B</div>
+        <div class="step-body">
+          <h3>Thêm endpoint mới vào Endpoints.java</h3>
+          <div class="code-block">
+            <div class="code-header"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><span class="filename">Endpoints.java</span></div>
+            <pre"><span class="cm">// Thêm endpoint admin cho POST/PUT/DELETE</span>
+<span class="kw">public static final</span> String[] ADMIN_POST_ENDPOINTS = {
+    <span class="str">"/sach"</span>,        <span class="cm">// Thêm sách</span>
+    <span class="str">"/the-loai"</span>,    <span class="cm">// Thêm thể loại</span>
+};
+
+<span class="cm">// Trong SecurityConfiguration, thêm rule:</span>
+.<span class="fn">requestMatchers</span>(HttpMethod.POST, Endpoints.ADMIN_POST_ENDPOINTS)
+    .<span class="fn">hasAnyAuthority</span>(<span class="str">"ROLE_ADMIN"</span>)</pre>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">C</div>
+        <div class="step-body">
+          <h3>Nâng cấp lên JWT (Tương lai)</h3>
+          <p>Basic Auth gửi username+password mỗi request → không an toàn và không stateless. JWT sẽ cấp token sau khi đăng nhập — request sau chỉ cần gửi token.</p>
+          <ul class="checklist">
+            <li>Thêm dependency <code>spring-boot-starter-oauth2-resource-server</code></li>
+            <li>Tạo <code>/tai-khoan/dang-nhap</code> endpoint trả về JWT token</li>
+            <li>Sửa <code>SecurityFilterChain</code> dùng <code>http.oauth2ResourceServer()</code></li>
+            <li>Frontend lưu token vào <code>localStorage</code> và gửi trong <code>Authorization: Bearer</code> header</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div style="text-align:center;padding:40px 0;color:var(--text2);font-size:.85rem;border-top:1px solid var(--border);margin-top:40px">
+    WebBanSach Backend · Spring Security · Role-Based Authorization Guide
+  </div>
+
+</main>
+
+<script>
+  // Highlight active nav item on scroll
+  const sections = document.querySelectorAll('section[id], div[id]');
+  const navItems = document.querySelectorAll('.nav-item');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 100) current = s.id;
+    });
+    navItems.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  });
+</script>
+</body>
+</html>
