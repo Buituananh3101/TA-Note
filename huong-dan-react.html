@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hướng Dẫn Học React – Dự Án Bán Sách</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d2e;
+      --surface2: #242740;
+      --border: #2e3150;
+      --accent: #6c63ff;
+      --accent2: #ff6584;
+      --accent3: #43e97b;
+      --accent4: #f7971e;
+      --text: #e2e8f0;
+      --text-muted: #8892a4;
+      --code-bg: #0d1117;
+      --tag-bg: rgba(108,99,255,0.15);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    /* ===== HEADER ===== */
+    header {
+      background: linear-gradient(135deg, #1a1d2e 0%, #0f1117 60%, #1a0533 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 60px 20px 50px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% -20%, rgba(108,99,255,0.25) 0%, transparent 65%);
+    }
+    .header-badge {
+      display: inline-block;
+      background: var(--tag-bg);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 4px 16px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    header h1 {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 700;
+      background: linear-gradient(90deg, #a78bfa, #6c63ff, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+      margin-bottom: 12px;
+    }
+    header p {
+      color: var(--text-muted);
+      font-size: 1rem;
+      position: relative;
+      max-width: 560px;
+      margin: 0 auto 28px;
+    }
+    .topics-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      position: relative;
+    }
+    .topics-bar span {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      transition: all .2s;
+      cursor: default;
+    }
+    .topics-bar span:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ===== LAYOUT ===== */
+    .wrapper {
+      display: flex;
+      max-width: 1200px;
+      margin: 0 auto;
+      gap: 0;
+    }
+    aside {
+      width: 240px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 28px 16px;
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+    }
+    aside h3 {
+      font-size: 0.7rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+    aside a {
+      display: block;
+      padding: 7px 12px;
+      border-radius: 8px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: all .2s;
+      margin-bottom: 2px;
+    }
+    aside a:hover, aside a.active {
+      background: var(--tag-bg);
+      color: var(--accent);
+    }
+    main {
+      flex: 1;
+      padding: 40px 32px;
+      min-width: 0;
+    }
+
+    /* ===== SECTION ===== */
+    section {
+      margin-bottom: 56px;
+      scroll-margin-top: 20px;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+    .section-header h2 {
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+    p { margin-bottom: 12px; color: var(--text); }
+
+    /* ===== CODE ===== */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 10px;
+      padding: 20px;
+      overflow-x: auto;
+      margin: 16px 0;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+    .kw { color: #c792ea; }
+    .fn { color: #82aaff; }
+    .str { color: #c3e88d; }
+    .cmt { color: #546e7a; font-style: italic; }
+    .jsx { color: #f07178; }
+    .num { color: #f78c6c; }
+    .type { color: #ffcb6b; }
+
+    /* ===== CALLOUTS ===== */
+    .callout {
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 16px 0;
+      border-left: 4px solid;
+      display: flex;
+      gap: 12px;
+    }
+    .callout-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
+    .callout.info { background: rgba(96,165,250,0.08); border-color: #60a5fa; }
+    .callout.warning { background: rgba(247,151,30,0.08); border-color: var(--accent4); }
+    .callout.tip { background: rgba(67,233,123,0.08); border-color: var(--accent3); }
+    .callout.project { background: rgba(108,99,255,0.08); border-color: var(--accent); }
+    .callout h4 { font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; }
+    .callout p { margin: 0; font-size: 0.88rem; color: var(--text-muted); }
+
+    /* ===== COMPARISON TABLE ===== */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 0.88rem;
+    }
+    th {
+      background: var(--surface2);
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    td {
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      vertical-align: top;
+    }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* ===== CARDS ===== */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin: 16px 0;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      transition: all .25s;
+    }
+    .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .card-icon { font-size: 1.5rem; margin-bottom: 10px; }
+    .card h4 { font-size: 0.95rem; margin-bottom: 6px; }
+    .card p { font-size: 0.83rem; color: var(--text-muted); margin: 0; }
+
+    /* ===== FLOW ===== */
+    .flow {
+      display: flex;
+      gap: 0;
+      align-items: center;
+      flex-wrap: wrap;
+      margin: 16px 0;
+    }
+    .flow-item {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 0.82rem;
+      font-weight: 500;
+    }
+    .flow-arrow {
+      color: var(--accent);
+      font-size: 1.2rem;
+      padding: 0 6px;
+    }
+
+    /* ===== INLINE CODE ===== */
+    code {
+      background: rgba(108,99,255,0.15);
+      color: #a78bfa;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85em;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media(max-width:768px){
+      aside { display: none; }
+      main { padding: 24px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-badge">📚 React Learning Guide</div>
+  <h1>Hướng Dẫn React<br/>Dự Án Web Bán Sách</h1>
+  <p>Tổng hợp các lý thuyết React được sử dụng thực tế trong project <strong>webbansach_frontend</strong></p>
+  <div class="topics-bar">
+    <span>useState</span><span>useEffect</span><span>useParams</span>
+    <span>Props & Interface</span><span>React Router DOM</span>
+    <span>Conditional Rendering</span><span>Array.map()</span>
+    <span>Async / Await</span><span>TypeScript</span>
+  </div>
+</header>
+
+<div class="wrapper">
+  <aside>
+    <h3>Nội Dung</h3>
+    <a href="#s1">1. JSX & Component</a>
+    <a href="#s2">2. Props & Interface</a>
+    <a href="#s3">3. useState</a>
+    <a href="#s4">4. useEffect</a>
+    <a href="#s5">5. useParams</a>
+    <a href="#s6">6. React Router DOM</a>
+    <a href="#s7">7. Conditional Rendering</a>
+    <a href="#s8">8. Array.map()</a>
+    <a href="#s9">9. Async / Await & API</a>
+    <a href="#s10">10. React.FC & TypeScript</a>
+    <a href="#s11">11. Luồng Dữ Liệu</a>
+  </aside>
+
+  <main>
+
+    <!-- ===== 1. JSX & Component ===== -->
+    <section id="s1">
+      <div class="section-header">
+        <div class="section-num">1</div>
+        <h2>JSX & Function Component</h2>
+      </div>
+      <p><strong>JSX</strong> (JavaScript XML) là cú pháp mở rộng cho phép viết HTML bên trong JavaScript. React biên dịch JSX thành các lời gọi <code>React.createElement()</code>.</p>
+      <p><strong>Function Component</strong> là hàm JavaScript thông thường nhận <code>props</code> vào và trả về JSX. Đây là cách xây dựng component phổ biến nhất trong React hiện đại.</p>
+      <pre><span class="cmt">// Cú pháp cơ bản của một Function Component</span>
+<span class="kw">function</span> <span class="fn">TenComponent</span>() {
+  <span class="cmt">// Logic JavaScript ở đây</span>
+  <span class="kw">return</span> (
+    <span class="jsx">&lt;div&gt;</span>
+      <span class="jsx">&lt;h1&gt;</span>Xin chào React!<span class="jsx">&lt;/h1&gt;</span>
+    <span class="jsx">&lt;/div&gt;</span>
+  );
+}
+<span class="kw">export default</span> TenComponent;</pre>
+
+      <div class="callout project">
+        <div class="callout-icon">📁</div>
+        <div>
+          <h4>Trong dự án</h4>
+          <p>Tất cả component đều là Function Component: <code>App()</code>, <code>Navbar()</code>, <code>HomePage()</code>, <code>DanhSachSanPham()</code>, <code>Footer()</code>…</p>
+        </div>
+      </div>
+      <pre><span class="cmt">// App.tsx – Component gốc của ứng dụng</span>
+<span class="kw">function</span> <span class="fn">App</span>() {
+  <span class="kw">return</span> (
+    <span class="jsx">&lt;div</span> className=<span class="str">"App"</span><span class="jsx">&gt;</span>
+      <span class="jsx">&lt;BrowserRouter&gt;</span>
+        <span class="jsx">&lt;Navbar ... /&gt;</span>
+        <span class="jsx">&lt;Routes&gt;</span> ... <span class="jsx">&lt;/Routes&gt;</span>
+        <span class="jsx">&lt;Footer /&gt;</span>
+      <span class="jsx">&lt;/BrowserRouter&gt;</span>
+    <span class="jsx">&lt;/div&gt;</span>
+  );
+}
+<span class="kw">export default</span> App;</pre>
+
+      <div class="callout info">
+        <div class="callout-icon">💡</div>
+        <div>
+          <h4>Lưu ý JSX</h4>
+          <p>Dùng <code>className</code> thay <code>class</code>, <code>htmlFor</code> thay <code>for</code>. Mọi thành phần JSX phải có một thẻ bọc ngoài duy nhất (hoặc dùng <code>&lt;&gt;...&lt;/&gt;</code>).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 2. Props & Interface ===== -->
+    <section id="s2">
+      <div class="section-header">
+        <div class="section-num">2</div>
+        <h2>Props & TypeScript Interface</h2>
+      </div>
+      <p><strong>Props</strong> (properties) là cơ chế truyền dữ liệu từ component cha xuống component con. Props là <em>read-only</em> – component con không được tự thay đổi props nhận vào.</p>
+      <p>Kết hợp với <strong>TypeScript Interface</strong>, ta định nghĩa rõ kiểu dữ liệu cho từng prop, giúp IDE báo lỗi sớm và code dễ bảo trì hơn.</p>
+      <pre><span class="cmt">// Bước 1: Định nghĩa Interface (kiểu Props)</span>
+<span class="kw">interface</span> <span class="type">NavbarProps</span> {
+  tuKhoaTimKiem: <span class="type">string</span>;
+  setTuKhoaTimKiem: (tuKhoa: <span class="type">string</span>) => <span class="type">void</span>;
+}
+
+<span class="cmt">// Bước 2: Nhận Props vào component (destructuring)</span>
+<span class="kw">function</span> <span class="fn">Navbar</span>({ tuKhoaTimKiem, setTuKhoaTimKiem }: <span class="type">NavbarProps</span>) {
+  <span class="kw">return</span> (<span class="jsx">&lt;nav&gt;</span>...<span class="jsx">&lt;/nav&gt;</span>);
+}
+
+<span class="cmt">// Bước 3: Truyền Props từ component cha</span>
+<span class="jsx">&lt;Navbar</span>
+  tuKhoaTimKiem={tuKhoaTimKiem}
+  setTuKhoaTimKiem={setTuKhoaTimKiem}
+<span class="jsx">/&gt;</span></pre>
+
+      <div class="callout project">
+        <div class="callout-icon">📁</div>
+        <div>
+          <h4>Trong dự án</h4>
+          <p><code>NavbarProps</code>, <code>HomePageProps</code>, <code>DanhSachSanPhamProps</code>, <code>PaginationInterface</code> đều là TypeScript interface định nghĩa props cho component tương ứng.</p>
+        </div>
+      </div>
+
+      <table>
+        <tr><th>Loại Prop</th><th>Ví dụ trong dự án</th><th>Mô tả</th></tr>
+        <tr><td><code>string</code></td><td><code>tuKhoaTimKiem: string</code></td><td>Từ khoá tìm kiếm</td></tr>
+        <tr><td><code>number</code></td><td><code>maTheLoai: number</code></td><td>Mã thể loại sách</td></tr>
+        <tr><td><code>function</code></td><td><code>setTuKhoaTimKiem: (s: string)=>void</code></td><td>Hàm callback cập nhật state ở cha</td></tr>
+        <tr><td><code>any</code></td><td><code>phanTrang: any</code></td><td>Hàm phân trang (nên dùng kiểu cụ thể hơn)</td></tr>
+      </table>
+    </section>
+
+    <!-- ===== 3. useState ===== -->
+    <section id="s3">
+      <div class="section-header">
+        <div class="section-num">3</div>
+        <h2>Hook: useState</h2>
+      </div>
+      <p><code>useState</code> là hook cho phép component lưu trữ và cập nhật dữ liệu. Khi state thay đổi, React tự động re-render lại component đó.</p>
+      <pre><span class="kw">const</span> [<span class="fn">giaTriHienTai</span>, <span class="fn">hamCapNhat</span>] = <span class="fn">useState</span>(<span class="str">giaTri_Ban_Dau</span>);</pre>
+
+      <pre><span class="cmt">// App.tsx – State từ khoá tìm kiếm toàn cục</span>
+<span class="kw">const</span> [tuKhoaTimKiem, setTuKhoaTimKiem] = <span class="fn">useState</span>(<span class="str">''</span>);
+
+<span class="cmt">// navbar.tsx – State tạm thời trong ô input</span>
+<span class="kw">const</span> [tuKhoaTamThoi, setTuKhoaTamThoi] = <span class="fn">useState</span>(<span class="str">''</span>);
+
+<span class="cmt">// DanhSachSanPham.tsx – Nhiều state quản lý danh sách sách</span>
+<span class="kw">const</span> [danhSachQuyenSach, setDanhSachQuyenSach] = <span class="fn">useState</span>&lt;<span class="type">SachModel[]</span>&gt;([]);
+<span class="kw">const</span> [dangTaiDuLieu, setDangTaiDuLieu]         = <span class="fn">useState</span>&lt;<span class="type">boolean</span>&gt;(<span class="kw">true</span>);
+<span class="kw">const</span> [baoLoi, setBaoLoi]                       = <span class="fn">useState</span>(<span class="kw">null</span>);
+<span class="kw">const</span> [trangHienTai, setTrangHienTai]           = <span class="fn">useState</span>(<span class="num">1</span>);
+<span class="kw">const</span> [tongSoTrang, setTongSoTrang]             = <span class="fn">useState</span>(<span class="num">0</span>);</pre>
+
+      <div class="callout tip">
+        <div class="callout-icon">✅</div>
+        <div>
+          <h4>Quy tắc quan trọng</h4>
+          <p>Không bao giờ trực tiếp gán <code>state = value</code>. Luôn dùng hàm setter như <code>setTrangHienTai(2)</code> để React biết cần re-render.</p>
+        </div>
+      </div>
+
+      <div class="callout warning">
+        <div class="callout-icon">⚠️</div>
+        <div>
+          <h4>Pattern: Nâng State Lên (Lifting State Up)</h4>
+          <p>Trong dự án, <code>tuKhoaTimKiem</code> được khai báo ở <code>App</code> rồi truyền cả <em>giá trị</em> lẫn <em>hàm setter</em> xuống <code>Navbar</code> và <code>HomePage</code>. Đây là cách chia sẻ state giữa các component anh em (siblings).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 4. useEffect ===== -->
+    <section id="s4">
+      <div class="section-header">
+        <div class="section-num">4</div>
+        <h2>Hook: useEffect</h2>
+      </div>
+      <p><code>useEffect</code> xử lý các <em>side effect</em>: gọi API, đăng ký event listener, thay đổi DOM… Nó chạy <strong>sau khi</strong> component render xong.</p>
+      <pre><span class="fn">useEffect</span>(() => {
+  <span class="cmt">// Code side effect ở đây</span>
+}, [<span class="str">dependency1</span>, <span class="str">dependency2</span>]); <span class="cmt">// Dependency Array</span></pre>
+
+      <table>
+        <tr><th>Dependency Array</th><th>Khi nào chạy?</th></tr>
+        <tr><td>Không có (bỏ qua)</td><td>Sau mỗi lần render</td></tr>
+        <tr><td><code>[]</code> (rỗng)</td><td>Chỉ một lần sau khi mount</td></tr>
+        <tr><td><code>[a, b]</code></td><td>Khi <code>a</code> hoặc <code>b</code> thay đổi</td></tr>
+      </table>
+
+      <div class="callout project">
+        <div class="callout-icon">📁</div>
+        <div>
+          <h4>Trong dự án – DanhSachSanPham.tsx</h4>
+          <p>Hai <code>useEffect</code> được dùng: (1) Reset trang về 1 khi từ khoá đổi, (2) Gọi API tìm kiếm khi trang/từ khoá/thể loại thay đổi.</p>
+        </div>
+      </div>
+
+      <pre><span class="cmt">// useEffect 1: Reset trang khi đổi từ khóa</span>
+<span class="fn">useEffect</span>(() => {
+  <span class="fn">setTrangHienTai</span>(<span class="num">1</span>);
+}, [tuKhoaTimKiem]);  <span class="cmt">// Chạy khi tuKhoaTimKiem thay đổi</span>
+
+<span class="cmt">// useEffect 2: Gọi API khi trang / từ khóa / thể loại thay đổi</span>
+<span class="fn">useEffect</span>(() => {
+  <span class="fn">timKiemSach</span>(tuKhoaTimKiem, maTheLoai, trangHienTai - <span class="num">1</span>)
+    .<span class="fn">then</span>(kq => {
+      <span class="fn">setDanhSachQuyenSach</span>(kq.ketQua);
+      <span class="fn">setTongSoTrang</span>(kq.tongSoTrang);
+      <span class="fn">setDangTaiDuLieu</span>(<span class="kw">false</span>);
+    })
+    .<span class="fn">catch</span>(error => {
+      <span class="fn">setBaoLoi</span>(error.message);
+      <span class="fn">setDangTaiDuLieu</span>(<span class="kw">false</span>);
+    });
+}, [trangHienTai, tuKhoaTimKiem, maTheLoai]);</pre>
+    </section>
+
+    <!-- ===== 5. useParams ===== -->
+    <section id="s5">
+      <div class="section-header">
+        <div class="section-num">5</div>
+        <h2>Hook: useParams</h2>
+      </div>
+      <p><code>useParams</code> (từ <code>react-router-dom</code>) trả về object chứa các tham số động trên URL, được khai báo bằng dấu <code>:</code> trong <code>Route</code>.</p>
+      <pre><span class="cmt">// Route khai báo tham số :maTheLoai</span>
+<span class="jsx">&lt;Route</span> path=<span class="str">'/:maTheLoai'</span> element={<span class="jsx">&lt;HomePage ... /&gt;</span>} <span class="jsx">/&gt;</span>
+
+<span class="cmt">// HomePage.tsx – đọc tham số từ URL</span>
+<span class="kw">const</span> { maTheLoai } = <span class="fn">useParams</span>();
+<span class="cmt">// URL: /3  →  maTheLoai = "3" (string)</span>
+
+<span class="kw">let</span> maTheLoaiNumber = <span class="fn">parseInt</span>(maTheLoai + <span class="str">''</span>);
+<span class="kw">if</span> (<span class="kw">Number</span>.<span class="fn">isNaN</span>(maTheLoaiNumber)) maTheLoaiNumber = <span class="num">0</span>;</pre>
+
+      <div class="callout warning">
+        <div class="callout-icon">⚠️</div>
+        <div>
+          <h4>Lưu ý</h4>
+          <p><code>useParams</code> luôn trả về <strong>string</strong>. Dự án dùng <code>parseInt</code> để chuyển sang <code>number</code> và validate với <code>Number.isNaN()</code> tránh lỗi khi URL không hợp lệ.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 6. React Router DOM ===== -->
+    <section id="s6">
+      <div class="section-header">
+        <div class="section-num">6</div>
+        <h2>React Router DOM</h2>
+      </div>
+      <p>Thư viện điều hướng cho React SPA (Single Page Application). Thay vì tải lại trang, router cập nhật URL và render component tương ứng mà không reload.</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon">🌐</div>
+          <h4>BrowserRouter</h4>
+          <p>Bọc toàn bộ app. Kích hoạt tính năng routing cho các component con bên trong.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🗺️</div>
+          <h4>Routes + Route</h4>
+          <p>Định nghĩa bảng ánh xạ URL → Component. <code>Routes</code> chọn <code>Route</code> khớp nhất.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔗</div>
+          <h4>Link</h4>
+          <p>Thay thế thẻ <code>&lt;a&gt;</code>. Điều hướng mà không reload trang, giữ SPA.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">📌</div>
+          <h4>useParams</h4>
+          <p>Hook đọc tham số động từ URL, ví dụ <code>/:maTheLoai</code>.</p>
+        </div>
+      </div>
+
+      <pre><span class="cmt">// App.tsx – Cấu trúc Routing của dự án</span>
+<span class="jsx">&lt;BrowserRouter&gt;</span>
+  <span class="jsx">&lt;Navbar ... /&gt;</span>
+
+  <span class="jsx">&lt;Routes&gt;</span>
+    <span class="jsx">&lt;Route</span> path=<span class="str">'/'</span>           element={<span class="jsx">&lt;HomePage ... /&gt;</span>} <span class="jsx">/&gt;</span>
+    <span class="jsx">&lt;Route</span> path=<span class="str">'/:maTheLoai'</span> element={<span class="jsx">&lt;HomePage ... /&gt;</span>} <span class="jsx">/&gt;</span>
+    <span class="jsx">&lt;Route</span> path=<span class="str">'/about'</span>      element={<span class="jsx">&lt;About /&gt;</span>}        <span class="jsx">/&gt;</span>
+  <span class="jsx">&lt;/Routes&gt;</span>
+
+  <span class="jsx">&lt;Footer /&gt;</span>
+<span class="jsx">&lt;/BrowserRouter&gt;</span>
+
+<span class="cmt">// navbar.tsx – Dùng Link thay &lt;a href&gt;</span>
+<span class="jsx">&lt;Link</span> to=<span class="str">"/"</span><span class="jsx">&gt;</span>Trang chủ<span class="jsx">&lt;/Link&gt;</span>
+<span class="jsx">&lt;Link</span> to=<span class="str">"/about"</span><span class="jsx">&gt;</span>Về Bookstore<span class="jsx">&lt;/Link&gt;</span>
+<span class="jsx">&lt;Link</span> to=<span class="str">"/1"</span><span class="jsx">&gt;</span>Tiểu thuyết<span class="jsx">&lt;/Link&gt;</span></pre>
+    </section>
+
+    <!-- ===== 7. Conditional Rendering ===== -->
+    <section id="s7">
+      <div class="section-header">
+        <div class="section-num">7</div>
+        <h2>Conditional Rendering</h2>
+      </div>
+      <p>Hiển thị UI khác nhau tuỳ theo điều kiện, tương tự câu lệnh <code>if</code> nhưng áp dụng trong JSX.</p>
+
+      <pre><span class="cmt">// DanhSachSanPham.tsx – 3 trường hợp</span>
+
+<span class="cmt">// 1. Đang tải dữ liệu</span>
+<span class="kw">if</span> (dangTaiDuLieu) {
+  <span class="kw">return</span> (<span class="jsx">&lt;div&gt;&lt;h1&gt;</span>Đang tải dữ liệu<span class="jsx">&lt;/h1&gt;&lt;/div&gt;</span>);
+}
+
+<span class="cmt">// 2. Có lỗi xảy ra</span>
+<span class="kw">if</span> (baoLoi) {
+  <span class="kw">return</span> (<span class="jsx">&lt;div&gt;&lt;h1&gt;</span>Gặp lỗi: {baoLoi}<span class="jsx">&lt;/h1&gt;&lt;/div&gt;</span>);
+}
+
+<span class="cmt">// 3. Không có sách</span>
+<span class="kw">if</span> (danhSachQuyenSach.length === <span class="num">0</span>) {
+  <span class="kw">return</span> (<span class="jsx">&lt;div&gt;&lt;h1&gt;</span>Sách bạn cần chúng tôi không bán<span class="jsx">&lt;/h1&gt;&lt;/div&gt;</span>);
+}
+
+<span class="cmt">// 4. Hiển thị danh sách bình thường</span>
+<span class="kw">return</span> (<span class="jsx">&lt;div&gt;</span>...danh sach sach...<span class="jsx">&lt;/div&gt;</span>);</pre>
+
+      <div class="callout tip">
+        <div class="callout-icon">✅</div>
+        <div>
+          <h4>Toán tử && trong JSX</h4>
+          <p>Dùng <code>&#123;dieu_kien &amp;&amp; &lt;Component /&gt;&#125;</code> để render có điều kiện trong JSX. Dùng toán tử ternary <code>a ? b : c</code> khi cần trả về 2 lựa chọn.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 8. Array.map() ===== -->
+    <section id="s8">
+      <div class="section-header">
+        <div class="section-num">8</div>
+        <h2>Render Danh Sách với Array.map()</h2>
+      </div>
+      <p>Để render một danh sách các phần tử, dùng <code>.map()</code> để biến mỗi phần tử data thành một component JSX. Mỗi phần tử phải có prop <code>key</code> duy nhất.</p>
+      <pre><span class="cmt">// DanhSachSanPham.tsx – Render danh sách sách</span>
+{
+  danhSachQuyenSach.<span class="fn">map</span>(sach => (
+    <span class="jsx">&lt;SachProps</span>
+      key={sach.maSach}  <span class="cmt">// KEY duy nhất, bắt buộc!</span>
+      sach={sach}
+    <span class="jsx">/&gt;</span>
+  ))
+}
+
+<span class="cmt">// pagination.tsx – Render danh sách số trang</span>
+{
+  danhSachTrang.<span class="fn">map</span>(trang => (
+    <span class="jsx">&lt;li</span>
+      key={trang}
+      className={<span class="str">"page-item "</span> + (trang === props.trangHienTai ? <span class="str">"active"</span> : <span class="str">""</span>)}
+      onClick={() => props.<span class="fn">phanTrang</span>(trang)}
+    <span class="jsx">&gt;</span>
+      <span class="jsx">&lt;button</span> className=<span class="str">"page-link"</span><span class="jsx">&gt;</span>{trang}<span class="jsx">&lt;/button&gt;</span>
+    <span class="jsx">&lt;/li&gt;</span>
+  ))
+}</pre>
+
+      <div class="callout warning">
+        <div class="callout-icon">⚠️</div>
+        <div>
+          <h4>Tại sao cần prop key?</h4>
+          <p>React dùng <code>key</code> để nhận biết phần tử nào cần cập nhật, thêm, hoặc xoá khi danh sách thay đổi, giúp tối ưu hiệu suất. Không dùng index mảng làm key nếu danh sách có thể thay đổi thứ tự.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 9. Async/Await & API ===== -->
+    <section id="s9">
+      <div class="section-header">
+        <div class="section-num">9</div>
+        <h2>Async / Await & Gọi API</h2>
+      </div>
+      <p>Giao tiếp với backend thông qua HTTP. Dự án dùng <code>fetch</code> kết hợp <code>async/await</code> trong tầng API riêng biệt (<code>src/api/</code>), rồi gọi từ component qua <code>useEffect</code>.</p>
+
+      <div class="flow">
+        <div class="flow-item">Component mount</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-item">useEffect kích hoạt</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-item">Gọi hàm API (async)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-item">fetch() backend</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-item">setState cập nhật UI</div>
+      </div>
+
+      <pre><span class="cmt">// api/Request.tsx – Hàm fetch tầng thấp nhất</span>
+<span class="kw">export async function</span> <span class="fn">my_request</span>(duongDan: <span class="type">string</span>) {
+  <span class="kw">const</span> response = <span class="kw">await</span> <span class="fn">fetch</span>(duongDan);
+  <span class="kw">if</span> (!response.ok) <span class="kw">throw new</span> <span class="type">Error</span>(<span class="str">'Lỗi khi gọi API'</span>);
+  <span class="kw">return</span> response.<span class="fn">json</span>();
+}
+
+<span class="cmt">// api/SachAPI.ts – Hàm nghiệp vụ</span>
+<span class="kw">async function</span> <span class="fn">laySach</span>(duongDan: <span class="type">string</span>): <span class="type">Promise</span>&lt;<span class="type">KetQuaInterface</span>&gt; {
+  <span class="kw">const</span> response = <span class="kw">await</span> <span class="fn">my_request</span>(duongDan);
+  <span class="cmt">// Xử lý dữ liệu, map sang SachModel...</span>
+  <span class="kw">return</span> { ketQua, tongSoTrang, tongSoSach };
+}
+
+<span class="cmt">// Component – Gọi API và xử lý kết quả</span>
+<span class="fn">timKiemSach</span>(tuKhoaTimKiem, maTheLoai, trangHienTai - <span class="num">1</span>)
+  .<span class="fn">then</span>(kq => {                       <span class="cmt">// Thành công</span>
+    <span class="fn">setDanhSachQuyenSach</span>(kq.ketQua);
+    <span class="fn">setDangTaiDuLieu</span>(<span class="kw">false</span>);
+  })
+  .<span class="fn">catch</span>(error => {                   <span class="cmt">// Thất bại</span>
+    <span class="fn">setBaoLoi</span>(error.message);
+    <span class="fn">setDangTaiDuLieu</span>(<span class="kw">false</span>);
+  });</pre>
+
+      <div class="callout info">
+        <div class="callout-icon">💡</div>
+        <div>
+          <h4>async/await vs .then/.catch</h4>
+          <p>Cả hai đều xử lý Promise. <code>async/await</code> giúp code đọc theo chiều dọc dễ hơn. <code>.then/.catch</code> dùng khi không cần <code>await</code> kết quả ngay (ví dụ gọi trong <code>useEffect</code> không dùng <code>async</code> trực tiếp).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 10. React.FC & TypeScript ===== -->
+    <section id="s10">
+      <div class="section-header">
+        <div class="section-num">10</div>
+        <h2>React.FC & TypeScript trong Component</h2>
+      </div>
+      <p><code>React.FC</code> (Function Component) là kiểu TypeScript generic giúp typing props rõ ràng hơn. Dự án dùng cả hai cách khai báo component.</p>
+      <pre><span class="cmt">// Cách 1: Function bình thường + Interface (phần lớn dự án dùng)</span>
+<span class="kw">function</span> <span class="fn">DanhSachSanPham</span>({ tuKhoaTimKiem, maTheLoai }: <span class="type">DanhSachSanPhamProps</span>) {
+  ...
+}
+
+<span class="cmt">// Cách 2: React.FC Generic (pagination.tsx dùng)</span>
+<span class="kw">export const</span> Pagination: <span class="type">React.FC</span>&lt;<span class="type">PaginationInterface</span>&gt; = (props) => {
+  ...
+}</pre>
+
+      <p>TypeScript cũng được dùng để định nghĩa <strong>Model</strong> cho dữ liệu từ API:</p>
+      <pre><span class="cmt">// model/SachModel.ts – Kiểu dữ liệu cho một cuốn sách</span>
+<span class="kw">interface</span> <span class="type">SachModel</span> {
+  maSach: <span class="type">number</span>;
+  tenSach: <span class="type">string</span>;
+  tenTacGia?: <span class="type">string</span>;   <span class="cmt">// ? = optional</span>
+  giaNiemYet?: <span class="type">number</span>;
+  giaBan?: <span class="type">number</span>;
+  moTa?: <span class="type">string</span>;
+}</pre>
+    </section>
+
+    <!-- ===== 11. Luồng Dữ Liệu ===== -->
+    <section id="s11">
+      <div class="section-header">
+        <div class="section-num">11</div>
+        <h2>Luồng Dữ Liệu Tổng Thể</h2>
+      </div>
+      <p>Sơ đồ cách dữ liệu và sự kiện đi qua các tầng của dự án:</p>
+
+      <pre><span class="cmt">╔══════════════════════════════════════════════════════════╗
+║                         App.tsx                          ║
+║  state: tuKhoaTimKiem                                    ║
+╠══════════════╦═══════════════════════════════════════════╣
+║   Navbar     ║              Routes                       ║
+║  (props: từ  ║  /        → HomePage → DanhSachSanPham    ║
+║  khóa + set) ║  /:maThe  → HomePage → DanhSachSanPham    ║
+║              ║  /about   → About                         ║
+╚══════════════╩═══════════════════════════════════════════╝
+
+User gõ từ khóa:
+  Navbar → setTuKhoaTamThoi (local state)
+  Click Search → setTuKhoaTimKiem (App state)
+  App re-render → truyền tuKhoaTimKiem mới xuống HomePage
+  DanhSachSanPham → useEffect kích hoạt → gọi API → re-render list
+
+User click thể loại (Link to="/1"):
+  URL đổi → Route /:maTheLoai khớp
+  HomePage → useParams() → maTheLoai = "1"
+  DanhSachSanPham nhận maTheLoai=1 → useEffect → gọi API lọc</span></pre>
+
+      <div class="callout info">
+        <div class="callout-icon">💡</div>
+        <div>
+          <h4>One-Way Data Flow</h4>
+          <p>React luôn truyền dữ liệu <strong>một chiều</strong>: từ cha xuống con qua props. Để con cập nhật cha, con gọi hàm callback được cha truyền xuống (ví dụ <code>setTuKhoaTimKiem</code>).</p>
+        </div>
+      </div>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon">🔄</div>
+          <h4>useState + useEffect</h4>
+          <p>Kết hợp cốt lõi: state thay đổi → useEffect chạy → gọi API → setState lại → re-render.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔀</div>
+          <h4>URL = State</h4>
+          <p>Thể loại sách được lưu trên URL (<code>/1</code>, <code>/2</code>…), đọc qua <code>useParams</code>. URL vừa là navigation vừa là state.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🧱</div>
+          <h4>Tách Tầng API</h4>
+          <p>Dự án tách logic gọi API vào <code>src/api/</code> riêng, giúp component sạch và dễ test.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">📐</div>
+          <h4>TypeScript Interfaces</h4>
+          <p>Mọi Props và Model đều có Interface, đảm bảo type safety và hiển thị gợi ý trong IDE.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // Highlight sidebar link active theo scroll
+  const sections = document.querySelectorAll('section[id]');
+  const links = document.querySelectorAll('aside a');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`aside a[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.4 });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
