@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Trang Web</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #0f1117;
+            display: flex;
+            justify-content: center; /* Căn giữa vùng menu trên màn hình */
+            padding-top: 80px; 
+            margin: 0;
+            color: #e2e8f0;
+        }
+
+        /* Vùng chứa các khối link để kiểm soát chiều rộng */
+        .menu-container {
+            width: 100%;
+            max-width: 400px; /* Chiều rộng tối đa của các khối */
+            display: flex;
+            flex-direction: column;
+            gap: 12px; /* Khoảng cách giữa các khối */
+        }
+
+        .link-block {
+            background-color: #1a1d2e;
+            color: #cbd5e1; /* Màu chữ xám đen, không quá chói */
+            text-decoration: none;
+            padding: 14px 18px;
+            border-radius: 8px;
+            border: 1px solid #2e3150;
+            
+            font-size: 15px;
+            font-weight: normal; /* Chữ không in đậm */
+            text-align: left;    /* Căn sát lề trái */
+            
+            /* Xử lý tên quá dài thành 3 chấm */
+            white-space: nowrap; 
+            overflow: hidden;
+            text-overflow: ellipsis;
+            
+            /* Hiệu ứng khi tương tác */
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-left: 4px solid transparent; /* Chuẩn bị viền trái ẩn */
+        }
+
+        .link-block:hover {
+            background-color: #242740;
+            border-color: #6c63ff;
+            border-left: 4px solid #6c63ff; /* Hiện viền xanh bên trái khi di chuột */
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="menu-container">
+        <a href="react/huong-dan-react.html" class="link-block">Hướng dẫn frontend react web bán sách</a>
+
+      
+    </div>
+
+</body>
+</html>
