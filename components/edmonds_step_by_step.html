@@ -1,0 +1,988 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thuật toán Edmonds' Branching – Hướng dẫn từng bước</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0f1a;
+    --panel: #111827;
+    --panel2: #1a2235;
+    --border: #1e2d45;
+    --accent: #38bdf8;
+    --accent2: #f59e0b;
+    --accent3: #34d399;
+    --accent4: #f472b6;
+    --danger: #f87171;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --code-bg: #0d1117;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, #0b0f1a 0%, #0f1e35 60%, #0b1525 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 56px 48px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(56,189,248,.12) 0%, transparent 70%);
+  }
+  header::after {
+    content: 'G=(V,E)';
+    position: absolute;
+    bottom: 12px; right: 48px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 72px;
+    color: rgba(56,189,248,.04);
+    font-weight: 700;
+    pointer-events: none;
+  }
+  .badge {
+    display: inline-block;
+    background: rgba(56,189,248,.12);
+    border: 1px solid rgba(56,189,248,.3);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 900;
+    line-height: 1.15;
+    background: linear-gradient(90deg, #e2e8f0 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    max-width: 700px;
+  }
+  header p {
+    margin-top: 12px;
+    color: var(--muted);
+    max-width: 580px;
+    font-size: 14px;
+  }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 1080px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  /* ── SECTION TITLES ── */
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    color: var(--text);
+  }
+
+  /* ── OVERVIEW CARDS ── */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 56px;
+  }
+  .ov-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 20px 18px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color .2s, transform .2s;
+  }
+  .ov-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .ov-card .ico {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+  .ov-card h3 { font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 4px; }
+  .ov-card p  { font-size: 14px; color: var(--text); font-weight: 400; }
+  .ov-card .num {
+    position: absolute; top: 16px; right: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 32px; font-weight: 700;
+    color: rgba(255,255,255,.04);
+  }
+
+  /* ── STEP BLOCKS ── */
+  .step-list { display: flex; flex-direction: column; gap: 32px; margin-bottom: 56px; }
+
+  .step {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color .25s;
+  }
+  .step:hover { border-color: rgba(56,189,248,.3); }
+
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    cursor: pointer;
+    user-select: none;
+    background: var(--panel);
+    transition: background .2s;
+  }
+  .step-header:hover { background: var(--panel2); }
+
+  .step-num {
+    width: 40px; height: 40px; min-width: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .step-title { font-size: 16px; font-weight: 500; flex: 1; }
+  .step-arrow {
+    font-size: 12px;
+    color: var(--muted);
+    transition: transform .3s;
+  }
+  .step.open .step-arrow { transform: rotate(90deg); }
+
+  .step-body {
+    display: none;
+    padding: 0 24px 24px;
+    border-top: 1px solid var(--border);
+  }
+  .step.open .step-body { display: block; }
+
+  .step-desc { margin-top: 18px; color: #94a3b8; font-size: 14px; line-height: 1.8; }
+  .step-desc strong { color: var(--text); }
+
+  /* ── CODE BLOCK ── */
+  .code-wrap { margin-top: 20px; border-radius: 10px; overflow: hidden; }
+  .code-title {
+    background: #0d1117;
+    border-bottom: 1px solid #1e2d45;
+    padding: 8px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: .08em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .code-dot { width: 8px; height: 8px; border-radius: 50%; }
+  pre {
+    background: var(--code-bg);
+    padding: 20px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.75;
+    tab-size: 4;
+  }
+  .kw  { color: #ff79c6; }
+  .cm  { color: #6272a4; font-style: italic; }
+  .str { color: #f1fa8c; }
+  .fn  { color: #50fa7b; }
+  .num { color: #bd93f9; }
+  .var { color: #8be9fd; }
+  .op  { color: #ff79c6; }
+
+  /* ── ANALOGY BOX ── */
+  .analogy {
+    margin-top: 18px;
+    background: rgba(52,211,153,.07);
+    border: 1px solid rgba(52,211,153,.2);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 13.5px;
+    color: #a7f3d0;
+    display: flex;
+    gap: 10px;
+  }
+  .analogy span { font-size: 18px; flex-shrink: 0; }
+
+  /* ── NOTE BOX ── */
+  .note {
+    margin-top: 14px;
+    background: rgba(245,158,11,.07);
+    border: 1px solid rgba(245,158,11,.2);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 13.5px;
+    color: #fde68a;
+    display: flex;
+    gap: 10px;
+  }
+
+  /* ── VISUAL GRAPH ── */
+  .graph-section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 56px;
+  }
+  .graph-section h2 { margin-bottom: 8px; }
+
+  .graph-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 7px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all .2s;
+    letter-spacing: .03em;
+  }
+  .tab-btn:hover, .tab-btn.active {
+    background: rgba(56,189,248,.12);
+    border-color: rgba(56,189,248,.4);
+    color: var(--accent);
+  }
+
+  svg.graph-svg { width: 100%; max-width: 640px; display: block; margin: 0 auto; }
+
+  .graph-legend {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .leg-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+  .leg-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .leg-line { width: 24px; height: 2px; }
+
+  /* ── COMPLEXITY TABLE ── */
+  .complexity-section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 56px;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    background: var(--panel2);
+    text-align: left;
+    padding: 11px 16px;
+    font-size: 12px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(30,45,69,.6);
+    font-size: 13.5px;
+    color: #94a3b8;
+    vertical-align: top;
+  }
+  td:first-child { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: 13px; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(56,189,248,.03); }
+
+  /* ── CLASS OVERVIEW ── */
+  .classes-section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 56px;
+  }
+  .class-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .class-card {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .class-card h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--accent3);
+    margin-bottom: 6px;
+  }
+  .class-card p { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 32px;
+    color: var(--muted);
+    font-size: 12px;
+    border-top: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  .step { animation: fadeIn .4s ease both; }
+  .step:nth-child(1) { animation-delay: .05s; }
+  .step:nth-child(2) { animation-delay: .1s; }
+  .step:nth-child(3) { animation-delay: .15s; }
+  .step:nth-child(4) { animation-delay: .2s; }
+  .step:nth-child(5) { animation-delay: .25s; }
+  .step:nth-child(6) { animation-delay: .3s; }
+
+  /* graph node animation */
+  @keyframes pulse { 0%,100%{r:18} 50%{r:22} }
+  .pulsing { animation: pulse 1s ease-in-out infinite; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">Thuật toán đồ thị có hướng</div>
+  <h1>Edmonds' Branching<br>Chu-Liu / Edmonds (1965)</h1>
+  <p>Hướng dẫn từng bước để hiểu thuật toán tìm <strong>Minimum Spanning Arborescence</strong> — cây khung nhỏ nhất có hướng trên đồ thị.</p>
+</header>
+
+<div class="container">
+
+  <!-- ── OVERVIEW CARDS ── -->
+  <div class="overview-grid">
+    <div class="ov-card">
+      <div class="num">1</div>
+      <div class="ico" style="background:rgba(56,189,248,.1)">🎯</div>
+      <h3>Bài toán</h3>
+      <p>Cho đồ thị có hướng G, gốc r. Tìm cây đến được mọi đỉnh, trọng số nhỏ nhất.</p>
+    </div>
+    <div class="ov-card">
+      <div class="num">2</div>
+      <div class="ico" style="background:rgba(245,158,11,.1)">🔁</div>
+      <h3>Phương pháp</h3>
+      <p>Tham lam + Co rút chu trình (contraction) + Đệ quy.</p>
+    </div>
+    <div class="ov-card">
+      <div class="num">3</div>
+      <div class="ico" style="background:rgba(52,211,153,.1)">⏱</div>
+      <h3>Độ phức tạp</h3>
+      <p>O(E·V) với cài đặt đơn giản. O(E + V log V) với Fibonacci Heap.</p>
+    </div>
+    <div class="ov-card">
+      <div class="num">4</div>
+      <div class="ico" style="background:rgba(244,114,182,.1)">✅</div>
+      <h3>Ứng dụng</h3>
+      <p>Mạng phân tán, NLP dependency trees, định tuyến có hướng.</p>
+    </div>
+  </div>
+
+  <!-- ── GRAPH VIZ ── -->
+  <div class="graph-section">
+    <div class="section-label">Minh họa trực quan</div>
+    <h2>Đồ thị mẫu & Kết quả MSA</h2>
+
+    <div class="graph-tabs">
+      <button class="tab-btn active" onclick="showGraph('original')">Đồ thị gốc G</button>
+      <button class="tab-btn" onclick="showGraph('minin')">Bước 1: chọn minIn</button>
+      <button class="tab-btn" onclick="showGraph('cycle')">Bước 3: chu trình C</button>
+      <button class="tab-btn" onclick="showGraph('msa')">Kết quả MSA</button>
+    </div>
+
+    <svg class="graph-svg" id="graphSvg" viewBox="0 0 600 380" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrowBlue" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#38bdf8"/>
+        </marker>
+        <marker id="arrowGray" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#334155"/>
+        </marker>
+        <marker id="arrowGreen" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#34d399"/>
+        </marker>
+        <marker id="arrowRed" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#f87171"/>
+        </marker>
+        <marker id="arrowAmber" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#f59e0b"/>
+        </marker>
+      </defs>
+      <!-- edges drawn by JS -->
+      <g id="edgesLayer"></g>
+      <!-- nodes drawn by JS -->
+      <g id="nodesLayer"></g>
+    </svg>
+
+    <div class="graph-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#475569"></div> Cạnh thường</div>
+      <div class="leg-item"><div class="leg-line" style="background:#38bdf8"></div> minIn (rẻ nhất)</div>
+      <div class="leg-item"><div class="leg-line" style="background:#f87171"></div> Chu trình C</div>
+      <div class="leg-item"><div class="leg-line" style="background:#34d399"></div> MSA cuối</div>
+    </div>
+  </div>
+
+  <!-- ── STEPS ── -->
+  <div class="section-label">Giải thích chi tiết</div>
+  <h2 style="margin-bottom:24px">6 Bước thuật toán</h2>
+  <div class="step-list">
+
+    <!-- STEP 1 -->
+    <div class="step open" id="s1">
+      <div class="step-header" onclick="toggleStep('s1')">
+        <div class="step-num" style="background:rgba(56,189,248,.15);color:#38bdf8">B1</div>
+        <div class="step-title">Chọn cạnh vào rẻ nhất cho mỗi đỉnh (minIn)</div>
+        <div class="step-arrow">▶</div>
+      </div>
+      <div class="step-body">
+        <div class="step-desc">
+          Với mỗi đỉnh <strong>v ≠ root</strong>, duyệt qua mọi cạnh đi <em>vào</em> v, chọn cạnh có <strong>trọng số nhỏ nhất</strong> — gọi là <code>minIn[v]</code>.<br><br>
+          Nếu có đỉnh không có cạnh vào nào → <strong>không tồn tại arborescence</strong>, trả về null.
+        </div>
+        <div class="analogy">
+          <span>💡</span>
+          <div><strong>Hình dung:</strong> Mỗi đỉnh (trừ gốc) chọn 1 "ông chủ" rẻ nhất để phụ thuộc vào. Bước này giống thuật toán tham lam, nhưng chưa chắc đúng vì có thể tạo vòng lặp.</div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-title">
+            <div class="code-dot" style="background:#ff5f57"></div>
+            <div class="code-dot" style="background:#febc2e"></div>
+            <div class="code-dot" style="background:#28c840"></div>
+            Edmonds_Branching.java — Bước 1
+          </div>
+          <pre><span class="cm">// minIn[v] = cạnh rẻ nhất đi vào v</span>
+<span class="var">DirectedEdge</span>[] <span class="var">minIn</span> = <span class="kw">new</span> <span class="var">DirectedEdge</span>[n];
+<span class="kw">double</span>[]       <span class="var">minW</span>  = <span class="kw">new</span> <span class="kw">double</span>[n];
+<span class="var">Arrays</span>.<span class="fn">fill</span>(minW, Double.POSITIVE_INFINITY);
+
+<span class="kw">for</span> (<span class="var">DirectedEdge</span> e : G.<span class="fn">edges</span>()) {
+    <span class="kw">int</span> <span class="var">vao</span> = e.<span class="fn">to</span>();
+    <span class="kw">int</span> <span class="var">ra</span>  = e.<span class="fn">from</span>();
+    <span class="kw">if</span> (vao == root) <span class="kw">continue</span>; <span class="cm">// gốc không có cha</span>
+    <span class="kw">if</span> (ra  == vao)  <span class="kw">continue</span>; <span class="cm">// bỏ tự vòng</span>
+    <span class="kw">if</span> (e.<span class="fn">weight</span>() &lt; minW[vao]) {
+        minW[vao]  = e.<span class="fn">weight</span>();
+        minIn[vao] = e;
+    }
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step" id="s2">
+      <div class="step-header" onclick="toggleStep('s2')">
+        <div class="step-num" style="background:rgba(245,158,11,.15);color:#f59e0b">B2</div>
+        <div class="step-title">Kiểm tra chu trình trong tập minIn</div>
+        <div class="step-arrow">▶</div>
+      </div>
+      <div class="step-body">
+        <div class="step-desc">
+          Xây đồ thị con chỉ gồm các cạnh <code>minIn</code> và chạy <strong>phát hiện chu trình có hướng</strong> (DFS).<br><br>
+          ✅ <strong>Không có chu trình</strong> → tập minIn đã là MSA hợp lệ. Trả về ngay, thuật toán kết thúc!<br>
+          ❌ <strong>Có chu trình</strong> → tiếp tục Bước 3.
+        </div>
+        <div class="note">
+          <span>⚠️</span>
+          <div>Tại sao tập minIn có thể là MSA? Vì mỗi đỉnh đã chọn cạnh vào rẻ nhất, nếu không có vòng thì đây đúng là cây khung tối ưu — không thể làm tốt hơn được nữa.</div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-title">
+            <div class="code-dot" style="background:#ff5f57"></div>
+            <div class="code-dot" style="background:#febc2e"></div>
+            <div class="code-dot" style="background:#28c840"></div>
+            Bước 2
+          </div>
+          <pre><span class="var">EdgeWeightedDigraph</span> <span class="var">subG</span> = <span class="fn">buildSubgraph</span>(n, minIn, root);
+<span class="var">EdgeWeightedDirectedCycle</span> <span class="var">cycleFinder</span> = <span class="kw">new</span> <span class="var">EdgeWeightedDirectedCycle</span>(subG);
+
+<span class="kw">if</span> (!cycleFinder.<span class="fn">hasCycle</span>()) {
+    <span class="cm">// Không có chu trình → minIn chính là MSA</span>
+    <span class="var">List</span>&lt;<span class="var">DirectedEdge</span>&gt; <span class="var">result</span> = <span class="kw">new</span> <span class="var">ArrayList</span>&lt;&gt;();
+    <span class="kw">for</span> (<span class="kw">int</span> vao = <span class="num">0</span>; vao &lt; n; vao++)
+        <span class="kw">if</span> (vao != root &amp;&amp; minIn[vao] != <span class="kw">null</span>)
+            result.<span class="fn">add</span>(minIn[vao]);
+    <span class="kw">return</span> result; <span class="cm">// ← MSA hoàn chỉnh!</span>
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step" id="s3">
+      <div class="step-header" onclick="toggleStep('s3')">
+        <div class="step-num" style="background:rgba(244,114,182,.15);color:#f472b6">B3</div>
+        <div class="step-title">Tìm và đánh dấu chu trình C</div>
+        <div class="step-arrow">▶</div>
+      </div>
+      <div class="step-body">
+        <div class="step-desc">
+          Lấy chu trình C từ <code>cycleFinder</code>, đánh dấu tất cả đỉnh nằm trong C bằng mảng <code>inCycle[]</code>.
+        </div>
+        <div class="analogy">
+          <span>💡</span>
+          <div><strong>Trong ví dụ:</strong> Đỉnh 1 → 2, cạnh 2 → 3, cạnh 3 → 1 tạo thành chu trình <strong>C = {1, 2, 3}</strong>. Đây là "vòng lặp" phải xử lý.</div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-title">
+            <div class="code-dot" style="background:#ff5f57"></div>
+            <div class="code-dot" style="background:#febc2e"></div>
+            <div class="code-dot" style="background:#28c840"></div>
+            Bước 3
+          </div>
+          <pre><span class="var">List</span>&lt;<span class="var">DirectedEdge</span>&gt; <span class="var">cycleEdgeList</span> = <span class="kw">new</span> <span class="var">ArrayList</span>&lt;&gt;();
+<span class="kw">for</span> (<span class="var">DirectedEdge</span> e : cycleFinder.<span class="fn">cycle</span>())
+    cycleEdgeList.<span class="fn">add</span>(e);
+
+<span class="cm">// Đánh dấu đỉnh nào trong chu trình</span>
+<span class="kw">boolean</span>[] <span class="var">inCycle</span> = <span class="kw">new</span> <span class="kw">boolean</span>[n];
+<span class="kw">for</span> (<span class="var">DirectedEdge</span> e : cycleEdgeList) {
+    inCycle[e.<span class="fn">from</span>()] = <span class="kw">true</span>;
+    inCycle[e.<span class="fn">to</span>()]   = <span class="kw">true</span>;
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step" id="s4">
+      <div class="step-header" onclick="toggleStep('s4')">
+        <div class="step-num" style="background:rgba(52,211,153,.15);color:#34d399">B4</div>
+        <div class="step-title">Co rút chu trình C thành siêu đỉnh → đồ thị G'</div>
+        <div class="step-arrow">▶</div>
+      </div>
+      <div class="step-body">
+        <div class="step-desc">
+          Gộp toàn bộ đỉnh trong C thành <strong>1 siêu đỉnh</strong> duy nhất (<code>superNodeId</code>). Xây đồ thị mới G' nhỏ hơn G.<br><br>
+          <strong>Quan trọng:</strong> Các cạnh từ ngoài đi <em>vào</em> C phải điều chỉnh trọng số:<br>
+          <code style="background:var(--code-bg);padding:2px 6px;border-radius:4px;color:#bd93f9">w' = w(e) − minW[v]</code><br><br>
+          Vì: nếu ta chọn cạnh ngoài đi vào đỉnh v trong C, ta phải <em>bỏ</em> cạnh <code>minIn[v]</code> vốn đang có trong C. Chi phí thực chỉ là phần chênh lệch.
+        </div>
+        <div class="note">
+          <span>⚠️</span>
+          <div><strong>Tại sao giảm trọng số?</strong> Khi chọn cạnh ngoài vào đỉnh v, ta ngầm hiểu là đã "tiêu" chi phí <code>minW[v]</code> rồi (vì toàn bộ minIn của C đã được tính vào chu trình). Nên chỉ tính thêm phần dư = <code>w − minW[v]</code>.</div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-title">
+            <div class="code-dot" style="background:#ff5f57"></div>
+            <div class="code-dot" style="background:#febc2e"></div>
+            <div class="code-dot" style="background:#28c840"></div>
+            Bước 4 — Co rút & xây G'
+          </div>
+          <pre><span class="cm">// Gán id mới: đỉnh ngoài C → 0,1,2,...; đỉnh trong C → superNodeId</span>
+<span class="kw">int</span>[] <span class="var">newId</span> = <span class="kw">new</span> <span class="kw">int</span>[n];
+<span class="kw">int</span>   <span class="var">counter</span> = <span class="num">0</span>;
+<span class="kw">for</span> (<span class="kw">int</span> v = <span class="num">0</span>; v &lt; n; v++)
+    <span class="kw">if</span> (!inCycle[v]) newId[v] = counter++;
+<span class="kw">int</span> <span class="var">superNodeId</span> = counter++;
+<span class="kw">for</span> (<span class="kw">int</span> v = <span class="num">0</span>; v &lt; n; v++)
+    <span class="kw">if</span> (inCycle[v]) newId[v] = superNodeId;
+
+<span class="cm">// Thêm cạnh vào G', điều chỉnh trọng số cạnh vào C</span>
+<span class="kw">for</span> (<span class="var">DirectedEdge</span> e : G.<span class="fn">edges</span>()) {
+    <span class="kw">if</span> (inCycle[ra] &amp;&amp; inCycle[vao])  <span class="kw">continue</span>; <span class="cm">// bỏ nội bộ C</span>
+    <span class="kw">double</span> <span class="var">newWeight</span> = inCycle[vao]
+        ? (e.<span class="fn">weight</span>() - minW[vao]) <span class="cm">// cạnh vào C: giảm trọng số</span>
+        : e.<span class="fn">weight</span>();               <span class="cm">// cạnh thường: giữ nguyên</span>
+    contractedG.<span class="fn">addEdge</span>(<span class="kw">new</span> <span class="var">DirectedEdge</span>(nra, nvao, newWeight));
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step" id="s5">
+      <div class="step-header" onclick="toggleStep('s5')">
+        <div class="step-num" style="background:rgba(139,92,246,.15);color:#a78bfa">B5</div>
+        <div class="step-title">Đệ quy: tìm MSA trên G' (nhỏ hơn)</div>
+        <div class="step-arrow">▶</div>
+      </div>
+      <div class="step-body">
+        <div class="step-desc">
+          Gọi đệ quy <code>edmonds(contractedG, newRoot)</code>. Mỗi lần đệ quy, G' nhỏ hơn G ít nhất <strong>1 đỉnh</strong> (nhiều đỉnh C → 1 siêu đỉnh), đảm bảo thuật toán luôn kết thúc.
+        </div>
+        <div class="analogy">
+          <span>💡</span>
+          <div><strong>Tại sao đệ quy hoạt động?</strong> Sau mỗi co rút, số đỉnh giảm đi ít nhất 1. Khi G' còn 1 đỉnh thì hiển nhiên không có chu trình → base case của đệ quy.</div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-title">
+            <div class="code-dot" style="background:#ff5f57"></div>
+            <div class="code-dot" style="background:#febc2e"></div>
+            <div class="code-dot" style="background:#28c840"></div>
+            Bước 5
+          </div>
+          <pre><span class="cm">// Đệ quy — G' nhỏ hơn G, sẽ đạt base case</span>
+<span class="var">List</span>&lt;<span class="var">DirectedEdge</span>&gt; <span class="var">contractedMSA</span> = <span class="fn">edmonds</span>(contractedG, newRoot);
+<span class="kw">if</span> (contractedMSA == <span class="kw">null</span>) <span class="kw">return null</span>;</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 6 -->
+    <div class="step" id="s6">
+      <div class="step-header" onclick="toggleStep('s6')">
+        <div class="step-num" style="background:rgba(248,113,113,.15);color:#f87171">B6</div>
+        <div class="step-title">Mở rộng siêu đỉnh — phục hồi kết quả gốc</div>
+        <div class="step-arrow">▶</div>
+      </div>
+      <div class="step-body">
+        <div class="step-desc">
+          Sau khi có MSA trên G', ta phục hồi về đồ thị gốc:<br><br>
+          1. Dịch mỗi cạnh trong <code>contractedMSA</code> về cạnh gốc tương ứng (qua bảng ánh xạ <code>originalList</code>).<br>
+          2. Tìm đỉnh <code>replacedVertex</code>: đỉnh trong C bị cạnh từ <em>ngoài</em> thay thế.<br>
+          3. Thêm lại <strong>tất cả cạnh của C</strong>, trừ cạnh đi vào <code>replacedVertex</code> (vì đỉnh đó đã có cha từ ngoài rồi).
+        </div>
+        <div class="analogy">
+          <span>💡</span>
+          <div><strong>Tại sao bỏ đúng 1 cạnh trong C?</strong> Arborescence yêu cầu mỗi đỉnh có đúng 1 cạnh vào (trừ gốc). Khi cạnh ngoài vào đỉnh v, đỉnh v đã có cha → phải xóa cạnh minIn[v] trong C để không vi phạm.</div>
+        </div>
+        <div class="code-wrap">
+          <div class="code-title">
+            <div class="code-dot" style="background:#ff5f57"></div>
+            <div class="code-dot" style="background:#febc2e"></div>
+            <div class="code-dot" style="background:#28c840"></div>
+            Bước 6 — Phục hồi
+          </div>
+          <pre><span class="kw">int</span> <span class="var">replacedVertex</span> = -<span class="num">1</span>;
+
+<span class="kw">for</span> (<span class="var">DirectedEdge</span> ce : contractedMSA) {
+    <span class="var">DirectedEdge</span> <span class="var">original</span> = <span class="fn">findOriginalEdge</span>(ce, ...);
+    <span class="kw">if</span> (original != <span class="kw">null</span>) {
+        result.<span class="fn">add</span>(original);
+        <span class="kw">if</span> (ce.<span class="fn">to</span>() == superNodeId)
+            replacedVertex = original.<span class="fn">to</span>(); <span class="cm">// đỉnh bị cạnh ngoài thay thế</span>
+    }
+}
+
+<span class="cm">// Thêm chu trình C, bỏ cạnh vào replacedVertex</span>
+<span class="kw">for</span> (<span class="var">DirectedEdge</span> e : cycleEdgeList)
+    <span class="kw">if</span> (e.<span class="fn">to</span>() != replacedVertex)
+        result.<span class="fn">add</span>(e);</pre>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end step-list -->
+
+  <!-- ── CLASSES ── -->
+  <div class="classes-section">
+    <div class="section-label">Cấu trúc code</div>
+    <h2>Các lớp sử dụng trong bài</h2>
+    <div class="class-cards">
+      <div class="class-card">
+        <h4>DirectedEdge</h4>
+        <p>Cạnh có hướng: <code>from()</code>, <code>to()</code>, <code>weight()</code>. Bất biến sau khi tạo.</p>
+      </div>
+      <div class="class-card">
+        <h4>EdgeWeightedDigraph</h4>
+        <p>Đồ thị có hướng có trọng số. Danh sách kề <code>adj(v)</code>, phương thức <code>edges()</code>.</p>
+      </div>
+      <div class="class-card">
+        <h4>EdgeWeightedDirectedCycle</h4>
+        <p>Phát hiện chu trình có hướng bằng DFS. <code>hasCycle()</code>, <code>cycle()</code> trả về danh sách cạnh.</p>
+      </div>
+      <div class="class-card">
+        <h4>Edmons_Branching</h4>
+        <p>Lớp chính. Constructor nhận G và root, gọi đệ quy <code>edmonds()</code>, lưu kết quả vào <code>msaEdges</code>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── COMPLEXITY ── -->
+  <div class="complexity-section">
+    <div class="section-label">Phân tích</div>
+    <h2>Bảng tóm tắt thuật toán</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Bước</th>
+          <th>Hành động</th>
+          <th>Chi phí</th>
+          <th>Ghi chú</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>B1</td>
+          <td>Chọn minIn mỗi đỉnh</td>
+          <td>O(E)</td>
+          <td>Duyệt toàn bộ cạnh 1 lần</td>
+        </tr>
+        <tr>
+          <td>B2</td>
+          <td>Phát hiện chu trình (DFS)</td>
+          <td>O(V)</td>
+          <td>Đồ thị con chỉ có V cạnh</td>
+        </tr>
+        <tr>
+          <td>B3</td>
+          <td>Thu thập cạnh chu trình C</td>
+          <td>O(V)</td>
+          <td>Độ dài C ≤ V</td>
+        </tr>
+        <tr>
+          <td>B4</td>
+          <td>Co rút C → G'</td>
+          <td>O(E)</td>
+          <td>G' có ít hơn ≥1 đỉnh</td>
+        </tr>
+        <tr>
+          <td>B5</td>
+          <td>Đệ quy trên G'</td>
+          <td>T(V−1, E)</td>
+          <td>Mỗi lần giảm ≥1 đỉnh</td>
+        </tr>
+        <tr>
+          <td>B6</td>
+          <td>Phục hồi kết quả</td>
+          <td>O(E + V)</td>
+          <td>Tra bảng ánh xạ</td>
+        </tr>
+        <tr>
+          <td colspan="2"><strong>Tổng cộng (đơn giản)</strong></td>
+          <td><strong>O(V · E)</strong></td>
+          <td>Tối đa V lần đệ quy</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- end container -->
+
+<footer>
+  Edmonds' Branching · Chu-Liu (1965) · Hướng dẫn bởi AI · Cấu trúc dữ liệu & Thuật toán
+</footer>
+
+<script>
+// ── TOGGLE STEPS ──────────────────────────────────────────
+function toggleStep(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+}
+
+// ── GRAPH DATA ────────────────────────────────────────────
+// Nodes: id, label, x, y
+const nodes = [
+  { id: 0, label: '0', x: 100, y: 190 },
+  { id: 1, label: '1', x: 280, y: 90  },
+  { id: 2, label: '2', x: 460, y: 90  },
+  { id: 3, label: '3', x: 280, y: 290 },
+  { id: 4, label: '4', x: 460, y: 290 },
+];
+
+// Edges: from, to, weight
+const allEdges = [
+  { from: 0, to: 1, w: 5 },
+  { from: 0, to: 3, w: 3 },
+  { from: 1, to: 2, w: 2 },
+  { from: 2, to: 3, w: 1 },
+  { from: 3, to: 1, w: 1 },
+  { from: 3, to: 4, w: 4 },
+  { from: 1, to: 4, w: 6 },
+];
+
+// minIn edges (step 1): each non-root vertex, cheapest incoming
+// vertex 1: min(0→1 w=5, 3→1 w=1) → 3→1
+// vertex 2: min(1→2 w=2) → 1→2
+// vertex 3: min(0→3 w=3, 2→3 w=1) → 2→3
+// vertex 4: min(3→4 w=4, 1→4 w=6) → 3→4
+const minInEdges = [
+  { from: 3, to: 1, w: 1 },
+  { from: 1, to: 2, w: 2 },
+  { from: 2, to: 3, w: 1 },
+  { from: 3, to: 4, w: 4 },
+];
+
+// Cycle: 1→2→3→1
+const cycleEdges = [
+  { from: 1, to: 2, w: 2 },
+  { from: 2, to: 3, w: 1 },
+  { from: 3, to: 1, w: 1 },
+];
+
+// MSA: 0→3(3), 3→1(1), 1→2(2), 3→4(4)
+const msaEdges = [
+  { from: 0, to: 3, w: 3 },
+  { from: 3, to: 1, w: 1 },
+  { from: 1, to: 2, w: 2 },
+  { from: 3, to: 4, w: 4 },
+];
+
+let currentMode = 'original';
+
+function nodePos(id) { return nodes.find(n => n.id === id); }
+
+function edgeKey(e) { return `${e.from}-${e.to}`; }
+
+function drawGraph(mode) {
+  currentMode = mode;
+  // update buttons
+  document.querySelectorAll('.tab-btn').forEach((b, i) => {
+    const modes = ['original','minin','cycle','msa'];
+    b.classList.toggle('active', modes[i] === mode);
+  });
+
+  const el = document.getElementById('edgesLayer');
+  const nl = document.getElementById('nodesLayer');
+  el.innerHTML = '';
+  nl.innerHTML = '';
+
+  // Determine highlight sets
+  let highlightEdges = new Set();
+  let highlightColor = {};
+  let cycleNodes = new Set();
+
+  if (mode === 'minin') {
+    minInEdges.forEach(e => {
+      highlightEdges.add(edgeKey(e));
+      highlightColor[edgeKey(e)] = '#38bdf8';
+    });
+  } else if (mode === 'cycle') {
+    minInEdges.forEach(e => {
+      highlightEdges.add(edgeKey(e));
+      highlightColor[edgeKey(e)] = '#38bdf8';
+    });
+    cycleEdges.forEach(e => {
+      highlightEdges.add(edgeKey(e));
+      highlightColor[edgeKey(e)] = '#f87171';
+      cycleNodes.add(e.from); cycleNodes.add(e.to);
+    });
+  } else if (mode === 'msa') {
+    msaEdges.forEach(e => {
+      highlightEdges.add(edgeKey(e));
+      highlightColor[edgeKey(e)] = '#34d399';
+    });
+  }
+
+  // Draw edges
+  allEdges.forEach(e => {
+    const p = nodePos(e.from), q = nodePos(e.to);
+    const key = edgeKey(e);
+    const highlighted = highlightEdges.has(key);
+    const color = highlighted ? (highlightColor[key] || '#38bdf8') : '#1e3a5a';
+    const strokeW = highlighted ? 2.5 : 1.5;
+    const markerMap = {
+      '#38bdf8': 'arrowBlue',
+      '#f87171': 'arrowRed',
+      '#34d399': 'arrowGreen',
+      '#1e3a5a': 'arrowGray',
+    };
+    const marker = markerMap[color] || 'arrowGray';
+
+    // Offset for bidirectional
+    const dx = q.x - p.x, dy = q.y - p.y;
+    const len = Math.sqrt(dx*dx+dy*dy);
+    const nx = -dy/len * 8, ny = dx/len * 8;
+
+    // Shorten line for arrowhead
+    const ratio = 22 / len;
+    const ex = q.x - dx*ratio, ey = q.y - dy*ratio;
+    const sx = p.x + dx*(22/len), sy = p.y + dy*(22/len);
+
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1', sx + nx); line.setAttribute('y1', sy + ny);
+    line.setAttribute('x2', ex + nx); line.setAttribute('y2', ey + ny);
+    line.setAttribute('stroke', color);
+    line.setAttribute('stroke-width', strokeW);
+    line.setAttribute('marker-end', `url(#${marker})`);
+    if (highlighted) line.setAttribute('stroke-dasharray', mode === 'original' ? '' : '');
+    el.appendChild(line);
+
+    // Weight label
+    const mx = (p.x + q.x)/2 + nx*1.2, my = (p.y + q.y)/2 + ny*1.2;
+    const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+    txt.setAttribute('x', mx); txt.setAttribute('y', my - 4);
+    txt.setAttribute('text-anchor', 'middle');
+    txt.setAttribute('font-family', 'JetBrains Mono, monospace');
+    txt.setAttribute('font-size', '12');
+    txt.setAttribute('fill', highlighted ? color : '#334155');
+    txt.textContent = e.w;
+    el.appendChild(txt);
+  });
+
+  // Draw nodes
+  nodes.forEach(n => {
+    const isRoot = n.id === 0;
+    const inCyc = cycleNodes.has(n.id);
+    const isMSA = mode === 'msa';
+
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+
+    const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circle.setAttribute('cx', n.x); circle.setAttribute('cy', n.y);
+    circle.setAttribute('r', 22);
+    circle.setAttribute('fill', isRoot ? '#1e3a5a' : inCyc ? 'rgba(248,113,113,.15)' : '#111827');
+    circle.setAttribute('stroke', isRoot ? '#38bdf8' : inCyc ? '#f87171' : '#1e2d45');
+    circle.setAttribute('stroke-width', isRoot ? 2.5 : inCyc ? 2 : 1.5);
+    g.appendChild(circle);
+
+    const label = document.createElementNS('http://www.w3.org/2000/svg','text');
+    label.setAttribute('x', n.x); label.setAttribute('y', n.y + 5);
+    label.setAttribute('text-anchor', 'middle');
+    label.setAttribute('font-family', 'JetBrains Mono, monospace');
+    label.setAttribute('font-size', '15');
+    label.setAttribute('font-weight', '700');
+    label.setAttribute('fill', isRoot ? '#38bdf8' : inCyc ? '#f87171' : '#94a3b8');
+    label.textContent = n.label;
+    g.appendChild(label);
+
+    if (isRoot) {
+      const tag = document.createElementNS('http://www.w3.org/2000/svg','text');
+      tag.setAttribute('x', n.x); tag.setAttribute('y', n.y - 28);
+      tag.setAttribute('text-anchor', 'middle');
+      tag.setAttribute('font-family', 'JetBrains Mono, monospace');
+      tag.setAttribute('font-size', '10');
+      tag.setAttribute('fill', '#38bdf8');
+      tag.textContent = 'root';
+      g.appendChild(tag);
+    }
+
+    nl.appendChild(g);
+  });
+}
+
+function showGraph(mode) { drawGraph(mode); }
+
+// Initial draw
+drawGraph('original');
+</script>
+</body>
+</html>
