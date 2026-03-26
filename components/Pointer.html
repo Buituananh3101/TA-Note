@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Con Trỏ Trong C/C++ — Hướng Dẫn Toàn Tập</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e17;
+    --bg2: #0f1420;
+    --bg3: #151c2e;
+    --panel: #1a2235;
+    --border: #243048;
+    --accent: #00e5ff;
+    --accent2: #7c4dff;
+    --accent3: #ff6b35;
+    --green: #00ff88;
+    --yellow: #ffd600;
+    --red: #ff4444;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --code-bg: #0d1117;
+    --mono: 'JetBrains Mono', monospace;
+    --display: 'Syne', sans-serif;
+    --body: 'Inter', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--accent2); border-radius: 3px; }
+
+  /* ── HEADER ── */
+  .site-header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(10,14,23,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .site-header .logo {
+    font-family: var(--display);
+    font-size: 18px; font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+  .site-header .logo span { color: var(--accent2); }
+  .progress-bar {
+    position: fixed; top: 56px; left: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+    width: 0%; z-index: 101; transition: width 0.1s;
+  }
+
+  /* ── LAYOUT ── */
+  .layout { display: flex; padding-top: 56px; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 260px; min-width: 260px;
+    height: calc(100vh - 56px);
+    position: sticky; top: 56px;
+    overflow-y: auto;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+  }
+  .sidebar::-webkit-scrollbar { width: 3px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .nav-section { margin-bottom: 8px; }
+  .nav-label {
+    font-family: var(--mono);
+    font-size: 10px; font-weight: 700;
+    color: var(--text3);
+    text-transform: uppercase; letter-spacing: 1.5px;
+    padding: 4px 20px 8px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 20px;
+    color: var(--text2);
+    text-decoration: none;
+    font-size: 13.5px;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+  .nav-item:hover { color: var(--text); background: var(--bg3); }
+  .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(0,229,255,0.05); }
+  .nav-item .level {
+    font-family: var(--mono); font-size: 10px;
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text3); padding: 1px 5px; border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .nav-item.active .level { background: rgba(0,229,255,0.15); border-color: var(--accent); color: var(--accent); }
+
+  /* ── MAIN CONTENT ── */
+  .main { flex: 1; min-width: 0; }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 360px;
+    background: linear-gradient(135deg, var(--bg) 0%, #0d1430 50%, #0a0e17 100%);
+    display: flex; align-items: center;
+    padding: 80px 60px 60px;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '*ptr';
+    position: absolute; right: 60px; top: 50%; transform: translateY(-50%);
+    font-family: var(--mono); font-size: 160px; font-weight: 700;
+    color: rgba(124,77,255,0.06);
+    pointer-events: none; user-select: none;
+    white-space: nowrap;
+  }
+  .hero-content { position: relative; }
+  .hero-tag {
+    font-family: var(--mono); font-size: 12px;
+    color: var(--accent2); letter-spacing: 2px;
+    text-transform: uppercase; margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-family: var(--display); font-size: 56px; font-weight: 800;
+    line-height: 1.05; letter-spacing: -2px;
+    color: #fff;
+    margin-bottom: 20px;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero p {
+    font-size: 17px; color: var(--text2);
+    max-width: 560px; line-height: 1.8;
+    margin-bottom: 28px;
+  }
+  .hero-badges { display: flex; gap: 10px; flex-wrap: wrap; }
+  .badge {
+    font-family: var(--mono); font-size: 12px;
+    padding: 5px 12px; border-radius: 4px;
+    border: 1px solid var(--border);
+    color: var(--text2);
+  }
+  .badge.b1 { border-color: var(--green); color: var(--green); background: rgba(0,255,136,0.06); }
+  .badge.b2 { border-color: var(--yellow); color: var(--yellow); background: rgba(255,214,0,0.06); }
+  .badge.b3 { border-color: var(--red); color: var(--red); background: rgba(255,68,68,0.06); }
+
+  /* ── SECTION ── */
+  .section {
+    padding: 56px 60px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section:last-child { border-bottom: none; }
+
+  .section-header { margin-bottom: 36px; }
+  .section-num {
+    font-family: var(--mono); font-size: 11px;
+    color: var(--accent2); letter-spacing: 2px;
+    text-transform: uppercase; margin-bottom: 8px;
+  }
+  .section h2 {
+    font-family: var(--display); font-size: 34px; font-weight: 800;
+    letter-spacing: -1px; color: #fff; margin-bottom: 10px;
+  }
+  .section h2 .hl { color: var(--accent); }
+  .section > p, .section-body > p {
+    color: var(--text2); font-size: 15px; max-width: 720px;
+    line-height: 1.8;
+  }
+
+  /* ── DIFFICULTY BADGE ── */
+  .diff {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--mono); font-size: 11px; font-weight: 700;
+    padding: 3px 10px; border-radius: 3px; margin-bottom: 20px;
+  }
+  .diff.easy { background: rgba(0,255,136,0.1); color: var(--green); border: 1px solid rgba(0,255,136,0.25); }
+  .diff.medium { background: rgba(255,214,0,0.1); color: var(--yellow); border: 1px solid rgba(255,214,0,0.25); }
+  .diff.hard { background: rgba(255,107,53,0.1); color: var(--accent3); border: 1px solid rgba(255,107,53,0.25); }
+  .diff.expert { background: rgba(255,68,68,0.1); color: var(--red); border: 1px solid rgba(255,68,68,0.25); }
+
+  /* ── CODE BLOCK ── */
+  .code-wrap {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px; overflow: hidden;
+    margin: 20px 0;
+  }
+  .code-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--border);
+  }
+  .code-title {
+    font-family: var(--mono); font-size: 12px; color: var(--text3);
+  }
+  .code-lang {
+    font-family: var(--mono); font-size: 11px;
+    color: var(--accent2); background: rgba(124,77,255,0.15);
+    padding: 2px 8px; border-radius: 3px;
+  }
+  .copy-btn {
+    font-family: var(--mono); font-size: 11px;
+    color: var(--text3); background: none; border: 1px solid var(--border);
+    padding: 3px 10px; border-radius: 3px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+  pre {
+    padding: 20px;
+    overflow-x: auto;
+    font-family: var(--mono); font-size: 13.5px;
+    line-height: 1.75;
+    color: #cdd6f4;
+  }
+  pre::-webkit-scrollbar { height: 4px; }
+  pre::-webkit-scrollbar-thumb { background: var(--border); }
+
+  /* Syntax highlighting */
+  .kw { color: #cba6f7; }      /* keyword */
+  .ty { color: #89b4fa; }      /* type */
+  .fn { color: #89dceb; }      /* function */
+  .nm { color: #cdd6f4; }      /* name */
+  .op { color: #f38ba8; }      /* operator */
+  .nu { color: #fab387; }      /* number */
+  .st { color: #a6e3a1; }      /* string */
+  .cm { color: #6c7086; font-style: italic; }  /* comment */
+  .pp { color: #f5c2e7; }      /* preprocessor */
+
+  /* ── OUTPUT BOX ── */
+  .output {
+    background: rgba(0,255,136,0.04);
+    border: 1px solid rgba(0,255,136,0.2);
+    border-radius: 6px; padding: 14px 20px;
+    font-family: var(--mono); font-size: 13px; color: var(--green);
+    margin: 12px 0 20px;
+  }
+  .output::before {
+    content: '$ output:';
+    display: block; color: var(--text3); font-size: 11px; margin-bottom: 8px;
+  }
+
+  /* ── MEMORY DIAGRAM ── */
+  .mem-diagram {
+    display: flex; gap: 4px; align-items: flex-end;
+    margin: 24px 0; flex-wrap: wrap;
+  }
+  .mem-cell {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 4px;
+  }
+  .mem-addr {
+    font-family: var(--mono); font-size: 10px;
+    color: var(--text3);
+  }
+  .mem-box {
+    width: 64px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 13px; font-weight: 700;
+    border-radius: 4px;
+  }
+  .mem-box.var { background: rgba(0,229,255,0.1); border: 2px solid var(--accent); color: var(--accent); }
+  .mem-box.ptr { background: rgba(124,77,255,0.1); border: 2px solid var(--accent2); color: var(--accent2); }
+  .mem-box.empty { background: rgba(255,255,255,0.03); border: 1px dashed var(--border); color: var(--text3); }
+  .mem-label {
+    font-family: var(--mono); font-size: 11px; color: var(--text2);
+  }
+  .mem-arrow {
+    font-size: 22px; color: var(--accent2);
+    align-self: center; margin: 0 4px;
+  }
+
+  /* ── INFO BOXES ── */
+  .info-box {
+    border-radius: 6px; padding: 16px 20px;
+    margin: 20px 0;
+    border-left: 3px solid;
+  }
+  .info-box.note { background: rgba(0,229,255,0.06); border-color: var(--accent); }
+  .info-box.warn { background: rgba(255,214,0,0.06); border-color: var(--yellow); }
+  .info-box.danger { background: rgba(255,68,68,0.06); border-color: var(--red); }
+  .info-box.tip { background: rgba(0,255,136,0.06); border-color: var(--green); }
+  .info-box .ib-title {
+    font-family: var(--mono); font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .info-box.note .ib-title { color: var(--accent); }
+  .info-box.warn .ib-title { color: var(--yellow); }
+  .info-box.danger .ib-title { color: var(--red); }
+  .info-box.tip .ib-title { color: var(--green); }
+  .info-box p { color: var(--text2); font-size: 14px; }
+
+  /* ── CONCEPT CARDS ── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 16px; margin: 24px 0; }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px; padding: 20px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--accent2); }
+  .card-icon { font-size: 22px; margin-bottom: 10px; }
+  .card h4 { font-family: var(--display); font-size: 15px; color: #fff; margin-bottom: 6px; }
+  .card p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+  .card code { font-family: var(--mono); font-size: 12px; color: var(--accent); background: rgba(0,229,255,0.08); padding: 1px 5px; border-radius: 3px; }
+
+  /* ── STEPS ── */
+  .steps { margin: 24px 0; }
+  .step {
+    display: flex; gap: 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    width: 36px; height: 36px; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 14px; font-weight: 700; color: #fff;
+  }
+  .step-content h4 { font-family: var(--display); font-size: 15px; color: #fff; margin-bottom: 6px; }
+  .step-content p { font-size: 14px; color: var(--text2); line-height: 1.7; }
+
+  /* ── QUIZ ── */
+  .quiz {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 8px; padding: 24px; margin: 24px 0;
+  }
+  .quiz h4 {
+    font-family: var(--display); font-size: 16px; color: var(--yellow);
+    margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+  }
+  .quiz-q { color: var(--text); margin-bottom: 14px; font-size: 15px; }
+  .quiz-opt {
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .opt-btn {
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    color: var(--text2); text-align: left;
+    padding: 10px 16px; border-radius: 6px;
+    font-family: var(--body); font-size: 14px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .opt-btn:hover { border-color: var(--accent2); color: var(--text); }
+  .opt-btn.correct { border-color: var(--green); background: rgba(0,255,136,0.1); color: var(--green); }
+  .opt-btn.wrong { border-color: var(--red); background: rgba(255,68,68,0.1); color: var(--red); }
+  .quiz-explain {
+    margin-top: 14px; padding: 12px 16px;
+    background: rgba(0,229,255,0.06); border: 1px solid rgba(0,229,255,0.2);
+    border-radius: 6px; color: var(--text2); font-size: 14px;
+    display: none;
+  }
+  .quiz-explain.show { display: block; }
+
+  /* ── PRACTICE BOX ── */
+  .practice {
+    background: linear-gradient(135deg, rgba(124,77,255,0.08), rgba(0,229,255,0.05));
+    border: 1px solid var(--accent2);
+    border-radius: 8px; padding: 24px; margin: 24px 0;
+  }
+  .practice h4 {
+    font-family: var(--display); font-size: 16px; color: var(--accent2);
+    margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+  }
+  .practice p { color: var(--text2); font-size: 14px; margin-bottom: 16px; }
+  .practice ul { color: var(--text2); font-size: 14px; padding-left: 20px; line-height: 2; }
+  .practice li::marker { color: var(--accent2); }
+
+  /* ── INLINE CODE ── */
+  code {
+    font-family: var(--mono); font-size: 13px;
+    color: var(--accent); background: rgba(0,229,255,0.08);
+    padding: 2px 6px; border-radius: 3px;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px; background: var(--border);
+    margin: 30px 0;
+  }
+
+  h3 {
+    font-family: var(--display); font-size: 20px; color: #fff;
+    margin: 28px 0 12px; font-weight: 700;
+  }
+  h3 .hl { color: var(--accent); }
+
+  /* ── TABLE ── */
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+  th {
+    background: var(--panel); color: var(--text2);
+    font-family: var(--mono); font-size: 12px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px;
+    padding: 10px 16px; text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(36,48,72,0.5);
+    font-size: 14px; color: var(--text2);
+  }
+  td:first-child { font-family: var(--mono); color: var(--accent); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* ── INTERACTIVE DEMO ── */
+  .demo-area {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 24px; margin: 20px 0;
+  }
+  .demo-area h4 { font-family: var(--display); font-size: 15px; color: var(--accent); margin-bottom: 16px; }
+  .demo-input { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+  .demo-input label { font-family: var(--mono); font-size: 13px; color: var(--text2); }
+  .demo-input input {
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text); font-family: var(--mono); font-size: 14px;
+    padding: 8px 12px; border-radius: 4px; width: 100px;
+    outline: none; transition: border-color 0.2s;
+  }
+  .demo-input input:focus { border-color: var(--accent); }
+  .run-btn {
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    color: #fff; font-family: var(--mono); font-size: 13px; font-weight: 700;
+    border: none; padding: 9px 20px; border-radius: 4px; cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .run-btn:hover { opacity: 0.85; }
+  .demo-output {
+    font-family: var(--mono); font-size: 13px; color: var(--green);
+    background: rgba(0,255,136,0.04); border: 1px solid rgba(0,255,136,0.15);
+    border-radius: 4px; padding: 12px 16px; min-height: 40px;
+    white-space: pre-wrap; line-height: 1.8;
+  }
+
+  /* ── TOC progress pills ── */
+  .toc-pills { display: flex; gap: 6px; flex-wrap: wrap; margin: 20px 60px 0; }
+  .toc-pill {
+    font-family: var(--mono); font-size: 11px;
+    color: var(--text3); background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 5px 12px; border-radius: 20px; cursor: pointer;
+    text-decoration: none; transition: all 0.15s;
+  }
+  .toc-pill:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .section { padding: 40px 24px; }
+    .hero { padding: 60px 24px 40px; }
+    .hero h1 { font-size: 38px; }
+    .hero::before { display: none; }
+    .toc-pills { margin: 16px 24px 0; }
+  }
+
+  /* ── Animations ── */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .section { animation: fadeInUp 0.4s ease both; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="logo">con<span>*</span>tro<span>.c</span></div>
+  <div style="font-family: var(--mono); font-size: 12px; color: var(--text3);">C/C++ Pointer Guide · Tutor Edition</div>
+</header>
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+<!-- SIDEBAR NAV -->
+<nav class="sidebar">
+  <div class="nav-section">
+    <div class="nav-label">Nền tảng</div>
+    <a class="nav-item active" href="#s0">
+      <span class="level">00</span> Bộ nhớ & Địa chỉ
+    </a>
+    <a class="nav-item" href="#s1">
+      <span class="level">01</span> Con trỏ là gì?
+    </a>
+    <a class="nav-item" href="#s2">
+      <span class="level">02</span> Khai báo & Toán tử
+    </a>
+    <a class="nav-item" href="#s3">
+      <span class="level">03</span> Con trỏ & Mảng
+    </a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Trung cấp</div>
+    <a class="nav-item" href="#s4">
+      <span class="level">04</span> Con trỏ & Hàm
+    </a>
+    <a class="nav-item" href="#s5">
+      <span class="level">05</span> Con trỏ & Chuỗi
+    </a>
+    <a class="nav-item" href="#s6">
+      <span class="level">06</span> Cấp phát động
+    </a>
+    <a class="nav-item" href="#s7">
+      <span class="level">07</span> Con trỏ hàm
+    </a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Nâng cao</div>
+    <a class="nav-item" href="#s8">
+      <span class="level">08</span> Con trỏ đến con trỏ
+    </a>
+    <a class="nav-item" href="#s9">
+      <span class="level">09</span> Con trỏ & Struct
+    </a>
+    <a class="nav-item" href="#s10">
+      <span class="level">10</span> Smart Pointer (C++)
+    </a>
+    <a class="nav-item" href="#s11">
+      <span class="level">11</span> Lỗi thường gặp
+    </a>
+    <a class="nav-item" href="#s12">
+      <span class="level">12</span> Thực hành tổng hợp
+    </a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- HERO -->
+<section class="hero" id="s0">
+  <div class="hero-content">
+    <div class="hero-tag">// Hướng dẫn toàn tập · Dành cho gia sư</div>
+    <h1>Con Trỏ<br/><span>Từ Số 0</span></h1>
+    <p>Hành trình chinh phục con trỏ từ khái niệm bộ nhớ cơ bản đến kỹ thuật nâng cao — được thiết kế để bạn giảng dạy dễ dàng, học viên hiểu nhanh.</p>
+    <div class="hero-badges">
+      <span class="badge b1">● Cơ bản</span>
+      <span class="badge b2">● Trung cấp</span>
+      <span class="badge b3">● Nâng cao</span>
+    </div>
+  </div>
+</section>
+
+<!-- TOC PILLS -->
+<div class="toc-pills">
+  <a class="toc-pill" href="#s0">Bộ nhớ</a>
+  <a class="toc-pill" href="#s1">Khái niệm</a>
+  <a class="toc-pill" href="#s2">Toán tử</a>
+  <a class="toc-pill" href="#s3">Mảng</a>
+  <a class="toc-pill" href="#s4">Hàm</a>
+  <a class="toc-pill" href="#s5">Chuỗi</a>
+  <a class="toc-pill" href="#s6">malloc/free</a>
+  <a class="toc-pill" href="#s7">Con trỏ hàm</a>
+  <a class="toc-pill" href="#s8">**ptr</a>
+  <a class="toc-pill" href="#s9">Struct</a>
+  <a class="toc-pill" href="#s10">Smart Ptr</a>
+  <a class="toc-pill" href="#s11">Lỗi</a>
+  <a class="toc-pill" href="#s12">Thực hành</a>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SECTION 0: BỘ NHỚ -->
+<!-- ══════════════════════════════════════════════ -->
+<section class="section" id="s0b">
+  <div class="section-header">
+    <div class="section-num">// 00 · Nền tảng</div>
+    <h2>Bộ nhớ máy tính <span class="hl">hoạt động</span> thế nào?</h2>
+  </div>
+  <div class="diff easy">● Cơ bản</div>
+  <p>Trước khi học con trỏ, ta phải hiểu bộ nhớ RAM là gì. Hãy hình dung nó như một dãy ô nhớ khổng lồ — mỗi ô có một <strong>địa chỉ</strong> duy nhất và lưu trữ dữ liệu.</p>
+
+  <h3>🏠 Phép so sánh: Dãy nhà</h3>
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">🏠</div>
+      <h4>Địa chỉ nhà</h4>
+      <p>Số nhà <code>0x1000</code> — địa chỉ trong bộ nhớ</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">👤</div>
+      <h4>Người ở trong nhà</h4>
+      <p>Giá trị được lưu tại địa chỉ đó — ví dụ <code>42</code></p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📋</div>
+      <h4>Tờ giấy ghi địa chỉ</h4>
+      <p>Con trỏ — lưu địa chỉ của ngôi nhà khác</p>
+    </div>
+  </div>
+
+  <h3>📦 Sơ đồ bộ nhớ</h3>
+  <p style="margin-bottom: 16px;">Khi bạn khai báo <code>int x = 42;</code>, hệ thống cấp phát 4 byte trong RAM:</p>
+  <div class="mem-diagram">
+    <div class="mem-cell">
+      <div class="mem-addr">0x1000</div>
+      <div class="mem-box var">42</div>
+      <div class="mem-label">x</div>
+    </div>
+    <div class="mem-cell">
+      <div class="mem-addr">0x1004</div>
+      <div class="mem-box empty">—</div>
+      <div class="mem-label"></div>
+    </div>
+    <div class="mem-cell">
+      <div class="mem-addr">0x1008</div>
+      <div class="mem-box empty">—</div>
+      <div class="mem-label"></div>
+    </div>
+    <div class="mem-cell">
+      <div class="mem-addr">0x100C</div>
+      <div class="mem-box empty">—</div>
+      <div class="mem-label"></div>
+    </div>
+  </div>
+
+  <div class="info-box note">
+    <div class="ib-title">💡 Ghi chú cho gia sư</div>
+    <p>Hỏi học viên: "Nếu tôi muốn gửi cho bạn một quyển sách, tôi cần biết gì?" → Địa chỉ nhà bạn. Con trỏ chính là "địa chỉ" đó trong lập trình.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SECTION 1: CON TRỎ LÀ GÌ -->
+<!-- ══════════════════════════════════════════════ -->
+<section class="section" id="s1">
+  <div class="section-header">
+    <div class="section-num">// 01 · Khái niệm</div>
+    <h2>Con trỏ <span class="hl">là gì?</span></h2>
+  </div>
+  <div class="diff easy">● Cơ bản</div>
+  <p>Con trỏ là một <strong>biến đặc biệt</strong> — thay vì lưu dữ liệu thực (như số, ký tự), nó lưu <strong>địa chỉ bộ nhớ</strong> của biến khác.</p>
+
+  <div class="divider"></div>
+
+  <h3>Ví dụ đầu tiên</h3>
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-title">pointer_intro.c</span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="code-lang">C</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+    </div>
+    <pre><span class="pp">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">int</span> <span class="nm">x</span> <span class="op">=</span> <span class="nu">42</span>;          <span class="cm">// biến bình thường</span>
+    <span class="kw">int</span> <span class="op">*</span><span class="nm">p</span> <span class="op">=</span> <span class="op">&amp;</span><span class="nm">x</span>;         <span class="cm">// p lưu ĐỊA CHỈ của x</span>
+
+    <span class="fn">printf</span>(<span class="st">"Giá trị x  = %d\n"</span>, <span class="nm">x</span>);
+    <span class="fn">printf</span>(<span class="st">"Địa chỉ x = %p\n"</span>, (<span class="kw">void</span><span class="op">*</span>)<span class="op">&amp;</span><span class="nm">x</span>);
+    <span class="fn">printf</span>(<span class="st">"p chứa    = %p\n"</span>, (<span class="kw">void</span><span class="op">*</span>)<span class="nm">p</span>);
+    <span class="fn">printf</span>(<span class="st">"*p        = %d\n"</span>, <span class="op">*</span><span class="nm">p</span>);   <span class="cm">// truy cập qua con trỏ</span>
+
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</pre>
+  </div>
+  <div class="output">Giá trị x  = 42
+Địa chỉ x = 0x7ffd1234abc0
+p chứa    = 0x7ffd1234abc0
+*p        = 42</div>
+
+  <h3>Sơ đồ bộ nhớ minh họa</h3>
+  <div class="mem-diagram">
+    <div class="mem-cell">
+      <div class="mem-addr">0x1000</div>
+      <div class="mem-box var">42</div>
+      <div class="mem-label">x</div>
+    </div>
+    <div class="mem-arrow">←</div>
+    <div class="mem-cell">
+      <div class="mem-addr">0x2000</div>
+      <div class="mem-box ptr">0x1000</div>
+      <div class="mem-label">p</div>
+    </div>
+  </div>
+  <p style="font-size:13px;color:var(--text3);margin-top:8px;">con trỏ <code>p</code> tại địa chỉ <code>0x2000</code> lưu giá trị <code>0x1000</code> — chính là địa chỉ của <code>x</code></p>
+
+  <div class="info-box warn">
+    <div class="ib-title">⚠️ Dễ nhầm</div>
+    <p><code>p</code> = địa chỉ (là <code>0x1000</code>) · <code>*p</code> = giá trị TẠI địa chỉ đó (là <code>42</code>). Dấu <code>*</code> khi dereference KHÔNG giống dấu <code>*</code> khi khai báo!</p>
+  </div>
+
+  <!-- QUIZ 1 -->
+  <div class="quiz">
+    <h4>🎯 Kiểm tra nhanh</h4>
+    <div class="quiz-q">Cho <code>int a = 10; int *q = &amp;a;</code> — giá trị của <code>*q</code> là?</div>
+    <div class="quiz-opt">
+      <button class="opt-btn" onclick="answer(this, false)">A. Địa chỉ của biến a</button>
+      <button class="opt-btn" onclick="answer(this, true)">B. 10</button>
+      <button class="opt-btn" onclick="answer(this, false)">C. Địa chỉ của con trỏ q</button>
+      <button class="opt-btn" onclick="answer(this, false)">D. Lỗi biên dịch</button>
+    </div>
+    <div class="quiz-explain" id="qe1">
+      ✓ <strong>*q</strong> là toán tử <em>dereference</em> — đọc giá trị tại địa chỉ mà q đang trỏ tới. Vì q trỏ tới a, và a = 10, nên *q = 10.
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SECTION 2: KHAI BÁO & TOÁN TỬ -->
+<!-- ══════════════════════════════════════════════ -->
+<section class="section" id="s2">
+  <div class="section-header">
+    <div class="section-num">// 02 · Syntax</div>
+    <h2>Khai báo <span class="hl">&amp;</span> Toán tử</h2>
+  </div>
+  <div class="diff easy">● Cơ bản</div>
+
+  <table>
+    <tr><th>Cú pháp</th><th>Ý nghĩa</th><th>Ví dụ</th></tr>
+    <tr><td>type *name</td><td>Khai báo con trỏ</td><td><code>int *p;</code></td></tr>
+    <tr><td>&amp;variable</td><td>Lấy địa chỉ của biến</td><td><code>p = &amp;x;</code></td></tr>
+    <tr><td>*pointer</td><td>Dereference (đọc/ghi giá trị)</td><td><code>*p = 99;</code></td></tr>
+    <tr><td>NULL / nullptr</td><td>Con trỏ rỗng (không trỏ đâu)</td><td><code>p = NULL;</code></td></tr>
+  </table>
+
+  <h3>Ghi qua con trỏ</h3>
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-title">pointer_write.c</span>
+      <div style="display:flex;gap:8px;">
+        <span class="code-lang">C</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+    </div>
+    <pre><span class="pp">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">int</span> <span class="nm">x</span> <span class="op">=</span> <span class="nu">10</span>;
+    <span class="kw">int</span> <span class="op">*</span><span class="nm">p</span> <span class="op">=</span> <span class="op">&amp;</span><span class="nm">x</span>;
+
+    <span class="fn">printf</span>(<span class="st">"Trước: x = %d\n"</span>, <span class="nm">x</span>);
+    <span class="op">*</span><span class="nm">p</span> <span class="op">=</span> <span class="nu">99</span>;   <span class="cm">// GHI qua con trỏ — thay đổi x!</span>
+    <span class="fn">printf</span>(<span class="st">"Sau:   x = %d\n"</span>, <span class="nm">x</span>);
+
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</pre>
+  </div>
+  <div class="output">Trước: x = 10
+Sau:   x = 99</div>
+
+  <h3>Pointer Arithmetic — Cộng trừ địa chỉ</h3>
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-title">ptr_arith.c</span>
+      <div style="display:flex;gap:8px;">
+        <span class="code-lang">C</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+    </div>
+    <pre><span class="kw">int</span> <span class="nm">arr</span>[] <span class="op">=</span> {<span class="nu">10</span>, <span class="nu">20</span>, <span class="nu">30</span>};
+<span class="kw">int</span> <span class="op">*</span><span class="nm">p</span> <span class="op">=</span> <span class="nm">arr</span>;
+
+<span class="fn">printf</span>(<span class="st">"%d\n"</span>, <span class="op">*</span><span class="nm">p</span>);       <span class="cm">// 10  (arr[0])</span>
+<span class="fn">printf</span>(<span class="st">"%d\n"</span>, <span class="op">*</span>(<span class="nm">p</span><span class="op">+</span><span class="nu">1</span>));   <span class="cm">// 20  (arr[1]) — cộng 4 bytes</span>
+<span class="fn">printf</span>(<span class="st">"%d\n"</span>, <span class="op">*</span>(<span class="nm">p</span><span class="op">+</span><span class="nu">2</span>));   <span class="cm">// 30  (arr[2]) — cộng 8 bytes</span>
+<span class="nm">p</span><span class="op">++</span>;                      <span class="cm">// p giờ trỏ tới arr[1]</span></pre>
+  </div>
+
+  <div class="info-box tip">
+    <div class="ib-title">💡 Mẹo giảng dạy</div>
+    <p>Khi <code>p++</code> với <code>int*</code>, địa chỉ thực sự tăng 4 bytes (kích thước int), không phải 1. Đây là lý do pointer arithmetic rất mạnh khi duyệt mảng!</p>
+  </div>
+
+  <!-- INTERACTIVE DEMO -->
+  <div class="demo-area">
+    <h4>🔬 Trình diễn tương tác — Kích thước con trỏ</h4>
+    <p style="color:var(--text2);font-size:13px;margin-bottom:16px;">Chọn kiểu dữ liệu để xem cách pointer arithmetic hoạt động:</p>
+    <div class="demo-input">
+      <label>Giá trị:</label>
+      <input type="number" id="demoVal" value="42" min="-999" max="999">
+      <select id="demoType" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:13px;padding:8px 12px;border-radius:4px;outline:none;">
+        <option value="1">char (1 byte)</option>
+        <option value="4" selected>int (4 bytes)</option>
+        <option value="8">double (8 bytes)</option>
+        <option value="8">pointer (8 bytes)</option>
+      </select>
+      <button class="run-btn" onclick="runDemo()">▶ Chạy</button>
+    </div>
+    <div class="demo-output" id="demoOut">// Nhấn ▶ Chạy để xem kết quả</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SECTION 3: CON TRỎ & MẢNG -->
+<!-- ══════════════════════════════════════════════ -->
+<section class="section" id="s3">
+  <div class="section-header">
+    <div class="section-num">// 03 · Mảng</div>
+    <h2>Con trỏ <span class="hl">&amp; Mảng</span></h2>
+  </div>
+  <div class="diff easy">● Cơ bản</div>
+  <p>Trong C, tên mảng về bản chất là một con trỏ trỏ tới phần tử đầu tiên. <code>arr</code> và <code>&amp;arr[0]</code> có cùng giá trị!</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-title">array_ptr.c</span>
+      <div style="display:flex;gap:8px;">
+        <span class="code-lang">C</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+    </div>
+    <pre><span class="pp">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">int</span> <span class="nm">arr</span>[] <span class="op">=</span> {<span class="nu">10</span>, <span class="nu">20</span>, <span class="nu">30</span>, <span class="nu">40</span>, <span class="nu">50</span>};
+    <span class="kw">int</span> <span class="op">*</span><span class="nm">p</span> <span class="op">=</span> <span class="nm">arr</span>;   <span class="cm">// không cần & vì arr đã là con trỏ</span>
+
+    <span class="cm">// 3 cách truy cập arr[2] — tất cả đều giống nhau!</span>
+    <span class="fn">printf</span>(<span class="st">"%d\n"</span>, <span class="nm">arr</span>[<span class="nu">2</span>]);      <span class="cm">// Cách 1: chỉ số mảng</span>
+    <span class="fn">printf</span>(<span class="st">"%d\n"</span>, <span class="op">*</span>(<span class="nm">arr</span><span class="op">+</span><span class="nu">2</span>));    <span class="cm">// Cách 2: pointer arithmetic</span>
+    <span class="fn">printf</span>(<span class="st">"%d\n"</span>, <span class="nm">p</span>[<span class="nu">2</span>]);        <span class="cm">// Cách 3: dùng con trỏ như mảng</span>
+
+    <span class="cm">// Duyệt mảng bằng con trỏ</span>
+    <span class="fn">printf</span>(<span class="st">"Mảng: "</span>);
+    <span class="kw">for</span> (<span class="kw">int</span> <span class="nm">i</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">i</span> <span class="op">&lt;</span> <span class="nu">5</span>; <span class="nm">i</span><span class="op">++</span>) {
+        <span class="fn">printf</span>(<span class="st">"%d "</span>, <span class="op">*</span>(<span class="nm">p</span><span class="op">++</span>));
+    }
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</pre>
+  </div>
+  <div class="output">30
+30
+30
+Mảng: 10 20 30 40 50</div>
+
+  <h3>Sơ đồ — Mảng trong bộ nhớ</h3>
+  <div class="mem-diagram">
+    <div class="mem-cell">
+      <div class="mem-addr">arr[0]</div>
+      <div class="mem-box var">10</div>
+      <div class="mem-label">← p</div>
+    </div>
+    <div class="mem-cell">
+      <div class="mem-addr">arr[1]</div>
+      <div class="mem-box var">20</div>
+      <div class="mem-label"></div>
+    </div>
+    <div class="mem-cell">
+      <div class="mem-addr">arr[2]</div>
+      <div class="mem-box var">30</div>
+      <div class="mem-label"></div>
+    </div>
+    <div class="mem-cell">
+      <div class="mem-addr">arr[3]</div>
+      <div class="mem-box var">40</div>
+      <div class="mem-label"></div>
+    </div>
+    <div class="mem-cell">
+      <div class="mem-addr">arr[4]</div>
+      <div class="mem-box var">50</div>
+      <div class="mem-label"></div>
+    </div>
+  </div>
+  <p style="font-size:13px;color:var(--text3);margin-top:8px;">Các phần tử nằm liên tiếp, mỗi ô cách nhau <code>sizeof(int) = 4</code> bytes</p>
+
+  <div class="practice">
+    <h4>✏️ Bài tập thực hành</h4>
+    <p>Viết chương trình dùng con trỏ để:</p>
+    <ul>
+      <li>Tính tổng các phần tử mảng</li>
+      <li>Tìm phần tử lớn nhất</li>
+      <li>Đảo ngược mảng tại chỗ (in-place)</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SECTION 4: CON TRỎ & HÀM -->
+<!-- ══════════════════════════════════════════════ -->
+<section class="section" id="s4">
+  <div class="section-header">
+    <div class="section-num">// 04 · Hàm</div>
+    <h2>Pass by <span class="hl">Reference</span> — Con trỏ &amp; Hàm</h2>
+  </div>
+  <div class="diff medium">● Trung cấp</div>
+  <p>Trong C, mọi thứ truyền vào hàm đều là <strong>copy</strong> (pass by value). Dùng con trỏ để hàm có thể thay đổi biến gốc.</p>
+
+  <h3>So sánh: Value vs Reference</h3>
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-title">swap_demo.c</span>
+      <div style="display:flex;gap:8px;">
+        <span class="code-lang">C</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+    </div>
+    <pre><span class="pp">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="cm">// ❌ Không hoạt động — chỉ đổi bản sao!</span>
+<span class="kw">void</span> <span class="fn">swap_wrong</span>(<span class="kw">int</span> <span class="nm">a</span>, <span class="kw">int</span> <span class="nm">b</span>) {
+    <span class="kw">int</span> <span class="nm">tmp</span> <span class="op">=</span> <span class="nm">a</span>;
+    <span class="nm">a</span> <span class="op">=</span> <span class="nm">b</span>;
+    <span class="nm">b</span> <span class="op">=</span> <span class="nm">tmp</span>;
+    <span class="cm">// a, b là local — khi return, thay đổi mất!</span>
+}
+
+<span class="cm">// ✅ Đúng — truyền địa chỉ, thay đổi giá trị gốc</span>
+<span class="kw">void</span> <span class="fn">swap</span>(<span class="kw">int</span> <span class="op">*</span><span class="nm">a</span>, <span class="kw">int</span> <span class="op">*</span><span class="nm">b</span>) {
+    <span class="kw">int</span> <span class="nm">tmp</span> <span class="op">=</span> <span class="op">*</span><span class="nm">a</span>;
+    <span class="op">*</span><span class="nm">a</span> <span class="op">=</span> <span class="op">*</span><span class="nm">b</span>;
+    <span class="op">*</span><span class="nm">b</span> <span class="op">=</span> <span class="nm">tmp</span>;
+}
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">int</span> <span class="nm">x</span> <span class="op">=</span> <span class="nu">5</span>, <span class="nm">y</span> <span class="op">=</span> <span class="nu">10</span>;
+
+    <span class="fn">swap_wrong</span>(<span class="nm">x</span>, <span class="nm">y</span>);
+    <span class="fn">printf</span>(<span class="st">"Sau swap_wrong: x=%d y=%d\n"</span>, <span class="nm">x</span>, <span class="nm">y</span>); <span class="cm">// 5 10 (không đổi!)</span>
+
+    <span class="fn">swap</span>(<span class="op">&amp;</span><span class="nm">x</span>, <span class="op">&amp;</span><span class="nm">y</span>);
+    <span class="fn">printf</span>(<span class="st">"Sau swap:       x=%d y=%d\n"</span>, <span class="nm">x</span>, <span class="nm">y</span>); <span class="cm">// 10 5 ✓</span>
+
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</pre>
+  </div>
+  <div class="output">Sau swap_wrong: x=5 y=10
+Sau swap:       x=10 y=5</div>
+
+  <h3>Trả về nhiều giá trị qua con trỏ</h3>
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-title">multi_return.c</span>
+      <div style="display:flex;gap:8px;">
+        <span class="code-lang">C</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+    </div>
+    <pre><span class="cm">// Hàm tìm min và max cùng lúc</span>
+<span class="kw">void</span> <span class="fn">minmax</span>(<span class="kw">int</span> <span class="op">*</span><span class="nm">arr</span>, <span class="kw">int</span> <span class="nm">n</span>, <span class="kw">int</span> <span class="op">*</span><span class="nm">min</span>, <span class="kw">int</span> <span class="op">*</span><span class="nm">max</span>) {
+    <span class="op">*</span><span class="nm">min</span> <span class="op">=</span> <span class="op">*</span><span class="nm">max</span> <span class="op">=</span> <span class="nm">arr</span>[<span class="nu">0</span>];
+    <span class="kw">for</span> (<span class="kw">int</span> <span class="nm">i</span> <span class="op">=</span> <span class="nu">1</span>; <span class="nm">i</span> <span class="op">&lt;</span> <span class="nm">n</span>; <span class="nm">i</span><span class="op">++</span>) {
+        <span class="kw">if</span> (<span class="nm">arr</span>[<span class="nm">i</span>] <span class="op">&lt;</span> <span class="op">*</span><span class="nm">min</span>) <span class="op">*</span><span class="nm">min</span> <span class="op">=</span> <span class="nm">arr</span>[<span class="nm">i</span>];
+        <span class="kw">if</span> (<span class="nm">arr</span>[<span class="nm">i</span>] <span class="op">&gt;</span> <span class="op">*</span><span class="nm">max</span>) <span class="op">*</span><span class="nm">max</span> <span class="op">=</span> <span class="nm">arr</span>[<span class="nm">i</span>];
+    }
+}
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">int</span> <span class="nm">data</span>[] <span class="op">=</span> {<span class="nu">3</span>, <span class="nu">7</span>, <span class="nu">1</span>, <span class="nu">9</span>, <span class="nu">4</span>};
+    <span class="kw">int</span> <span class="nm">lo</span>, <span class="nm">hi</span>;
+    <span class="fn">minmax</span>(<span class="nm">data</span>, <span class="nu">5</span>, <span class="op">&amp;</span><span class="nm">lo</span>, <span class="op">&amp;</span><span class="nm">hi</span>);
+    <span class="fn">printf</span>(<span class="st">"Min=%d, Max=%d\n"</span>, <span class="nm">lo</span>, <span class="nm">hi</span>);
+}</pre>
+  </div>
+  <div class="output">Min=1, Max=9</div>
+
+  <div class="practice">
+    <h4>✏️ Bài tập</h4>
+    <p>Viết hàm <code>divide(int a, int b, int *quotient, int *remainder)</code> trả về cả thương và dư qua con trỏ.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SECTION 5: CON TRỎ & CHUỖI -->
+<!-- ══════════════════════════════════════════════ -->
+<section class="section" id="s5">
+  <div class="section-header">
+    <div class="section-num">// 05 · Chuỗi</div>
+    <h2>Con trỏ <span class="hl">&amp; Chuỗi</span></h2>
+  </div>
+  <div class="diff medium">● Trung cấp</div>
+  <p>Chuỗi trong C là mảng ký tự kết thúc bằng <code>'\0'</code>. <code>char*</code> là con trỏ đến ký tự đầu tiên.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-title">string_ptr.c</span>
+      <div style="display:flex;gap:8px;">
+        <span class="code-lang">C</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+    </div>
+    <pre><span class="pp">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="cm">// Đếm độ dài chuỗi bằng con trỏ</span>
+<span class="kw">int</span> <span class="fn">my_strlen</span>(<span class="kw">const char</span> <span class="op">*</span><span class="nm">s</span>) {
+    <span class="kw">const char</span> <span class="op">*</span><span class="nm">p</span> <span class="op">=</span> <span class="nm">s</span>;
+    <span class="kw">while</span> (<span class="op">*</span><span class="nm">p</span> <span class="op">!=</span> <span class="st">'\0'</span>) <span class="nm">p</span><span class="op">++</span>;
+    <span class="kw">return</span> (<span class="kw">int</span>)(<span class="nm">p</span> <span class="op">-</span> <span class="nm">s</span>);
+}
+
+<span class="cm">// Đảo ngược chuỗi</span>
+<span class="kw">void</span> <span class="fn">reverse_str</span>(<span class="kw">char</span> <span class="op">*</span><span class="nm">s</span>) {
+    <span class="kw">char</span> <span class="op">*</span><span class="nm">end</span> <span class="op">=</span> <span class="nm">s</span>;
+    <span class="kw">while</span> (<span class="op">*</span><span class="nm">end</span>) <span class="nm">end</span><span class="op">++</span>;
+    <span class="nm">end</span><span class="op">--</span>;
+    <span class="kw">while</span> (<span class="nm">s</span> <span class="op">&lt;</span> <span class="nm">end</span>) {
+        <span class="kw">char</span> <span class="nm">tmp</span> <span class="op">=</span> <span class="op">*</span><span class="nm">s</span>;
+        <span class="op">*</span><span class="nm">s</span><span class="op">++</span> <span class="op">=</span> <span class="op">*</span><span class="nm">end</span>;
+        <span class="op">*</span><span class="nm">end</span><span class="op">--</span> <span class="op">=</span> <span class="nm">tmp</span>;
+    }
+}
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">char</span> <span class="nm">s</span>[] <span class="op">=</span> <span class="st">"hello"</span>;
+    <span class="fn">printf</span>(<span class="st">"Độ dài: %d\n"</span>, <span class="fn">my_strlen</span>(<span class="nm">s</span>));
+    <span class="fn">reverse_str</span>(<span class="nm">s</span>);
+    <span class="fn">printf</span>(<span class="st">"Đảo ngược: %s\n"</span>, <span class="nm">s</span>);
+}</pre>
+  </div>
+  <div class="output">Độ dài: 5
+Đảo ngược: olleh</div>
+
+  <div class="info-box warn">
+    <div class="ib-title">⚠️ Cảnh báo quan trọng</div>
+    <p><code>char *s = "hello";</code> tạo con trỏ đến <strong>string literal</strong> — bộ nhớ READ-ONLY. Không thể sửa! Dùng <code>char s[] = "hello";</code> nếu cần chỉnh sửa.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SECTION 6: CẤP PHÁT ĐỘNG -->
+<!-- ══════════════════════════════════════════════ -->
+<section class="section" id="s6">
+  <div class="section-header">
+    <div class="section-num">// 06 · Heap</div>
+    <h2>Cấp phát bộ nhớ <span class="hl">động</span></h2>
+  </div>
+  <div class="diff medium">● Trung cấp</div>
+  <p>Stack có giới hạn và tự giải phóng. Heap thì lớn hơn — nhưng bạn phải tự quản lý bộ nhớ bằng <code>malloc</code>/<code>free</code>.</p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">📚</div>
+      <h4>Stack</h4>
+      <p>Tự động cấp phát/giải phóng. Kích thước cố định tại compile time. Nhanh.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🏗️</div>
+      <h4>Heap</h4>
+      <p>Cấp phát thủ công. Kích thước linh hoạt tại runtime. Phải <code>free()</code> sau khi dùng.</p>
+    </div>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-title">dynamic_alloc.c</span>
+      <div style="display:flex;gap:8px;">
+        <span class="code-lang">C</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+    </div>
+    <pre><span class="pp">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;stdlib.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">int</span> <span class="nm">n</span>;
+    <span class="fn">printf</span>(<span class="st">"Nhập số phần tử: "</span>);
+    <span class="fn">scanf</span>(<span class="st">"%d"</span>, <span class="op">&amp;</span><span class="nm">n</span>);
+
+    <span class="cm">// Cấp phát n ô nhớ kiểu int trên heap</span>
+    <span class="kw">int</span> <span class="op">*</span><span class="nm">arr</span> <span class="op">=</span> (<span class="kw">int</span><span class="op">*</span>) <span class="fn">malloc</span>(<span class="nm">n</span> <span class="op">*</span> <span class="kw">sizeof</span>(<span class="kw">int</span>));
+    <span class="kw">if</span> (<span class="nm">arr</span> <span class="op">==</span> <span class="nm">NULL</span>) {
+        <span class="fn">printf</span>(<span class="st">"Lỗi cấp phát bộ nhớ!\n"</span>);
+        <span class="kw">return</span> <span class="nu">1</span>;
+    }
+
+    <span class="kw">for</span> (<span class="kw">int</span> <span class="nm">i</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">i</span> <span class="op">&lt;</span> <span class="nm">n</span>; <span class="nm">i</span><span class="op">++</span>)
+        <span class="nm">arr</span>[<span class="nm">i</span>] <span class="op">=</span> <span class="nm">i</span> <span class="op">*</span> <span class="nm">i</span>;   <span class="cm">// bình phương</span>
+
+    <span class="kw">for</span> (<span class="kw">int</span> <span class="nm">i</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">i</span> <span class="op">&lt;</span> <span class="nm">n</span>; <span class="nm">i</span><span class="op">++</span>)
+        <span class="fn">printf</span>(<span class="st">"%d "</span>, <span class="nm">arr</span>[<span class="nm">i</span>]);
+
+    <span class="fn">free</span>(<span class="nm">arr</span>);   <span class="cm">// BẮT BUỘC — tránh memory leak!</span>
+    <span class="nm">arr</span> <span class="op">=</span> <span class="nm">NULL</span>; <span class="cm">// Good practice sau khi free</span>
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</pre>
+  </div>
+
+  <h3>Các hàm cấp phát</h3>
+  <table>
+    <tr><th>Hàm</th><th>Mô tả</th><th>Khởi tạo</th></tr>
+    <tr><td>malloc(size)</td><td>Cấp phát size bytes</td><td>Không (garbage)</td></tr>
+    <tr><td>calloc(n, size)</td><td>Cấp phát n×size bytes</td><td>Có (zeros)</td></tr>
+    <tr><td>realloc(ptr, size)</td><td>Thay đổi kích thước</td><td>—</td></tr>
+    <tr><td>free(ptr)</td><td>Giải phóng bộ nhớ</td><td>—</td></tr>
+  </table>
+
+  <div class="info-box danger">
+    <div class="ib-title">🚨 Memory Leak</div>
+    <p>Nếu quên <code>free()</code>, bộ nhớ bị chiếm mãi đến khi chương trình tắt. Với chương trình lâu dài (server, app...) điều này cực kỳ nguy hiểm — hệ thống sẽ chạy chậm rồi crash.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SECTION 7: CON TRỎ HÀM -->
+<!-- ══════════════════════════════════════════════ -->
+<section class="section" id="s7">
+  <div class="section-header">
+    <div class="section-num">// 07 · Nâng cao</div>
+    <h2>Con trỏ <span class="hl">Hàm</span></h2>
+  </div>
+  <div class="diff hard">● Nâng cao</div>
+  <p>Hàm cũng được lưu trong bộ nhớ và có địa chỉ! Con trỏ hàm cho phép truyền hàm như tham số — nền tảng của callback, strategy pattern.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-title">func_ptr.c</span>
+      <div style="display:flex;gap:8px;">
+        <span class="code-lang">C</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+    </div>
+    <pre><span class="pp">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">add</span>(<span class="kw">int</span> <span class="nm">a</span>, <span class="kw">int</span> <span class="nm">b</span>) { <span class="kw">return</span> <span class="nm">a</span> <span class="op">+</span> <span class="nm">b</span>; }
+<span class="kw">int</span> <span class="fn">mul</span>(<span class="kw">int</span> <span class="nm">a</span>, <span class="kw">int</span> <span class="nm">b</span>) { <span class="kw">return</span> <span class="nm">a</span> <span class="op">*</span> <span class="nm">b</span>; }
+<span class="kw">int</span> <span class="fn">sub</span>(<span class="kw">int</span> <span class="nm">a</span>, <span class="kw">int</span> <span class="nm">b</span>) { <span class="kw">return</span> <span class="nm">a</span> <span class="op">-</span> <span class="nm">b</span>; }
+
+<span class="cm">// Hàm nhận con trỏ hàm làm tham số</span>
+<span class="kw">void</span> <span class="fn">apply</span>(<span class="kw">int</span> <span class="nm">x</span>, <span class="kw">int</span> <span class="nm">y</span>, <span class="kw">int</span> (<span class="op">*</span><span class="nm">op</span>)(<span class="kw">int</span>, <span class="kw">int</span>), <span class="kw">const char</span> <span class="op">*</span><span class="nm">name</span>) {
+    <span class="fn">printf</span>(<span class="st">"%s(%d, %d) = %d\n"</span>, <span class="nm">name</span>, <span class="nm">x</span>, <span class="nm">y</span>, <span class="fn">op</span>(<span class="nm">x</span>, <span class="nm">y</span>));
+}
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="cm">// Khai báo mảng con trỏ hàm</span>
+    <span class="kw">int</span> (<span class="op">*</span><span class="nm">ops</span>[<span class="nu">3</span>])(<span class="kw">int</span>, <span class="kw">int</span>) <span class="op">=</span> {<span class="nm">add</span>, <span class="nm">mul</span>, <span class="nm">sub</span>};
+    <span class="kw">const char</span> <span class="op">*</span><span class="nm">names</span>[] <span class="op">=</span> {<span class="st">"add"</span>, <span class="st">"mul"</span>, <span class="st">"sub"</span>};
+
+    <span class="kw">for</span> (<span class="kw">int</span> <span class="nm">i</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">i</span> <span class="op">&lt;</span> <span class="nu">3</span>; <span class="nm">i</span><span class="op">++</span>)
+        <span class="fn">apply</span>(<span class="nu">6</span>, <span class="nu">3</span>, <span class="nm">ops</span>[<span class="nm">i</span>], <span class="nm">names</span>[<span class="nm">i</span>]);
+
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</pre>
+  </div>
+  <div class="output">add(6, 3) = 9
+mul(6, 3) = 18
+sub(6, 3) = 3</div>
+
+  <div class="info-box note">
+    <div class="ib-title">📚 Ứng dụng thực tế</div>
+    <p>Con trỏ hàm là nền tảng của: <strong>qsort()</strong> trong stdlib · <strong>Callback</strong> trong lập trình hệ thống · <strong>Strategy pattern</strong> trong design patterns · <strong>Event handlers</strong>.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SECTION 8: CON TRỎ ĐẾN CON TRỎ -->
+<!-- ══════════════════════════════════════════════ -->
+<section class="section" id="s8">
+  <div class="section-header">
+    <div class="section-num">// 08 · Advanced</div>
+    <h2>Con trỏ <span class="hl">đến</span> Con trỏ (<code>**ptr</code>)</h2>
+  </div>
+  <div class="diff hard">● Nâng cao</div>
+  <p>Con trỏ cũng là biến — có địa chỉ — nên có thể tạo con trỏ trỏ đến con trỏ. Cực kỳ cần thiết khi làm việc với mảng 2D động và linked list.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-title">ptr_to_ptr.c</span>
+      <div style="display:flex;gap:8px;">
+        <span class="code-lang">C</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+    </div>
+    <pre><span class="pp">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">int</span>   <span class="nm">x</span>   <span class="op">=</span> <span class="nu">42</span>;    <span class="cm">// biến int</span>
+    <span class="kw">int</span>  <span class="op">*</span><span class="nm">p</span>   <span class="op">=</span> <span class="op">&amp;</span><span class="nm">x</span>;    <span class="cm">// con trỏ đến int</span>
+    <span class="kw">int</span> <span class="op">**</span><span class="nm">pp</span>  <span class="op">=</span> <span class="op">&amp;</span><span class="nm">p</span>;    <span class="cm">// con trỏ đến con trỏ đến int</span>
+
+    <span class="fn">printf</span>(<span class="st">"x    = %d\n"</span>,  <span class="nm">x</span>);
+    <span class="fn">printf</span>(<span class="st">"*p   = %d\n"</span>, <span class="op">*</span><span class="nm">p</span>);
+    <span class="fn">printf</span>(<span class="st">"**pp = %d\n"</span>, <span class="op">**</span><span class="nm">pp</span>);   <span class="cm">// đều là 42</span>
+
+    <span class="op">**</span><span class="nm">pp</span> <span class="op">=</span> <span class="nu">100</span>;   <span class="cm">// ghi xuyên qua 2 lớp con trỏ</span>
+    <span class="fn">printf</span>(<span class="st">"x bây giờ = %d\n"</span>, <span class="nm">x</span>);  <span class="cm">// 100</span>
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</pre>
+  </div>
+
+  <h3>Sơ đồ 3 cấp</h3>
+  <div class="mem-diagram">
+    <div class="mem-cell">
+      <div class="mem-addr">0x3000</div>
+      <div class="mem-box ptr">0x2000</div>
+      <div class="mem-label">pp</div>
+    </div>
+    <div class="mem-arrow">→</div>
+    <div class="mem-cell">
+      <div class="mem-addr">0x2000</div>
+      <div class="mem-box ptr">0x1000</div>
+      <div class="mem-label">p</div>
+    </div>
+    <div class="mem-arrow">→</div>
+    <div class="mem-cell">
+      <div class="mem-addr">0x1000</div>
+      <div class="mem-box var">42</div>
+      <div class="mem-label">x</div>
+    </div>
+  </div>
+
+  <h3>Ứng dụng: Mảng 2D động</h3>
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-title">2d_array.c</span>
+      <div style="display:flex;gap:8px;">
+        <span class="code-lang">C</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+    </div>
+    <pre><span class="pp">#include</span> <span class="st">&lt;stdlib.h&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">int</span> <span class="nm">rows</span> <span class="op">=</span> <span class="nu">3</span>, <span class="nm">cols</span> <span class="op">=</span> <span class="nu">4</span>;
+
+    <span class="cm">// Cấp phát mảng con trỏ (mỗi phần tử là 1 hàng)</span>
+    <span class="kw">int</span> <span class="op">**</span><span class="nm">mat</span> <span class="op">=</span> (<span class="kw">int</span><span class="op">**</span>) <span class="fn">malloc</span>(<span class="nm">rows</span> <span class="op">*</span> <span class="kw">sizeof</span>(<span class="kw">int</span><span class="op">*</span>));
+    <span class="kw">for</span> (<span class="kw">int</span> <span class="nm">i</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">i</span> <span class="op">&lt;</span> <span class="nm">rows</span>; <span class="nm">i</span><span class="op">++</span>)
+        <span class="nm">mat</span>[<span class="nm">i</span>] <span class="op">=</span> (<span class="kw">int</span><span class="op">*</span>) <span class="fn">malloc</span>(<span class="nm">cols</span> <span class="op">*</span> <span class="kw">sizeof</span>(<span class="kw">int</span>));
+
+    <span class="cm">// Điền và in</span>
+    <span class="kw">for</span> (<span class="kw">int</span> <span class="nm">i</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">i</span> <span class="op">&lt;</span> <span class="nm">rows</span>; <span class="nm">i</span><span class="op">++</span>)
+        <span class="kw">for</span> (<span class="kw">int</span> <span class="nm">j</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">j</span> <span class="op">&lt;</span> <span class="nm">cols</span>; <span class="nm">j</span><span class="op">++</span>)
+            <span class="nm">mat</span>[<span class="nm">i</span>][<span class="nm">j</span>] <span class="op">=</span> <span class="nm">i</span> <span class="op">*</span> <span class="nm">cols</span> <span class="op">+</span> <span class="nm">j</span>;
+
+    <span class="kw">for</span> (<span class="kw">int</span> <span class="nm">i</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">i</span> <span class="op">&lt;</span> <span class="nm">rows</span>; <span class="nm">i</span><span class="op">++</span>) {
+        <span class="kw">for</span> (<span class="kw">int</span> <span class="nm">j</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">j</span> <span class="op">&lt;</span> <span class="nm">cols</span>; <span class="nm">j</span><span class="op">++</span>)
+            <span class="fn">printf</span>(<span class="st">"%3d"</span>, <span class="nm">mat</span>[<span class="nm">i</span>][<span class="nm">j</span>]);
+        <span class="fn">printf</span>(<span class="st">"\n"</span>);
+    }
+
+    <span class="cm">// Giải phóng theo thứ tự ngược lại</span>
+    <span class="kw">for</span> (<span class="kw">int</span> <span class="nm">i</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">i</span> <span class="op">&lt;</span> <span class="nm">rows</span>; <span class="nm">i</span><span class="op">++</span>)
+        <span class="fn">free</span>(<span class="nm">mat</span>[<span class="nm">i</span>]);
+    <span class="fn">free</span>(<span class="nm">mat</span>);
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</pre>
+  </div>
+  <div class="output">  0  1  2  3
+  4  5  6  7
+  8  9 10 11</div>
+</section>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SECTION 9: CON TRỎ & STRUCT -->
+<!-- ══════════════════════════════════════════════ -->
+<section class="section" id="s9">
+  <div class="section-header">
+    <div class="section-num">// 09 · Struct</div>
+    <h2>Con trỏ <span class="hl">&amp; Struct</span> — Linked List</h2>
+  </div>
+  <div class="diff hard">● Nâng cao</div>
+  <p>Con trỏ đến struct là nền tảng của mọi cấu trúc dữ liệu động: linked list, tree, graph. Toán tử <code>-&gt;</code> là cách truy cập thành viên qua con trỏ.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-title">linked_list.c</span>
+      <div style="display:flex;gap:8px;">
+        <span class="code-lang">C</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+    </div>
+    <pre><span class="pp">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;stdlib.h&gt;</span>
+
+<span class="cm">// Định nghĩa Node</span>
+<span class="kw">typedef struct</span> <span class="ty">Node</span> {
+    <span class="kw">int</span> <span class="nm">data</span>;
+    <span class="kw">struct</span> <span class="ty">Node</span> <span class="op">*</span><span class="nm">next</span>;  <span class="cm">// con trỏ đến node tiếp theo</span>
+} <span class="ty">Node</span>;
+
+<span class="cm">// Tạo node mới</span>
+<span class="ty">Node</span><span class="op">*</span> <span class="fn">new_node</span>(<span class="kw">int</span> <span class="nm">val</span>) {
+    <span class="ty">Node</span><span class="op">*</span> <span class="nm">n</span> <span class="op">=</span> (<span class="ty">Node</span><span class="op">*</span>) <span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="ty">Node</span>));
+    <span class="nm">n</span><span class="op">-&gt;</span><span class="nm">data</span> <span class="op">=</span> <span class="nm">val</span>;   <span class="cm">// n->x tương đương (*n).x</span>
+    <span class="nm">n</span><span class="op">-&gt;</span><span class="nm">next</span> <span class="op">=</span> <span class="nm">NULL</span>;
+    <span class="kw">return</span> <span class="nm">n</span>;
+}
+
+<span class="cm">// Thêm vào đầu</span>
+<span class="kw">void</span> <span class="fn">push</span>(<span class="ty">Node</span> <span class="op">**</span><span class="nm">head</span>, <span class="kw">int</span> <span class="nm">val</span>) {
+    <span class="ty">Node</span><span class="op">*</span> <span class="nm">n</span> <span class="op">=</span> <span class="fn">new_node</span>(<span class="nm">val</span>);
+    <span class="nm">n</span><span class="op">-&gt;</span><span class="nm">next</span> <span class="op">=</span> <span class="op">*</span><span class="nm">head</span>;
+    <span class="op">*</span><span class="nm">head</span> <span class="op">=</span> <span class="nm">n</span>;
+}
+
+<span class="cm">// In danh sách</span>
+<span class="kw">void</span> <span class="fn">print_list</span>(<span class="ty">Node</span><span class="op">*</span> <span class="nm">h</span>) {
+    <span class="kw">while</span> (<span class="nm">h</span>) {
+        <span class="fn">printf</span>(<span class="st">"%d → "</span>, <span class="nm">h</span><span class="op">-&gt;</span><span class="nm">data</span>);
+        <span class="nm">h</span> <span class="op">=</span> <span class="nm">h</span><span class="op">-&gt;</span><span class="nm">next</span>;
+    }
+    <span class="fn">printf</span>(<span class="st">"NULL\n"</span>);
+}
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="ty">Node</span><span class="op">*</span> <span class="nm">head</span> <span class="op">=</span> <span class="nm">NULL</span>;
+    <span class="fn">push</span>(<span class="op">&amp;</span><span class="nm">head</span>, <span class="nu">30</span>);
+    <span class="fn">push</span>(<span class="op">&amp;</span><span class="nm">head</span>, <span class="nu">20</span>);
+    <span class="fn">push</span>(<span class="op">&amp;</span><span class="nm">head</span>, <span class="nu">10</span>);
+    <span class="fn">print_list</span>(<span class="nm">head</span>);
+}</pre>
+  </div>
+  <div class="output">10 → 20 → 30 → NULL</div>
+
+  <div class="practice">
+    <h4>✏️ Thử thách</h4>
+    <p>Mở rộng linked list với các hàm:</p>
+    <ul>
+      <li><code>pop(Node **head)</code> — xóa phần tử đầu</li>
+      <li><code>search(Node *head, int val)</code> — tìm kiếm</li>
+      <li><code>reverse(Node **head)</code> — đảo ngược danh sách</li>
+      <li><code>free_list(Node **head)</code> — giải phóng toàn bộ bộ nhớ</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SECTION 10: SMART POINTERS -->
+<!-- ══════════════════════════════════════════════ -->
+<section class="section" id="s10">
+  <div class="section-header">
+    <div class="section-num">// 10 · C++ Modern</div>
+    <h2><span class="hl">Smart Pointers</span> trong C++</h2>
+  </div>
+  <div class="diff expert">● Expert</div>
+  <p>C++11 giới thiệu smart pointers — con trỏ "thông minh" tự động giải phóng bộ nhớ, loại bỏ memory leak.</p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">🔒</div>
+      <h4>unique_ptr</h4>
+      <p>Sở hữu duy nhất. Không thể copy, chỉ move. Tự giải phóng khi ra khỏi scope.</p>
+      <code>unique_ptr&lt;int&gt;</code>
+    </div>
+    <div class="card">
+      <div class="card-icon">🤝</div>
+      <h4>shared_ptr</h4>
+      <p>Nhiều con trỏ cùng sở hữu. Đếm tham chiếu (reference count). Free khi count = 0.</p>
+      <code>shared_ptr&lt;int&gt;</code>
+    </div>
+    <div class="card">
+      <div class="card-icon">👀</div>
+      <h4>weak_ptr</h4>
+      <p>Quan sát shared_ptr mà không tăng count. Dùng để tránh circular reference.</p>
+      <code>weak_ptr&lt;int&gt;</code>
+    </div>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-title">smart_ptr.cpp</span>
+      <div style="display:flex;gap:8px;">
+        <span class="code-lang">C++</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+    </div>
+    <pre><span class="pp">#include</span> <span class="st">&lt;memory&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">struct</span> <span class="ty">Dog</span> {
+    string <span class="nm">name</span>;
+    <span class="fn">Dog</span>(string <span class="nm">n</span>) : <span class="nm">name</span>(<span class="nm">n</span>) { cout <span class="op">&lt;&lt;</span> <span class="st">"Dog "</span> <span class="op">&lt;&lt;</span> <span class="nm">name</span> <span class="op">&lt;&lt;</span> <span class="st">" born\n"</span>; }
+    <span class="op">~</span><span class="fn">Dog</span>() { cout <span class="op">&lt;&lt;</span> <span class="st">"Dog "</span> <span class="op">&lt;&lt;</span> <span class="nm">name</span> <span class="op">&lt;&lt;</span> <span class="st">" died\n"</span>; }
+};
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="cm">// unique_ptr — tự free khi ra scope</span>
+    {
+        <span class="kw">auto</span> <span class="nm">d1</span> <span class="op">=</span> make_unique<span class="op">&lt;</span><span class="ty">Dog</span><span class="op">&gt;</span>(<span class="st">"Rex"</span>);
+        cout <span class="op">&lt;&lt;</span> <span class="st">"Trong scope\n"</span>;
+    } <span class="cm">// Rex tự động bị xóa ở đây!</span>
+    cout <span class="op">&lt;&lt;</span> <span class="st">"Sau scope\n"</span>;
+
+    <span class="cm">// shared_ptr — đếm tham chiếu</span>
+    <span class="kw">auto</span> <span class="nm">d2</span> <span class="op">=</span> make_shared<span class="op">&lt;</span><span class="ty">Dog</span><span class="op">&gt;</span>(<span class="st">"Buddy"</span>);
+    {
+        <span class="kw">auto</span> <span class="nm">d3</span> <span class="op">=</span> <span class="nm">d2</span>;   <span class="cm">// count = 2</span>
+        cout <span class="op">&lt;&lt;</span> <span class="st">"Refs: "</span> <span class="op">&lt;&lt;</span> <span class="nm">d2</span>.use_count() <span class="op">&lt;&lt;</span> <span class="st">"\n"</span>;  <span class="cm">// 2</span>
+    } <span class="cm">// d3 xóa, count = 1</span>
+    cout <span class="op">&lt;&lt;</span> <span class="st">"Refs: "</span> <span class="op">&lt;&lt;</span> <span class="nm">d2</span>.use_count() <span class="op">&lt;&lt;</span> <span class="st">"\n"</span>;    <span class="cm">// 1</span>
+    <span class="kw">return</span> <span class="nu">0</span>;  <span class="cm">// Buddy tự xóa</span>
+}</pre>
+  </div>
+  <div class="output">Dog Rex born
+Trong scope
+Dog Rex died
+Sau scope
+Dog Buddy born
+Refs: 2
+Refs: 1
+Dog Buddy died</div>
+</section>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SECTION 11: LỖI THƯỜNG GẶP -->
+<!-- ══════════════════════════════════════════════ -->
+<section class="section" id="s11">
+  <div class="section-header">
+    <div class="section-num">// 11 · Bugs</div>
+    <h2>Những lỗi <span class="hl">nguy hiểm</span> nhất</h2>
+  </div>
+  <div class="diff expert">● Expert</div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h4>🔴 Dangling Pointer — Con trỏ trỏ vào bộ nhớ đã free</h4>
+        <p>Sau khi <code>free(p)</code>, <code>p</code> vẫn giữ địa chỉ cũ. Truy cập <code>*p</code> = undefined behavior!</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h4>🔴 Wild Pointer — Con trỏ chưa khởi tạo</h4>
+        <p><code>int *p; *p = 5;</code> — <code>p</code> chứa rác, truy cập vùng nhớ ngẫu nhiên → crash hoặc corruption.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h4>🔴 Buffer Overflow — Ghi ngoài vùng cấp phát</h4>
+        <p><code>int arr[3]; arr[5] = 99;</code> — ghi vào vùng nhớ không thuộc về mình → security vulnerability!</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h4>🔴 Memory Leak — Quên free</h4>
+        <p>Gọi <code>malloc</code> mà không <code>free</code> → bộ nhớ bị chiếm vĩnh viễn đến khi tắt chương trình.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <h4>🔴 Double Free — Free cùng một vùng nhớ 2 lần</h4>
+        <p>Gọi <code>free(p)</code> hai lần → undefined behavior, có thể corrupt allocator state.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>✅ Checklist phòng tránh</h3>
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-title">safe_pointer.c — Best Practices</span>
+      <div style="display:flex;gap:8px;">
+        <span class="code-lang">C</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+    </div>
+    <pre><span class="cm">// ✅ 1. Luôn khởi tạo con trỏ</span>
+<span class="kw">int</span> <span class="op">*</span><span class="nm">p</span> <span class="op">=</span> <span class="nm">NULL</span>;
+
+<span class="cm">// ✅ 2. Kiểm tra NULL trước khi dùng</span>
+<span class="kw">if</span> (<span class="nm">p</span> <span class="op">!=</span> <span class="nm">NULL</span>) { <span class="op">*</span><span class="nm">p</span> <span class="op">=</span> <span class="nu">5</span>; }
+
+<span class="cm">// ✅ 3. Kiểm tra malloc thành công</span>
+<span class="nm">p</span> <span class="op">=</span> <span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="kw">int</span>));
+<span class="kw">if</span> (<span class="nm">p</span> <span class="op">==</span> <span class="nm">NULL</span>) { <span class="cm">/* xử lý lỗi */</span> }
+
+<span class="cm">// ✅ 4. Sau free, gán NULL ngay</span>
+<span class="fn">free</span>(<span class="nm">p</span>);
+<span class="nm">p</span> <span class="op">=</span> <span class="nm">NULL</span>;  <span class="cm">// tránh dangling pointer</span>
+
+<span class="cm">// ✅ 5. Dùng const để bảo vệ dữ liệu read-only</span>
+<span class="kw">void</span> <span class="fn">print</span>(<span class="kw">const int</span> <span class="op">*</span><span class="nm">arr</span>, <span class="kw">int</span> <span class="nm">n</span>) { <span class="cm">/* không thể sửa arr */</span> }</pre>
+  </div>
+
+  <div class="info-box tip">
+    <div class="ib-title">🛠️ Công cụ phát hiện lỗi</div>
+    <p><strong>Valgrind</strong>: Phát hiện memory leak, dangling pointer trên Linux · <strong>AddressSanitizer</strong>: Compile với <code>-fsanitize=address</code> · <strong>clang-tidy</strong>: Static analysis</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SECTION 12: THỰC HÀNH TỔNG HỢP -->
+<!-- ══════════════════════════════════════════════ -->
+<section class="section" id="s12">
+  <div class="section-header">
+    <div class="section-num">// 12 · Capstone</div>
+    <h2>Thực hành <span class="hl">tổng hợp</span></h2>
+  </div>
+  <div class="diff expert">● Expert</div>
+  <p>Kết hợp tất cả kiến thức: cấp phát động, con trỏ hàm, struct — xây dựng một <strong>Generic Sort</strong> tương tự <code>qsort</code> trong stdlib.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-title">generic_sort.c — Capstone Project</span>
+      <div style="display:flex;gap:8px;">
+        <span class="code-lang">C</span>
+        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      </div>
+    </div>
+    <pre><span class="pp">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;stdlib.h&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;string.h&gt;</span>
+
+<span class="cm">// ── Student struct ──</span>
+<span class="kw">typedef struct</span> {
+    <span class="kw">char</span> <span class="nm">name</span>[<span class="nu">32</span>];
+    <span class="kw">float</span> <span class="nm">gpa</span>;
+} <span class="ty">Student</span>;
+
+<span class="cm">// ── Comparators (con trỏ hàm) ──</span>
+<span class="kw">int</span> <span class="fn">cmp_by_gpa</span>(<span class="kw">const void</span> <span class="op">*</span><span class="nm">a</span>, <span class="kw">const void</span> <span class="op">*</span><span class="nm">b</span>) {
+    <span class="kw">float</span> <span class="nm">ga</span> <span class="op">=</span> ((<span class="kw">const</span> <span class="ty">Student</span><span class="op">*</span>)<span class="nm">a</span>)<span class="op">-&gt;</span><span class="nm">gpa</span>;
+    <span class="kw">float</span> <span class="nm">gb</span> <span class="op">=</span> ((<span class="kw">const</span> <span class="ty">Student</span><span class="op">*</span>)<span class="nm">b</span>)<span class="op">-&gt;</span><span class="nm">gpa</span>;
+    <span class="kw">if</span> (<span class="nm">ga</span> <span class="op">&lt;</span> <span class="nm">gb</span>) <span class="kw">return</span> <span class="op">-</span><span class="nu">1</span>;
+    <span class="kw">if</span> (<span class="nm">ga</span> <span class="op">&gt;</span> <span class="nm">gb</span>) <span class="kw">return</span>  <span class="nu">1</span>;
+    <span class="kw">return</span> <span class="nu">0</span>;
+}
+
+<span class="kw">int</span> <span class="fn">cmp_by_name</span>(<span class="kw">const void</span> <span class="op">*</span><span class="nm">a</span>, <span class="kw">const void</span> <span class="op">*</span><span class="nm">b</span>) {
+    <span class="kw">return</span> <span class="fn">strcmp</span>(((<span class="kw">const</span> <span class="ty">Student</span><span class="op">*</span>)<span class="nm">a</span>)<span class="op">-&gt;</span><span class="nm">name</span>,
+                  ((<span class="kw">const</span> <span class="ty">Student</span><span class="op">*</span>)<span class="nm">b</span>)<span class="op">-&gt;</span><span class="nm">name</span>);
+}
+
+<span class="kw">void</span> <span class="fn">print_students</span>(<span class="ty">Student</span> <span class="op">*</span><span class="nm">s</span>, <span class="kw">int</span> <span class="nm">n</span>) {
+    <span class="kw">for</span> (<span class="kw">int</span> <span class="nm">i</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">i</span> <span class="op">&lt;</span> <span class="nm">n</span>; <span class="nm">i</span><span class="op">++</span>)
+        <span class="fn">printf</span>(<span class="st">"  %-12s GPA: %.1f\n"</span>, <span class="nm">s</span>[<span class="nm">i</span>].<span class="nm">name</span>, <span class="nm">s</span>[<span class="nm">i</span>].<span class="nm">gpa</span>);
+}
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="cm">// Cấp phát mảng động</span>
+    <span class="ty">Student</span> <span class="op">*</span><span class="nm">class</span> <span class="op">=</span> (<span class="ty">Student</span><span class="op">*</span>) <span class="fn">malloc</span>(<span class="nu">4</span> <span class="op">*</span> <span class="kw">sizeof</span>(<span class="ty">Student</span>));
+    <span class="nm">class</span>[<span class="nu">0</span>] <span class="op">=</span> (<span class="ty">Student</span>){<span class="st">"Alice"</span>,  <span class="nu">3.8</span>};
+    <span class="nm">class</span>[<span class="nu">1</span>] <span class="op">=</span> (<span class="ty">Student</span>){<span class="st">"Charlie"</span>,<span class="nu">3.5</span>};
+    <span class="nm">class</span>[<span class="nu">2</span>] <span class="op">=</span> (<span class="ty">Student</span>){<span class="st">"Bob"</span>,    <span class="nu">3.9</span>};
+    <span class="nm">class</span>[<span class="nu">3</span>] <span class="op">=</span> (<span class="ty">Student</span>){<span class="st">"Diana"</span>,  <span class="nu">3.6</span>};
+
+    <span class="fn">printf</span>(<span class="st">"--- Sắp xếp theo GPA ---\n"</span>);
+    <span class="fn">qsort</span>(<span class="nm">class</span>, <span class="nu">4</span>, <span class="kw">sizeof</span>(<span class="ty">Student</span>), <span class="nm">cmp_by_gpa</span>);
+    <span class="fn">print_students</span>(<span class="nm">class</span>, <span class="nu">4</span>);
+
+    <span class="fn">printf</span>(<span class="st">"--- Sắp xếp theo Tên ---\n"</span>);
+    <span class="fn">qsort</span>(<span class="nm">class</span>, <span class="nu">4</span>, <span class="kw">sizeof</span>(<span class="ty">Student</span>), <span class="nm">cmp_by_name</span>);
+    <span class="fn">print_students</span>(<span class="nm">class</span>, <span class="nu">4</span>);
+
+    <span class="fn">free</span>(<span class="nm">class</span>);
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</pre>
+  </div>
+  <div class="output">--- Sắp xếp theo GPA ---
+  Charlie      GPA: 3.5
+  Diana        GPA: 3.6
+  Alice        GPA: 3.8
+  Bob          GPA: 3.9
+--- Sắp xếp theo Tên ---
+  Alice        GPA: 3.8
+  Bob          GPA: 3.9
+  Charlie      GPA: 3.5
+  Diana        GPA: 3.6</div>
+
+  <div class="practice">
+    <h4>🏆 Thử thách cuối khóa</h4>
+    <p>Mở rộng dự án trên với yêu cầu:</p>
+    <ul>
+      <li>Thêm hàm sắp xếp theo cả tên và GPA (multi-key sort)</li>
+      <li>Dùng <code>**Student</code> để lưu mảng con trỏ thay vì copy struct</li>
+      <li>Cài đặt merge sort tùy chỉnh với con trỏ hàm comparator</li>
+      <li>Thêm tính năng filter: chỉ giữ sinh viên GPA ≥ 3.7</li>
+      <li>(C++) Chuyển đổi dùng <code>std::vector</code> và <code>std::sort</code></li>
+    </ul>
+  </div>
+
+  <!-- FINAL QUIZ -->
+  <div class="quiz">
+    <h4>🎯 Quiz tổng kết</h4>
+    <div class="quiz-q">Đoạn code sau có vấn đề gì? <code>int *p = malloc(4); free(p); *p = 10;</code></div>
+    <div class="quiz-opt">
+      <button class="opt-btn" onclick="answer(this, false)">A. Cú pháp sai</button>
+      <button class="opt-btn" onclick="answer(this, false)">B. malloc cần cast</button>
+      <button class="opt-btn" onclick="answer(this, true)">C. Dangling pointer — truy cập sau khi free</button>
+      <button class="opt-btn" onclick="answer(this, false)">D. Không có vấn đề gì</button>
+    </div>
+    <div class="quiz-explain">
+      ✓ Sau khi <code>free(p)</code>, bộ nhớ được trả lại cho OS. Tiếp tục ghi <code>*p = 10</code> là truy cập vùng nhớ không còn sở hữu — đây là <strong>dangling pointer</strong>. Hành vi không xác định (undefined behavior)! Luôn gán <code>p = NULL</code> sau khi free.
+    </div>
+  </div>
+
+  <!-- Summary table -->
+  <h3>📊 Tóm tắt toàn bộ</h3>
+  <table>
+    <tr><th>Chủ đề</th><th>Cú pháp</th><th>Mức độ</th></tr>
+    <tr><td>Khai báo</td><td><code>int *p;</code></td><td style="color:var(--green)">Cơ bản</td></tr>
+    <tr><td>Lấy địa chỉ</td><td><code>&amp;x</code></td><td style="color:var(--green)">Cơ bản</td></tr>
+    <tr><td>Dereference</td><td><code>*p</code></td><td style="color:var(--green)">Cơ bản</td></tr>
+    <tr><td>Pointer Arithmetic</td><td><code>p++, p+n</code></td><td style="color:var(--green)">Cơ bản</td></tr>
+    <tr><td>Pass by reference</td><td><code>void f(int *p)</code></td><td style="color:var(--yellow)">Trung cấp</td></tr>
+    <tr><td>Dynamic allocation</td><td><code>malloc/free</code></td><td style="color:var(--yellow)">Trung cấp</td></tr>
+    <tr><td>Function pointer</td><td><code>int (*fp)(int,int)</code></td><td style="color:var(--accent3)">Nâng cao</td></tr>
+    <tr><td>Double pointer</td><td><code>int **pp</code></td><td style="color:var(--accent3)">Nâng cao</td></tr>
+    <tr><td>Struct pointer</td><td><code>Node->next</code></td><td style="color:var(--accent3)">Nâng cao</td></tr>
+    <tr><td>Smart pointer</td><td><code>unique_ptr, shared_ptr</code></td><td style="color:var(--red)">Expert</td></tr>
+  </table>
+</section>
+
+</main>
+</div>
+
+<script>
+// Progress bar
+window.addEventListener('scroll', () => {
+  const el = document.documentElement;
+  const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+});
+
+// Active nav
+const sections = document.querySelectorAll('section[id]');
+const navItems = document.querySelectorAll('.nav-item');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navItems.forEach(n => {
+        n.classList.remove('active');
+        if (n.getAttribute('href') === '#' + e.target.id ||
+            (e.target.id === 's0b' && n.getAttribute('href') === '#s0')) {
+          n.classList.add('active');
+        }
+      });
+    }
+  });
+}, { threshold: 0.3 });
+sections.forEach(s => observer.observe(s));
+
+// Copy button
+function copyCode(btn) {
+  const code = btn.closest('.code-wrap').querySelector('pre').innerText;
+  navigator.clipboard.writeText(code).then(() => {
+    btn.textContent = 'copied!';
+    btn.style.color = 'var(--green)';
+    btn.style.borderColor = 'var(--green)';
+    setTimeout(() => {
+      btn.textContent = 'copy';
+      btn.style.color = '';
+      btn.style.borderColor = '';
+    }, 1500);
+  });
+}
+
+// Quiz
+function answer(btn, correct) {
+  const opts = btn.closest('.quiz-opt').querySelectorAll('.opt-btn');
+  opts.forEach(o => {
+    o.disabled = true;
+    o.classList.remove('correct','wrong');
+  });
+  btn.classList.add(correct ? 'correct' : 'wrong');
+  if (!correct) {
+    opts.forEach(o => {
+      // find correct
+    });
+  }
+  const explain = btn.closest('.quiz').querySelector('.quiz-explain');
+  if (explain) explain.classList.add('show');
+}
+
+// Interactive demo
+function runDemo() {
+  const val = parseInt(document.getElementById('demoVal').value) || 42;
+  const size = parseInt(document.getElementById('demoType').value);
+  const typeName = document.getElementById('demoType').options[document.getElementById('demoType').selectedIndex].text;
+
+  const baseAddr = 0x1000;
+  let out = `// Kiểu: ${typeName}\n`;
+  out += `int x = ${val};\n`;
+  out += `Địa chỉ của x: 0x${baseAddr.toString(16).toUpperCase()}\n\n`;
+  out += `Pointer Arithmetic (p++):\n`;
+  for (let i = 0; i < 4; i++) {
+    const addr = baseAddr + i * size;
+    out += `  p+${i} → 0x${addr.toString(16).toUpperCase().padStart(4,'0')}  (tăng ${i * size} bytes)\n`;
+  }
+  out += `\nMỗi bước cộng ${size} byte${size > 1 ? 's' : ''} (sizeof = ${size})`;
+  document.getElementById('demoOut').textContent = out;
+}
+</script>
+
+</body>
+</html>

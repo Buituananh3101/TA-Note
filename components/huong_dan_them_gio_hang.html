@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hướng Dẫn: Thêm Chức Năng Giỏ Hàng</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-card: #1c2128;
+            --bg-code: #0d1117;
+            --border: #30363d;
+            --border-light: #21262d;
+            --accent-blue: #58a6ff;
+            --accent-purple: #bc8cff;
+            --accent-green: #3fb950;
+            --accent-orange: #ffa657;
+            --accent-red: #ff7b72;
+            --accent-cyan: #79c0ff;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --text-muted: #6e7681;
+            --step-1: #58a6ff;
+            --step-2: #bc8cff;
+            --step-3: #3fb950;
+            --step-4: #ffa657;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        /* ─── Hero Header ─── */
+        .hero {
+            background: linear-gradient(135deg, #0d1117 0%, #1a1f2e 50%, #0d1117 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 60px 24px 50px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 50% at 20% 50%, rgba(88, 166, 255, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 80% 50% at 80% 50%, rgba(188, 140, 255, 0.08) 0%, transparent 60%);
+        }
+
+        .hero-icon {
+            font-size: 52px;
+            display: block;
+            margin-bottom: 16px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .hero h1 {
+            font-size: clamp(1.6rem, 4vw, 2.5rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #58a6ff 0%, #bc8cff 50%, #79c0ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .hero p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            max-width: 600px;
+            margin: 0 auto 24px;
+            position: relative;
+        }
+
+        .badge-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            position: relative;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 5px 14px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .badge .dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+        }
+
+        /* ─── Layout ─── */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 24px 60px;
+        }
+
+        /* ─── Overview Cards ─── */
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 14px;
+            margin-bottom: 48px;
+        }
+
+        .overview-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .overview-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
+
+        .overview-card .ov-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .overview-card .ov-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 3px;
+        }
+
+        .overview-card .ov-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* ─── Step Cards ─── */
+        .step-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 28px;
+            overflow: hidden;
+            transition: border-color 0.25s;
+        }
+
+        .step-card:hover { border-color: #30363d; }
+        .step-card:nth-child(1) .step-header { --step-color: var(--step-1); }
+        .step-card:nth-child(2) .step-header { --step-color: var(--step-2); }
+        .step-card:nth-child(3) .step-header { --step-color: var(--step-3); }
+        .step-card:nth-child(4) .step-header { --step-color: var(--step-4); }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px 24px;
+            background: linear-gradient(90deg, rgba(88,166,255,0.06) 0%, transparent 100%);
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+        }
+
+        .step-number {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 1rem;
+            background: rgba(88, 166, 255, 0.12);
+            color: var(--accent-blue);
+            border: 1px solid rgba(88, 166, 255, 0.3);
+            flex-shrink: 0;
+        }
+
+        .step-card:nth-child(2) .step-number {
+            background: rgba(188, 140, 255, 0.12);
+            color: var(--accent-purple);
+            border-color: rgba(188, 140, 255, 0.3);
+        }
+
+        .step-card:nth-child(3) .step-number {
+            background: rgba(63, 185, 80, 0.12);
+            color: var(--accent-green);
+            border-color: rgba(63, 185, 80, 0.3);
+        }
+
+        .step-card:nth-child(4) .step-number {
+            background: rgba(255, 166, 87, 0.12);
+            color: var(--accent-orange);
+            border-color: rgba(255, 166, 87, 0.3);
+        }
+
+        .step-title-wrap { flex: 1; }
+
+        .step-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--accent-blue);
+            margin-bottom: 2px;
+        }
+
+        .step-card:nth-child(2) .step-label { color: var(--accent-purple); }
+        .step-card:nth-child(3) .step-label { color: var(--accent-green); }
+        .step-card:nth-child(4) .step-label { color: var(--accent-orange); }
+
+        .step-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .step-body {
+            padding: 24px;
+        }
+
+        /* ─── File Path Tag ─── */
+        .file-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(88, 166, 255, 0.08);
+            border: 1px solid rgba(88, 166, 255, 0.25);
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            color: var(--accent-cyan);
+            margin-bottom: 16px;
+        }
+
+        .file-tag .file-icon { font-size: 14px; }
+
+        /* ─── Description Text ─── */
+        .step-body > p {
+            color: var(--text-secondary);
+            font-size: 0.93rem;
+            margin-bottom: 16px;
+        }
+
+        p code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82em;
+            background: rgba(88, 166, 255, 0.1);
+            color: var(--accent-cyan);
+            padding: 2px 7px;
+            border-radius: 5px;
+            border: 1px solid rgba(88, 166, 255, 0.2);
+        }
+
+        /* ─── Sub Section ─── */
+        .sub-section {
+            margin-bottom: 20px;
+        }
+
+        .sub-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .sub-num {
+            width: 22px; height: 22px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+
+        /* ─── Code Block ─── */
+        .code-wrap {
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+
+        .code-header {
+            background: #161b22;
+            padding: 9px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .code-lang {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .code-dots {
+            display: flex; gap: 6px;
+        }
+
+        .code-dots span {
+            width: 11px; height: 11px;
+            border-radius: 50%;
+        }
+
+        .code-dots span:nth-child(1) { background: #ff5f57; }
+        .code-dots span:nth-child(2) { background: #febc2e; }
+        .code-dots span:nth-child(3) { background: #28c840; }
+
+        pre {
+            background: var(--bg-code);
+            padding: 18px 20px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.83rem;
+            line-height: 1.65;
+        }
+
+        pre code { font-family: inherit; }
+
+        /* ─── Syntax colors ─── */
+        .kw  { color: #ff7b72; }   /* keyword */
+        .fn  { color: #d2a8ff; }   /* function */
+        .str { color: #a5d6ff; }   /* string */
+        .num { color: #79c0ff; }   /* number */
+        .cm  { color: #8b949e; font-style: italic; } /* comment */
+        .tp  { color: #ffa657; }   /* type */
+        .id  { color: #cae2ff; }   /* identifier */
+        .op  { color: #79c0ff; }   /* operator */
+        .jsx { color: #7ee787; }   /* jsx tag */
+
+        /* ─── Note / Tip Box ─── */
+        .tip-box {
+            display: flex;
+            gap: 12px;
+            background: rgba(63, 185, 80, 0.07);
+            border: 1px solid rgba(63, 185, 80, 0.25);
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .tip-box .tip-icon { font-size: 18px; flex-shrink: 0; }
+
+        /* ─── Success Banner ─── */
+        .success-banner {
+            background: linear-gradient(135deg, rgba(63, 185, 80, 0.1) 0%, rgba(88, 166, 255, 0.1) 100%);
+            border: 1px solid rgba(63, 185, 80, 0.3);
+            border-radius: 16px;
+            padding: 28px 30px;
+            display: flex;
+            gap: 18px;
+            align-items: flex-start;
+            margin-top: 8px;
+        }
+
+        .success-banner .s-icon { font-size: 32px; flex-shrink: 0; }
+
+        .success-banner h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--accent-green);
+            margin-bottom: 6px;
+        }
+
+        .success-banner p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ─── Separator / Header between steps ─── */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            margin-top: 40px;
+        }
+
+        .section-header:first-child { margin-top: 0; }
+
+        .section-header h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .section-line {
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ══ Hero ══ -->
+    <div class="hero">
+        <span class="hero-icon">🛒</span>
+        <h1>Chức Năng Thêm Vào Giỏ Hàng</h1>
+        <p>Hướng dẫn chi tiết cài đặt giỏ hàng với <strong style="color:#58a6ff">Context API</strong> + <strong style="color:#bc8cff">LocalStorage</strong> trong dự án React TypeScript.</p>
+        <div class="badge-row">
+            <span class="badge"><span class="dot" style="background:#58a6ff"></span> React + TypeScript</span>
+            <span class="badge"><span class="dot" style="background:#3fb950"></span> Context API</span>
+            <span class="badge"><span class="dot" style="background:#ffa657"></span> LocalStorage</span>
+            <span class="badge"><span class="dot" style="background:#bc8cff"></span> 4 Bước</span>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <!-- ══ Overview ══ -->
+        <div class="overview-grid">
+            <div class="overview-card">
+                <span class="ov-icon">📦</span>
+                <div>
+                    <div class="ov-label">Bước 1</div>
+                    <div class="ov-value">CartItemModel</div>
+                </div>
+            </div>
+            <div class="overview-card">
+                <span class="ov-icon">🧠</span>
+                <div>
+                    <div class="ov-label">Bước 2</div>
+                    <div class="ov-value">CartContext</div>
+                </div>
+            </div>
+            <div class="overview-card">
+                <span class="ov-icon">🔗</span>
+                <div>
+                    <div class="ov-label">Bước 3</div>
+                    <div class="ov-value">CartProvider</div>
+                </div>
+            </div>
+            <div class="overview-card">
+                <span class="ov-icon">🖱️</span>
+                <div>
+                    <div class="ov-label">Bước 4</div>
+                    <div class="ov-value">Handle Event</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ Step 1 ══ -->
+        <div class="step-card">
+            <div class="step-header">
+                <div class="step-number">1</div>
+                <div class="step-title-wrap">
+                    <div class="step-label">Model</div>
+                    <div class="step-title">Tạo <code>CartItemModel</code> — định nghĩa dữ liệu sản phẩm trong giỏ</div>
+                </div>
+            </div>
+            <div class="step-body">
+                <div class="file-tag"><span class="file-icon">📄</span> src/model/CartItemModel.ts</div>
+                <p>Một món hàng trong giỏ bao gồm thông tin cuốn sách và số lượng người dùng muốn mua:</p>
+                <div class="code-wrap">
+                    <div class="code-header">
+                        <div class="code-dots"><span></span><span></span><span></span></div>
+                        <span class="code-lang">TypeScript</span>
+                    </div>
+<pre><code><span class="kw">import</span> SachModel <span class="kw">from</span> <span class="str">"./SachModel"</span>;
+
+<span class="kw">class</span> <span class="tp">CartItemModel</span> {
+    <span class="id">sach</span>: <span class="tp">SachModel</span>;
+    <span class="id">soLuong</span>: <span class="tp">number</span>;
+
+    <span class="fn">constructor</span>(<span class="id">sach</span>: <span class="tp">SachModel</span>, <span class="id">soLuong</span>: <span class="tp">number</span>) {
+        <span class="kw">this</span>.<span class="id">sach</span> = <span class="id">sach</span>;
+        <span class="kw">this</span>.<span class="id">soLuong</span> = <span class="id">soLuong</span>;
+    }
+}
+
+<span class="kw">export default</span> CartItemModel;</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ Step 2 ══ -->
+        <div class="step-card">
+            <div class="step-header">
+                <div class="step-number">2</div>
+                <div class="step-title-wrap">
+                    <div class="step-label">Context</div>
+                    <div class="step-title">Tạo <code>CartContext</code> — bộ nhớ trung tâm quản lý giỏ hàng toàn cục</div>
+                </div>
+            </div>
+            <div class="step-body">
+                <div class="file-tag"><span class="file-icon">📄</span> src/context/CartContext.tsx</div>
+                <p>Tạo Context chứa <code>cartList</code> và hàm <code>addToCart</code> — dùng được ở bất kỳ component nào trong App. Dữ liệu được đồng bộ với <strong>LocalStorage</strong> để không mất khi reload trang.</p>
+                <div class="code-wrap">
+                    <div class="code-header">
+                        <div class="code-dots"><span></span><span></span><span></span></div>
+                        <span class="code-lang">TSX</span>
+                    </div>
+<pre><code><span class="kw">import</span> React, { createContext, useState, useEffect, ReactNode } <span class="kw">from</span> <span class="str">"react"</span>;
+<span class="kw">import</span> CartItemModel <span class="kw">from</span> <span class="str">"../model/CartItemModel"</span>;
+
+<span class="kw">interface</span> <span class="tp">CartContextType</span> {
+    cartList: <span class="tp">CartItemModel</span>[];
+    addToCart: (<span class="id">item</span>: <span class="tp">CartItemModel</span>) =&gt; <span class="tp">void</span>;
+}
+
+<span class="kw">export const</span> CartContext = <span class="fn">createContext</span>&lt;<span class="tp">CartContextType</span> | <span class="kw">undefined</span>&gt;(<span class="kw">undefined</span>);
+
+<span class="kw">export const</span> CartProvider: <span class="tp">React.FC</span>&lt;{children: <span class="tp">ReactNode</span>}&gt; = ({ children }) =&gt; {
+
+    <span class="cm">// Khởi tạo State từ LocalStorage — tự động phục hồi giỏ hàng phiên trước</span>
+    <span class="kw">const</span> [cartList, setCartList] = <span class="fn">useState</span>&lt;<span class="tp">CartItemModel</span>[]&gt;(() =&gt; {
+        <span class="kw">const</span> savedCart = localStorage.<span class="fn">getItem</span>(<span class="str">'cart'</span>);
+        <span class="kw">return</span> savedCart ? <span class="tp">JSON</span>.<span class="fn">parse</span>(savedCart) : [];
+    });
+
+    <span class="cm">// Mỗi khi cartList thay đổi → lưu lại vào LocalStorage ngay lập tức</span>
+    <span class="fn">useEffect</span>(() =&gt; {
+        localStorage.<span class="fn">setItem</span>(<span class="str">'cart'</span>, <span class="tp">JSON</span>.<span class="fn">stringify</span>(cartList));
+    }, [cartList]);
+
+    <span class="cm">// Logic Thêm Vào Giỏ: cộng dồn nếu đã có, thêm mới nếu chưa có</span>
+    <span class="kw">const</span> addToCart = (<span class="id">item</span>: <span class="tp">CartItemModel</span>) =&gt; {
+        <span class="fn">setCartList</span>((prevCart) =&gt; {
+            <span class="kw">const</span> existingItem = prevCart.<span class="fn">find</span>(c =&gt; c.sach.maSach === item.sach.maSach);
+            <span class="kw">if</span> (existingItem) {
+                <span class="kw">return</span> prevCart.<span class="fn">map</span>(c =&gt;
+                    c.sach.maSach === item.sach.maSach
+                        ? { ...c, soLuong: c.soLuong + item.soLuong }
+                        : c
+                );
+            }
+            <span class="kw">return</span> [...prevCart, item];
+        });
+    };
+
+    <span class="kw">return</span> (
+        <span class="jsx">&lt;CartContext.Provider</span> <span class="id">value</span>={{ cartList, addToCart }}<span class="jsx">&gt;</span>
+            {children}
+        <span class="jsx">&lt;/CartContext.Provider&gt;</span>
+    );
+};</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ Step 3 ══ -->
+        <div class="step-card">
+            <div class="step-header">
+                <div class="step-number">3</div>
+                <div class="step-title-wrap">
+                    <div class="step-label">Provider</div>
+                    <div class="step-title">Bọc ứng dụng với <code>CartProvider</code> trong <code>index.tsx</code></div>
+                </div>
+            </div>
+            <div class="step-body">
+                <div class="file-tag"><span class="file-icon">📄</span> src/index.tsx</div>
+                <p>Để <code>addToCart</code> hoạt động ở bất kỳ component nào (từ <code>ChiTietSanPham</code> đến icon giỏ hàng trên Navbar), hãy bọc <code>&lt;CartProvider&gt;</code> bao quanh toàn bộ App:</p>
+                <div class="code-wrap">
+                    <div class="code-header">
+                        <div class="code-dots"><span></span><span></span><span></span></div>
+                        <span class="code-lang">TSX</span>
+                    </div>
+<pre><code><span class="kw">import</span> React <span class="kw">from</span> <span class="str">'react'</span>;
+<span class="kw">import</span> ReactDOM <span class="kw">from</span> <span class="str">'react-dom/client'</span>;
+<span class="kw">import</span> App <span class="kw">from</span> <span class="str">'./App'</span>;
+<span class="kw">import</span> { CartProvider } <span class="kw">from</span> <span class="str">'./context/CartContext'</span>;
+
+<span class="kw">const</span> root = ReactDOM.<span class="fn">createRoot</span>(
+    document.<span class="fn">getElementById</span>(<span class="str">'root'</span>) <span class="kw">as</span> <span class="tp">HTMLElement</span>
+);
+
+root.<span class="fn">render</span>(
+    <span class="jsx">&lt;React.StrictMode&gt;</span>
+        <span class="jsx">&lt;CartProvider&gt;</span>
+            <span class="jsx">&lt;App /&gt;</span>
+        <span class="jsx">&lt;/CartProvider&gt;</span>
+    <span class="jsx">&lt;/React.StrictMode&gt;</span>
+);</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ Step 4 ══ -->
+        <div class="step-card">
+            <div class="step-header">
+                <div class="step-number">4</div>
+                <div class="step-title-wrap">
+                    <div class="step-label">Event Handler</div>
+                    <div class="step-title">Viết logic sự kiện trong <code>ChiTietSanPham.tsx</code></div>
+                </div>
+            </div>
+            <div class="step-body">
+                <div class="file-tag"><span class="file-icon">📄</span> src/layouts/product/ChiTietSanPham.tsx</div>
+
+                <div class="sub-section">
+                    <div class="sub-title"><span class="sub-num">1</span> Import các thư viện cần dùng (đặt trên cùng)</div>
+                    <div class="code-wrap">
+                        <div class="code-header">
+                            <div class="code-dots"><span></span><span></span><span></span></div>
+                            <span class="code-lang">TypeScript</span>
+                        </div>
+<pre><code><span class="kw">import</span> { useContext } <span class="kw">from</span> <span class="str">"react"</span>;
+<span class="kw">import</span> { CartContext } <span class="kw">from</span> <span class="str">"../../context/CartContext"</span>;
+<span class="kw">import</span> CartItemModel <span class="kw">from</span> <span class="str">"../../model/CartItemModel"</span>;</code></pre>
+                    </div>
+                </div>
+
+                <div class="sub-section">
+                    <div class="sub-title"><span class="sub-num">2</span> Kết nối tới bộ quản lý giỏ hàng (trong component)</div>
+                    <div class="code-wrap">
+                        <div class="code-header">
+                            <div class="code-dots"><span></span><span></span><span></span></div>
+                            <span class="code-lang">TypeScript</span>
+                        </div>
+<pre><code><span class="cm">// Đặt ngay bên dưới dòng khai báo useState của soLuong</span>
+<span class="kw">const</span> cartContext = <span class="fn">useContext</span>(CartContext);</code></pre>
+                    </div>
+                </div>
+
+                <div class="sub-section">
+                    <div class="sub-title"><span class="sub-num">3</span> Hàm <code>handleThemVaoGioHang</code></div>
+                    <div class="code-wrap">
+                        <div class="code-header">
+                            <div class="code-dots"><span></span><span></span><span></span></div>
+                            <span class="code-lang">TypeScript</span>
+                        </div>
+<pre><code><span class="kw">const</span> handleThemVaoGioHang = () =&gt; {
+    <span class="kw">if</span> (sach) {
+        <span class="kw">if</span> (cartContext) {
+            <span class="cm">// 1. Tạo CartItem từ model đã định nghĩa ở Bước 1</span>
+            <span class="kw">const</span> cartItem = <span class="kw">new</span> <span class="tp">CartItemModel</span>(sach, soLuong);
+
+            <span class="cm">// 2. Đẩy vào Context — tự động đồng bộ LocalStorage</span>
+            cartContext.<span class="fn">addToCart</span>(cartItem);
+
+            <span class="cm">// 3. Thông báo thành công (nên dùng react-toastify thay alert)</span>
+            <span class="fn">alert</span>(<span class="str">`Thêm ${soLuong} cuốn '${sach.tenSach}' vào giỏ hàng!`</span>);
+        }
+    } <span class="kw">else</span> {
+        <span class="fn">alert</span>(<span class="str">"Đang tải dữ liệu sách, vui lòng thử lại!"</span>);
+    }
+};</code></pre>
+                    </div>
+                </div>
+
+                <div class="sub-section">
+                    <div class="sub-title"><span class="sub-num">4</span> Hàm <code>handleMuaNgay</code> — thêm vào giỏ &amp; chuyển ngay sang trang thanh toán</div>
+                    <div class="code-wrap">
+                        <div class="code-header">
+                            <div class="code-dots"><span></span><span></span><span></span></div>
+                            <span class="code-lang">TypeScript</span>
+                        </div>
+<pre><code><span class="cm">// Thêm import ở trên cùng: import { useNavigate } from "react-router-dom";</span>
+<span class="kw">const</span> navigate = <span class="fn">useNavigate</span>();
+
+<span class="kw">const</span> handleMuaNgay = () =&gt; {
+    <span class="kw">if</span> (sach &amp;&amp; cartContext) {
+        <span class="kw">const</span> cartItem = <span class="kw">new</span> <span class="tp">CartItemModel</span>(sach, soLuong);
+        cartContext.<span class="fn">addToCart</span>(cartItem);
+        <span class="cm">// Chuyển thẳng sang trang giỏ hàng (đừng quên cấu hình route trong App.tsx)</span>
+        <span class="fn">navigate</span>(<span class="str">"/gio-hang"</span>);
+    }
+};</code></pre>
+                    </div>
+                </div>
+
+                <div class="tip-box">
+                    <span class="tip-icon">💡</span>
+                    <span>Thay thế <code>alert()</code> bằng thư viện <strong>react-toastify</strong> để thông báo trông chuyên nghiệp hơn nhiều. Install bằng: <code>npm install react-toastify</code></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ Success ══ -->
+        <div class="success-banner">
+            <span class="s-icon">🎉</span>
+            <div>
+                <h3>Hoàn tất! Kiểm tra kết quả</h3>
+                <p>Click vào nút <strong>"Thêm Vào Giỏ Hàng"</strong> rồi bấm <strong>F12</strong> → tab <strong>Application → Local Storage</strong> trên Chrome. Bạn sẽ thấy thông tin sách được lưu bền vững tại đây. Nhờ Context API, bạn còn có thể dễ dàng hiển thị số lượng sản phẩm trên icon giỏ hàng ở Navbar. Chúc bạn code vui! 🚀</p>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
