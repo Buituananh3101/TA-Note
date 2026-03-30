@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giải Thích Chức Năng: Phân Quyền Giữa Các User</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-base: #0f172a; --bg-surface: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8; --primary: #3b82f6; --accent: #10b981; --border: #334155; --code-bg: #0d1117;}
+        body { font-family: 'Inter', sans-serif; background: var(--bg-base); color: var(--text-main); line-height: 1.6; display: flex; justify-content: center; padding: 40px 20px;}
+        .container { max-width: 900px; width: 100%; }
+        h1 { color: #f59e0b; border-bottom: 2px solid var(--border); padding-bottom: 10px;}
+        .card { background: var(--bg-surface); padding: 25px; border-radius: 12px; margin-bottom: 25px; border: 1px solid var(--border); }
+        .filename { font-weight: bold; color: #fbbf24; margin-bottom: 15px; }
+        pre { background: var(--code-bg); padding: 15px; border-radius: 8px; overflow-x: auto; color: #a5d6ff; border: 1px solid var(--border);}
+        .explanation { padding-top: 15px; border-top: 1px solid var(--border); margin-top: 15px; }
+        strong { color: #f59e0b; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cơ Chế Phân Quyền Người Dùng & Quản Trị Viên</h1>
+
+        <div class="card">
+            <div class="filename">📄 Lục tìm Quyền hạn lúc giải mã chứng thư</div>
+            <pre><code>// JwtFilter.java
+UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+//...
+UsernamePasswordAuthenticationToken auth = 
+   new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+SecurityContextHolder.getContext().setAuthentication(auth);
+</code></pre>
+            <div class="explanation">
+                <p><strong>Nguồn gốc của thẩm quyền (Authorities):</strong> Đầu tiên, khi Bộ Lọc Jwt (Filter) chặn được ông khách nào có cầm Token, ngoài việc xác minh Token chuẩn, nó sẽ chui xuống hệ thống csdl thông qua <code>loadUserByUsername</code> lấy người đó lên và moi ra bộ danh sách Quyền của người này (Cột TenQuyen chứa ROLE_ADMIN, hoặc ROLE_USER). Việc này được chốt hạ đẩy vào bục phát ngôn của Bộ bảo vệ: <code>SecurityContextHolder</code>.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="filename">📄 Thiết Lập Luật Lệ Xuyên Xuyên Khu Vực</div>
+            <pre><code>// SecurityConfiguration.java
+http.authorizeHttpRequests(config -> config
+   // 1. Phân khu công cộng (Mở cửa tự do - Cho Phép)
+   .requestMatchers(HttpMethod.GET, Endpoints.PUBLIC_GET_ENDPOINTS).permitAll()
+   .requestMatchers(HttpMethod.POST, Endpoints.PUBLIC_POST_ENDPOINTS).permitAll()
+   
+   // 2. Phân khu đặc biệt (Yêu Cầu The Thẩm Quyền ROLE_ADMIN)
+   .requestMatchers(HttpMethod.GET, Endpoints.ADMIN_GET_ENDPOINTS).hasAnyAuthority("ROLE_ADMIN")
+   .requestMatchers(HttpMethod.POST, Endpoints.ADMIN_POST_ENDPOINTS).hasAnyAuthority("ROLE_ADMIN")
+   
+   // 3. Phân khu dọn dẹp các mục còn lại - Cứ có đăng nhập (Bất kỳ user nào) là đi được
+   .anyRequest().authenticated()
+);</code></pre>
+            <div class="explanation">
+                <p><strong>Xây Lô Cốt Xét Quyền (Authorization):</strong> Tại file cấu hình lõi, bạn định nghĩa các mức cho từng "Endpoint (Url link)". API có Phương thức HTTP nào với Đường dẫn nào trùng với cấu hình thì sẽ đánh giá xem thẻ Quyền được nạp từ Bước 1 có qua nổi cửa không. Dùng lệnh <code>.hasAnyAuthority("ROLE_ADMIN")</code> nghĩa là "Nếu không thấy chữ ROLE_ADMIN ở đây là khóa mồm đạp ra ngoài (Lỗi HTTP Error 403 Forbidden)". Còn <code>permitAll</code> là lệnh miễn trừ, không cần kiểm tra thẻ JWT làm chi cho mệt.</p>
+            </div>
+        </div>
+        
+    </div>
+</body>
+</html>

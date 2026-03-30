@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phân Loại Dạng SQL — QuanLyDiemTruongDaiHoc</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --surface2: #181b23;
+    --border: #252830;
+    --accent: #6ee7b7;
+    --accent2: #818cf8;
+    --accent3: #fb923c;
+    --accent4: #f472b6;
+    --accent5: #facc15;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --code-bg: #0f1117;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 56px 32px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, #6ee7b720 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 4px 14px;
+    border-radius: 2px;
+    margin-bottom: 20px;
+    opacity: .85;
+  }
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    line-height: 1.1;
+    letter-spacing: -.02em;
+    background: linear-gradient(135deg, #e2e8f0 30%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 14px;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    font-style: italic;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 24px 80px; }
+
+  /* ── CATEGORY FILTER ── */
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 48px;
+    padding: 0 8px;
+  }
+  .filter-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: 7px 16px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active { background: var(--accent); color: #0a0c10; border-color: var(--accent); font-weight: 500; }
+
+  /* ── CATEGORY SECTION ── */
+  .category-section {
+    margin-bottom: 64px;
+    animation: fadeUp .5s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .category-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .category-icon {
+    width: 40px; height: 40px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .category-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: -.01em;
+  }
+  .category-count {
+    margin-left: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 3px 10px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  /* ── PATTERN BOX ── */
+  .pattern-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .pattern-box:hover {
+    border-color: #3a3f4e;
+    box-shadow: 0 4px 24px #00000040;
+  }
+
+  .pattern-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px 24px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .q-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+  .q-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .pattern-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  .pattern-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .expand-icon {
+    margin-left: auto;
+    font-size: 18px;
+    color: var(--muted);
+    transition: transform .3s;
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+  .pattern-box.open .expand-icon { transform: rotate(180deg); }
+
+  .pattern-body {
+    display: none;
+    padding: 0 24px 24px;
+    border-top: 1px solid var(--border);
+  }
+  .pattern-box.open .pattern-body { display: block; }
+
+  /* ── TABS ── */
+  .tabs { display: flex; gap: 0; margin: 20px 0 0; border-bottom: 1px solid var(--border); }
+  .tab-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 9px 18px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all .2s;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-panel { display: none; padding-top: 20px; }
+  .tab-panel.active { display: block; }
+
+  /* ── RECOGNITION CLUES ── */
+  .clue-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .clue-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13.5px;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border-radius: 8px;
+    border-left: 3px solid transparent;
+  }
+  .clue-item::before { content: '→'; color: var(--accent); font-family: 'DM Mono', monospace; flex-shrink: 0; }
+
+  /* ── CODE BLOCKS ── */
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+    overflow-x: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.8;
+    color: #cbd5e1;
+  }
+  .kw  { color: #818cf8; font-weight: 500; }
+  .fn  { color: #6ee7b7; }
+  .str { color: #fde68a; }
+  .cm  { color: #475569; font-style: italic; }
+  .pl  { color: #fb923c; }
+  .ph  { color: #f472b6; font-style: italic; }  /* placeholder */
+
+  /* ── SAMPLE QUESTIONS ── */
+  .sample-list { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+  .sample-item {
+    font-size: 13px;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border-radius: 8px;
+    color: var(--text);
+    display: flex;
+    gap: 12px;
+    align-items: baseline;
+  }
+  .sample-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+
+  /* COLOR VARIANTS */
+  .c1 { --cat-color: #6ee7b7; }
+  .c2 { --cat-color: #818cf8; }
+  .c3 { --cat-color: #fb923c; }
+  .c4 { --cat-color: #f472b6; }
+  .c5 { --cat-color: #facc15; }
+  .c6 { --cat-color: #38bdf8; }
+  .c7 { --cat-color: #a78bfa; }
+  .c8 { --cat-color: #34d399; }
+
+  .category-icon { background: color-mix(in srgb, var(--cat-color) 15%, transparent); color: var(--cat-color); }
+  .category-title { color: var(--cat-color); }
+  .clue-item { border-left-color: var(--cat-color); }
+  .tab-btn.active { color: var(--cat-color); border-bottom-color: var(--cat-color); }
+
+  .q-badge { background: color-mix(in srgb, var(--cat-color) 15%, transparent); color: var(--cat-color); border: 1px solid color-mix(in srgb, var(--cat-color) 30%, transparent); }
+
+  /* ── HIDDEN ── */
+  .hidden { display: none !important; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .pattern-header { flex-wrap: wrap; }
+    .q-badges { order: 3; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-tag">SQL Pattern Guide</div>
+  <h1>Phân Loại Dạng SQL</h1>
+  <p class="subtitle">QuanLyDiemTruongDaiHoc — 45 câu truy vấn được phân loại theo dạng, khung giải và cách nhận biết</p>
+</header>
+
+<div class="container">
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterCat('all', this)">Tất cả</button>
+    <button class="filter-btn" onclick="filterCat('join', this)">JOIN cơ bản</button>
+    <button class="filter-btn" onclick="filterCat('agg', this)">Tổng hợp / GROUP BY</button>
+    <button class="filter-btn" onclick="filterCat('subquery', this)">Subquery / EXISTS</button>
+    <button class="filter-btn" onclick="filterCat('update', this)">UPDATE / DELETE</button>
+    <button class="filter-btn" onclick="filterCat('window', this)">Window Function</button>
+    <button class="filter-btn" onclick="filterCat('cte', this)">CTE / Tính toán phức tạp</button>
+    <button class="filter-btn" onclick="filterCat('date', this)">Date / Điều kiện đặc biệt</button>
+    <button class="filter-btn" onclick="filterCat('rank', this)">TOP-N / Xếp hạng</button>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       CATEGORY 1 — JOIN CƠ BẢN
+  ════════════════════════════════════════════ -->
+  <div class="category-section c1" data-cat="join">
+    <div class="category-header">
+      <div class="category-icon">🔗</div>
+      <div>
+        <div class="category-title">JOIN Cơ Bản</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px;">Kết hợp nhiều bảng để lấy thông tin liên quan</div>
+      </div>
+      <div class="category-count">Câu 1, 2, 8, 10, 25</div>
+    </div>
+
+    <!-- PATTERN 1.1 -->
+    <div class="pattern-box c1" id="p1">
+      <div class="pattern-header" onclick="toggle('p1')">
+        <div>
+          <div class="q-badges"><span class="q-badge">Câu 1</span><span class="q-badge">Câu 10</span></div>
+        </div>
+        <div>
+          <div class="pattern-name">INNER JOIN nhiều bảng + điều kiện lọc cụ thể</div>
+          <div class="pattern-desc">Lấy thông tin từ nhiều bảng theo điều kiện WHERE xác định (mã HP, mã LHP...)</div>
+        </div>
+        <div class="expand-icon">⌄</div>
+      </div>
+      <div class="pattern-body">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(this,'t1a')">Nhận biết</button>
+          <button class="tab-btn" onclick="switchTab(this,'t1b')">Khung giải</button>
+          <button class="tab-btn" onclick="switchTab(this,'t1c')">Câu hỏi mẫu</button>
+        </div>
+        <div class="tab-panel active" id="t1a">
+          <ul class="clue-list">
+            <li class="clue-item">Đề yêu cầu <strong>"danh sách ... của ... mã ... '...' ".</strong></li>
+            <li class="clue-item">Cần lấy cột từ ít nhất 2–3 bảng khác nhau (SV, LHP, điểm...).</li>
+            <li class="clue-item">Có điều kiện lọc cố định: <code>MaHP = '...' AND MaLHP = '...'</code>.</li>
+            <li class="clue-item">Không yêu cầu GROUP BY hay tổng hợp.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="t1b">
+<pre><span class="kw">SELECT</span> sv.MaSV, sv.HoTen, sv.MaLop, sv.NgaySinh,
+       lhpsv.DiemQT, lhpsv.DiemThi, lhpsv.DiemTKHP
+<span class="kw">FROM</span>   <span class="pl">SinhVien</span> sv
+<span class="kw">INNER JOIN</span> <span class="pl">LopHocPhan_SinhVien</span> lhpsv
+       <span class="kw">ON</span> sv.MaSV = lhpsv.MaSV
+<span class="kw">INNER JOIN</span> <span class="pl">LopHocPhan</span> lhp
+       <span class="kw">ON</span> lhpsv.MaHP = lhp.MaHP
+      <span class="kw">AND</span> lhpsv.MaLHP = lhp.MaLHP
+<span class="kw">WHERE</span> lhp.MaHP  = <span class="str">'<span class="ph">MaHocPhan</span>'</span>
+  <span class="kw">AND</span> lhp.MaLHP = <span class="str">'<span class="ph">MaLopHocPhan</span>'</span>;</pre>
+          <p style="font-size:12px;color:var(--muted);margin-top:10px;">💡 Thêm bảng nào cần thêm INNER JOIN tương ứng. Điều kiện WHERE cố định.</p>
+        </div>
+        <div class="tab-panel" id="t1c">
+          <div class="sample-list">
+            <div class="sample-item"><span class="sample-num">Câu 1</span> Danh sách SV điểm lớp HP 'IT1.110.3', LHP '1-2-22-QT08'.</div>
+            <div class="sample-item"><span class="sample-num">Câu 10</span> Thông tin chi tiết LHP mà SV '212606016' đang học kèm điểm.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PATTERN 1.2 -->
+    <div class="pattern-box c1" id="p2">
+      <div class="pattern-header" onclick="toggle('p2')">
+        <div><div class="q-badges"><span class="q-badge">Câu 2</span><span class="q-badge">Câu 25</span></div></div>
+        <div>
+          <div class="pattern-name">SELF JOIN / LEFT JOIN để lấy thông tin liên quan (quản lý, tiên quyết)</div>
+          <div class="pattern-desc">Kết nối bảng với chính nó hoặc bảng phụ để lấy thông tin cha–con</div>
+        </div>
+        <div class="expand-icon">⌄</div>
+      </div>
+      <div class="pattern-body">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(this,'t2a')">Nhận biết</button>
+          <button class="tab-btn" onclick="switchTab(this,'t2b')">Khung giải</button>
+          <button class="tab-btn" onclick="switchTab(this,'t2c')">Câu hỏi mẫu</button>
+        </div>
+        <div class="tab-panel active" id="t2a">
+          <ul class="clue-list">
+            <li class="clue-item">Đề có cụm <em>"trưởng/chủ nhiệm"</em>, <em>"quản lý"</em>, <em>"tiên quyết"</em>, <em>"cha – con"</em>.</li>
+            <li class="clue-item">Một bảng có FK tự trỏ về chính nó <strong>hoặc</strong> có bảng phụ lưu quan hệ tiên quyết.</li>
+            <li class="clue-item">Yêu cầu <em>"nếu có"</em> → dùng <code>LEFT JOIN</code> để giữ bản ghi không có liên kết.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="t2b">
+<pre><span class="cm">-- Ví dụ: Bộ môn + Trưởng bộ môn</span>
+<span class="kw">SELECT</span> bm.MaBM, bm.TenBM, gv.MaGV, gv.HoTen
+<span class="kw">FROM</span>   <span class="pl">BoMon</span> bm
+<span class="kw">INNER JOIN</span> <span class="pl">GiangVien</span> gv
+       <span class="kw">ON</span> bm.MaTBM = gv.MaGV;  <span class="cm">-- FK trưởng bộ môn</span>
+
+<span class="cm">-- Ví dụ: Học phần + tiên quyết (nếu có)</span>
+<span class="kw">SELECT</span> hp.MaHP, hp.TenHP,
+       tq.MaHP <span class="kw">AS</span> MaHPTQ, hp2.TenHP <span class="kw">AS</span> TenHPTQ
+<span class="kw">FROM</span>   <span class="pl">HocPhan</span> hp
+<span class="kw">LEFT JOIN</span> <span class="pl">TienQuyet</span> tq  <span class="kw">ON</span> hp.MaHP = tq.MaHP
+<span class="kw">LEFT JOIN</span> <span class="pl">HocPhan</span>  hp2 <span class="kw">ON</span> tq.MaHPTQ = hp2.MaHP;</pre>
+        </div>
+        <div class="tab-panel" id="t2c">
+          <div class="sample-list">
+            <div class="sample-item"><span class="sample-num">Câu 2</span> GV là trưởng bộ môn cùng thông tin bộ môn họ quản lý.</div>
+            <div class="sample-item"><span class="sample-num">Câu 25</span> Học phần và học phần tiên quyết (tên + mã), nếu có.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PATTERN 1.3 -->
+    <div class="pattern-box c1" id="p3">
+      <div class="pattern-header" onclick="toggle('p3')">
+        <div><div class="q-badges"><span class="q-badge">Câu 8</span></div></div>
+        <div>
+          <div class="pattern-name">JOIN + GROUP BY đếm số lượng theo nhóm</div>
+          <div class="pattern-desc">Kết bảng rồi GROUP BY để COUNT số học phần / SV / LHP theo đơn vị</div>
+        </div>
+        <div class="expand-icon">⌄</div>
+      </div>
+      <div class="pattern-body">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(this,'t3a')">Nhận biết</button>
+          <button class="tab-btn" onclick="switchTab(this,'t3b')">Khung giải</button>
+          <button class="tab-btn" onclick="switchTab(this,'t3c')">Câu hỏi mẫu</button>
+        </div>
+        <div class="tab-panel active" id="t3a">
+          <ul class="clue-list">
+            <li class="clue-item">Đề yêu cầu <em>"số học phần mà mỗi bộ môn..."</em> / <em>"số sinh viên mỗi lớp..."</em>.</li>
+            <li class="clue-item">Cần đếm (<code>COUNT</code>) theo nhóm → bắt buộc có <code>GROUP BY</code>.</li>
+            <li class="clue-item">Có điều kiện thuộc khoa/đơn vị cụ thể → thêm <code>WHERE</code> trước <code>GROUP BY</code>.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="t3b">
+<pre><span class="kw">SELECT</span> bm.MaBM, bm.TenBM, <span class="fn">COUNT</span>(hp.MaHP) <span class="kw">AS</span> SoHocPhan
+<span class="kw">FROM</span>   <span class="pl">BoMon</span> bm
+<span class="kw">INNER JOIN</span> <span class="pl">HocPhan</span> hp <span class="kw">ON</span> bm.MaBM = hp.MaBM
+<span class="kw">INNER JOIN</span> <span class="pl">Khoa</span>    k  <span class="kw">ON</span> bm.MaKhoa = k.MaKhoa
+<span class="kw">WHERE</span>  k.TenKhoa <span class="kw">LIKE</span> <span class="str">N'%Công nghệ thông tin%'</span>
+<span class="kw">GROUP BY</span> bm.MaBM, bm.TenBM;</pre>
+        </div>
+        <div class="tab-panel" id="t3c">
+          <div class="sample-list">
+            <div class="sample-item"><span class="sample-num">Câu 8</span> Số học phần mỗi bộ môn của Khoa CNTT phụ trách.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       CATEGORY 2 — TỔNG HỢP / GROUP BY
+  ════════════════════════════════════════════ -->
+  <div class="category-section c2" data-cat="agg">
+    <div class="category-header">
+      <div class="category-icon">📊</div>
+      <div>
+        <div class="category-title">Tổng Hợp / GROUP BY</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px;">COUNT, AVG, SUM, HAVING theo nhóm</div>
+      </div>
+      <div class="category-count">Câu 9, 13, 14, 19, 26, 27, 28, 29, 30, 44</div>
+    </div>
+
+    <div class="pattern-box c2" id="p4">
+      <div class="pattern-header" onclick="toggle('p4')">
+        <div><div class="q-badges"><span class="q-badge">Câu 9</span><span class="q-badge">Câu 13</span><span class="q-badge">Câu 29</span><span class="q-badge">Câu 30</span></div></div>
+        <div>
+          <div class="pattern-name">COUNT + GROUP BY + HAVING (lọc nhóm thỏa điều kiện)</div>
+          <div class="pattern-desc">Đếm số lượng theo nhóm và chỉ lấy nhóm thỏa ngưỡng</div>
+        </div>
+        <div class="expand-icon">⌄</div>
+      </div>
+      <div class="pattern-body">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(this,'t4a')">Nhận biết</button>
+          <button class="tab-btn" onclick="switchTab(this,'t4b')">Khung giải</button>
+          <button class="tab-btn" onclick="switchTab(this,'t4c')">Câu hỏi mẫu</button>
+        </div>
+        <div class="tab-panel active" id="t4a">
+          <ul class="clue-list">
+            <li class="clue-item">Đề yêu cầu <em>"số lớp/sinh viên/học phần"</em> theo từng đơn vị.</li>
+            <li class="clue-item">Có điều kiện <em>"lớn hơn X"</em>, <em>"từ Y trở lên"</em> trên kết quả nhóm → <code>HAVING</code>.</li>
+            <li class="clue-item">Sắp xếp <em>"giảm dần"</em> / <em>"tăng dần"</em> → thêm <code>ORDER BY ... DESC/ASC</code>.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="t4b">
+<pre><span class="kw">SELECT</span> <span class="pl"><span class="ph">NhomCot</span></span>, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> SoLuong
+<span class="kw">FROM</span>   <span class="pl"><span class="ph">Bang</span></span>
+<span class="kw">JOIN</span>   <span class="pl"><span class="ph">BangLien</span></span> <span class="kw">ON</span> <span class="ph">...dk_join...</span>
+<span class="kw">WHERE</span>  <span class="ph">...dieu_kien_loc...</span>          <span class="cm">-- lọc trước nhóm</span>
+<span class="kw">GROUP BY</span> <span class="ph">NhomCot</span>
+<span class="kw">HAVING</span> <span class="fn">COUNT</span>(*) > <span class="ph">nguong</span>          <span class="cm">-- lọc SAU nhóm</span>
+<span class="kw">ORDER BY</span> SoLuong <span class="kw">DESC</span>;</pre>
+          <p style="font-size:12px;color:var(--muted);margin-top:8px;">⚡ Nhớ: WHERE lọc hàng, HAVING lọc nhóm — không được hoán đổi.</p>
+        </div>
+        <div class="tab-panel" id="t4c">
+          <div class="sample-list">
+            <div class="sample-item"><span class="sample-num">Câu 9</span> GV + số LHP đảm nhiệm HK2 2023-2024.</div>
+            <div class="sample-item"><span class="sample-num">Câu 13</span> Số SV đăng ký mỗi học phần HK2 2023-2024, sắp xếp giảm dần.</div>
+            <div class="sample-item"><span class="sample-num">Câu 29</span> Tổng SV đăng ký LHP theo từng năm học và học kỳ.</div>
+            <div class="sample-item"><span class="sample-num">Câu 30</span> Khoa có số SV > 2000.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pattern-box c2" id="p5">
+      <div class="pattern-header" onclick="toggle('p5')">
+        <div><div class="q-badges"><span class="q-badge">Câu 14</span><span class="q-badge">Câu 26</span></div></div>
+        <div>
+          <div class="pattern-name">AVG + GROUP BY — Trung bình điểm theo nhóm</div>
+          <div class="pattern-desc">Tính điểm trung bình của các nhóm (lớp, khoa, CTDT...)</div>
+        </div>
+        <div class="expand-icon">⌄</div>
+      </div>
+      <div class="pattern-body">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(this,'t5a')">Nhận biết</button>
+          <button class="tab-btn" onclick="switchTab(this,'t5b')">Khung giải</button>
+          <button class="tab-btn" onclick="switchTab(this,'t5c')">Câu hỏi mẫu</button>
+        </div>
+        <div class="tab-panel active" id="t5a">
+          <ul class="clue-list">
+            <li class="clue-item">Đề dùng từ <em>"trung bình"</em>, <em>"điểm tích lũy trung bình"</em>, <em>"tính trung bình theo..."</em>.</li>
+            <li class="clue-item">Nhóm hóa theo lớp / khoa / chương trình → <code>GROUP BY</code>.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="t5b">
+<pre><span class="kw">SELECT</span> <span class="ph">NhomCot</span>, <span class="fn">AVG</span>(DiemTKHP) <span class="kw">AS</span> DiemTBNhom
+<span class="kw">FROM</span>   <span class="pl">LopHocPhan_SinhVien</span> lhpsv
+<span class="kw">JOIN</span>   <span class="pl"><span class="ph">BangNhom</span></span> bn <span class="kw">ON</span> <span class="ph">...join...</span>
+<span class="kw">WHERE</span>  lhpsv.DiemTKHP <span class="kw">IS NOT NULL</span>
+<span class="kw">GROUP BY</span> <span class="ph">NhomCot</span>;</pre>
+        </div>
+        <div class="tab-panel" id="t5c">
+          <div class="sample-list">
+            <div class="sample-item"><span class="sample-num">Câu 14</span> Điểm tích lũy TB của SV Khoa CNTT theo từng CTDT.</div>
+            <div class="sample-item"><span class="sample-num">Câu 26</span> Trung bình DiemTKHP theo từng LHP.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pattern-box c2" id="p6">
+      <div class="pattern-header" onclick="toggle('p6')">
+        <div><div class="q-badges"><span class="q-badge">Câu 19</span><span class="q-badge">Câu 44</span></div></div>
+        <div>
+          <div class="pattern-name">Tỷ lệ % theo nhóm (CASE WHEN + AVG/COUNT)</div>
+          <div class="pattern-desc">Tính % sinh viên đạt/không đạt, phân phối điểm theo lớp</div>
+        </div>
+        <div class="expand-icon">⌄</div>
+      </div>
+      <div class="pattern-body">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(this,'t6a')">Nhận biết</button>
+          <button class="tab-btn" onclick="switchTab(this,'t6b')">Khung giải</button>
+          <button class="tab-btn" onclick="switchTab(this,'t6c')">Câu hỏi mẫu</button>
+        </div>
+        <div class="tab-panel active" id="t6a">
+          <ul class="clue-list">
+            <li class="clue-item">Đề có cụm <em>"số phần trăm"</em>, <em>"tỷ lệ"</em>, <em>"bao nhiêu % đạt"</em>.</li>
+            <li class="clue-item">Cần chia theo nhiều khoảng điểm hoặc điều kiện → <code>CASE WHEN</code> bên trong hàm tổng hợp.</li>
+            <li class="clue-item">Dùng <code>* 100.0 / COUNT(*)</code> để tính phần trăm.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="t6b">
+<pre><span class="kw">SELECT</span>
+  MaLHP,
+  <span class="fn">COUNT</span>(*) <span class="kw">AS</span> TongSV,
+  <span class="fn">ROUND</span>(
+    <span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> DiemTKHP >= 8.5 <span class="kw">THEN</span> 1 <span class="kw">ELSE</span> 0 <span class="kw">END</span>)
+    * 100.0 / <span class="fn">COUNT</span>(*), 2)        <span class="kw">AS</span> PhanTramTren85,
+  <span class="fn">ROUND</span>(
+    <span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> DiemTKHP >= 7
+              <span class="kw">AND</span>  DiemTKHP < 8.5 <span class="kw">THEN</span> 1 <span class="kw">ELSE</span> 0 <span class="kw">END</span>)
+    * 100.0 / <span class="fn">COUNT</span>(*), 2)        <span class="kw">AS</span> PhanTram7to85
+  <span class="cm">-- ... thêm các dải điểm còn lại ...</span>
+<span class="kw">FROM</span>   <span class="pl">LopHocPhan_SinhVien</span>
+<span class="kw">GROUP BY</span> MaLHP
+<span class="kw">HAVING</span> <span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> DiemTKHP >= 4 <span class="kw">THEN</span> 1 <span class="kw">ELSE</span> 0 <span class="kw">END</span>)
+       * 100.0 / <span class="fn">COUNT</span>(*) < 50;  <span class="cm">-- câu 44: chỉ lớp < 50%</span></pre>
+        </div>
+        <div class="tab-panel" id="t6c">
+          <div class="sample-list">
+            <div class="sample-item"><span class="sample-num">Câu 19</span> % SV theo dải điểm (>8.5, 7–8.5, 5.5–7, 4–5.5, &lt;4) từng LHP CNTT HK2 2023-2024.</div>
+            <div class="sample-item"><span class="sample-num">Câu 44</span> Tỷ lệ % SV đạt (≥4) mỗi LHP — chỉ hiện LHP tỷ lệ đạt < 50%.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       CATEGORY 3 — SUBQUERY / EXISTS / NOT EXISTS
+  ════════════════════════════════════════════ -->
+  <div class="category-section c3" data-cat="subquery">
+    <div class="category-header">
+      <div class="category-icon">🔍</div>
+      <div>
+        <div class="category-title">Subquery / EXISTS / NOT EXISTS</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px;">Tìm bản ghi "chưa có", "chưa học", "không tồn tại"</div>
+      </div>
+      <div class="category-count">Câu 3, 6, 12, 15, 21, 24, 34, 45</div>
+    </div>
+
+    <div class="pattern-box c3" id="p7">
+      <div class="pattern-header" onclick="toggle('p7')">
+        <div><div class="q-badges"><span class="q-badge">Câu 3</span><span class="q-badge">Câu 21</span><span class="q-badge">Câu 24</span></div></div>
+        <div>
+          <div class="pattern-name">NOT EXISTS / LEFT JOIN IS NULL — "Chưa được phân công" / "Chưa có SV"</div>
+          <div class="pattern-desc">Tìm bản ghi không có bản ghi tương ứng ở bảng khác</div>
+        </div>
+        <div class="expand-icon">⌄</div>
+      </div>
+      <div class="pattern-body">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(this,'t7a')">Nhận biết</button>
+          <button class="tab-btn" onclick="switchTab(this,'t7b')">Khung giải</button>
+          <button class="tab-btn" onclick="switchTab(this,'t7c')">Câu hỏi mẫu</button>
+        </div>
+        <div class="tab-panel active" id="t7a">
+          <ul class="clue-list">
+            <li class="clue-item">Từ khóa: <em>"chưa được phân công"</em>, <em>"không có SV đăng ký"</em>, <em>"chưa có SV"</em>.</li>
+            <li class="clue-item">Logic: bảng A <strong>không</strong> xuất hiện trong bảng B theo một điều kiện.</li>
+            <li class="clue-item">Có thể dùng <code>NOT EXISTS</code> hoặc <code>LEFT JOIN ... WHERE ... IS NULL</code>.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="t7b">
+<pre><span class="cm">-- Cách 1: NOT EXISTS</span>
+<span class="kw">SELECT</span> gv.*
+<span class="kw">FROM</span>   <span class="pl">GiangVien</span> gv
+<span class="kw">WHERE NOT EXISTS</span> (
+  <span class="kw">SELECT</span> 1 <span class="kw">FROM</span> <span class="pl">LopHocPhan</span> lhp
+  <span class="kw">WHERE</span>  lhp.MaGV     = gv.MaGV
+    <span class="kw">AND</span>  lhp.NamHoc   = <span class="str">'2023-2024'</span>
+    <span class="kw">AND</span>  lhp.HocKy    = 2
+);
+
+<span class="cm">-- Cách 2: LEFT JOIN + IS NULL (tương đương)</span>
+<span class="kw">SELECT</span> gv.*
+<span class="kw">FROM</span>   <span class="pl">GiangVien</span> gv
+<span class="kw">LEFT JOIN</span> <span class="pl">LopHocPhan</span> lhp
+       <span class="kw">ON</span>  lhp.MaGV   = gv.MaGV
+      <span class="kw">AND</span>  lhp.NamHoc = <span class="str">'2023-2024'</span>
+      <span class="kw">AND</span>  lhp.HocKy  = 2
+<span class="kw">WHERE</span> lhp.MaGV <span class="kw">IS NULL</span>;</pre>
+        </div>
+        <div class="tab-panel" id="t7c">
+          <div class="sample-list">
+            <div class="sample-item"><span class="sample-num">Câu 3</span> GV chưa được phân công LHP HK2 2023-2024.</div>
+            <div class="sample-item"><span class="sample-num">Câu 21</span> GV không có SV đăng ký trong LHP của họ.</div>
+            <div class="sample-item"><span class="sample-num">Câu 24</span> Học phần chưa có SV đăng ký.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pattern-box c3" id="p8">
+      <div class="pattern-header" onclick="toggle('p8')">
+        <div><div class="q-badges"><span class="q-badge">Câu 12</span><span class="q-badge">Câu 15</span><span class="q-badge">Câu 45</span></div></div>
+        <div>
+          <div class="pattern-name">Subquery kiểm tra hoàn thành / chưa học (tiên quyết, CTDT)</div>
+          <div class="pattern-desc">So sánh tập HP cần học với tập HP đã học của một SV cụ thể</div>
+        </div>
+        <div class="expand-icon">⌄</div>
+      </div>
+      <div class="pattern-body">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(this,'t8a')">Nhận biết</button>
+          <button class="tab-btn" onclick="switchTab(this,'t8b')">Khung giải</button>
+          <button class="tab-btn" onclick="switchTab(this,'t8c')">Câu hỏi mẫu</button>
+        </div>
+        <div class="tab-panel active" id="t8a">
+          <ul class="clue-list">
+            <li class="clue-item">Đề hỏi SV <em>"đã đủ tiên quyết chưa"</em> hoặc <em>"chưa hoàn thành HP nào"</em>.</li>
+            <li class="clue-item">Cần so sánh 2 tập: (HP cần) MINUS (HP đã đạt) → phần còn lại là chưa học.</li>
+            <li class="clue-item">Có thể dùng <code>NOT IN</code> + subquery hoặc <code>EXCEPT</code>.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="t8b">
+<pre><span class="cm">-- Kiểm tra tiên quyết: HP tiên quyết mà SV chưa đạt</span>
+<span class="kw">SELECT</span> tq.MaHPTQ
+<span class="kw">FROM</span>   <span class="pl">TienQuyet</span> tq
+<span class="kw">WHERE</span>  tq.MaHP = <span class="str">'<span class="ph">MaHocPhan</span>'</span>
+  <span class="kw">AND</span>  tq.MaHPTQ <span class="kw">NOT IN</span> (
+    <span class="kw">SELECT</span> lhpsv.MaHP
+    <span class="kw">FROM</span>   <span class="pl">LopHocPhan_SinhVien</span> lhpsv
+    <span class="kw">WHERE</span>  lhpsv.MaSV      = <span class="str">'<span class="ph">MaSinhVien</span>'</span>
+      <span class="kw">AND</span>  lhpsv.DiemTKHP >= 4
+  );
+<span class="cm">-- Nếu không có hàng trả về → đã đủ tiên quyết</span>
+
+<span class="cm">-- HP trong CTDT chưa đăng ký hoặc điểm < 4</span>
+<span class="kw">SELECT</span> hp.MaHP, hp.TenHP
+<span class="kw">FROM</span>   <span class="pl">CTDT_HocPhan</span> ctdthp
+<span class="kw">JOIN</span>   <span class="pl">HocPhan</span> hp <span class="kw">ON</span> ctdthp.MaHP = hp.MaHP
+<span class="kw">WHERE</span>  ctdthp.MaCTDT = (<span class="kw">SELECT</span> MaCTDT <span class="kw">FROM</span> <span class="pl">SinhVien</span>
+                          <span class="kw">WHERE</span> MaSV = <span class="str">'<span class="ph">MaSV</span>'</span>)
+  <span class="kw">AND</span>  hp.MaHP <span class="kw">NOT IN</span> (
+    <span class="kw">SELECT</span> MaHP <span class="kw">FROM</span> <span class="pl">LopHocPhan_SinhVien</span>
+    <span class="kw">WHERE</span>  MaSV = <span class="str">'<span class="ph">MaSV</span>'</span> <span class="kw">AND</span> DiemTKHP >= 4
+  );</pre>
+        </div>
+        <div class="tab-panel" id="t8c">
+          <div class="sample-list">
+            <div class="sample-item"><span class="sample-num">Câu 12</span> SV '212606016' đã học đủ HP tiên quyết của 'IE3.003.3' chưa.</div>
+            <div class="sample-item"><span class="sample-num">Câu 15</span> HP chưa hoàn thành (dưới 4 hoặc chưa đăng ký) của SV '212606016'.</div>
+            <div class="sample-item"><span class="sample-num">Câu 45</span> HP trong CTDT mà SV chưa đăng ký.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pattern-box c3" id="p9">
+      <div class="pattern-header" onclick="toggle('p9')">
+        <div><div class="q-badges"><span class="q-badge">Câu 18</span><span class="q-badge">Câu 23</span></div></div>
+        <div>
+          <div class="pattern-name">Subquery vô hướng — so sánh điểm với trung bình / ngưỡng</div>
+          <div class="pattern-desc">WHERE điểm &lt; (SELECT AVG(điểm) FROM ...) hoặc điểm &lt; ngưỡng cố định</div>
+        </div>
+        <div class="expand-icon">⌄</div>
+      </div>
+      <div class="pattern-body">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(this,'t9a')">Nhận biết</button>
+          <button class="tab-btn" onclick="switchTab(this,'t9b')">Khung giải</button>
+          <button class="tab-btn" onclick="switchTab(this,'t9c')">Câu hỏi mẫu</button>
+        </div>
+        <div class="tab-panel active" id="t9a">
+          <ul class="clue-list">
+            <li class="clue-item">Đề yêu cầu <em>"dưới điểm trung bình của lớp"</em>, <em>"nhỏ hơn TB"</em>.</li>
+            <li class="clue-item">Subquery trả về <strong>một giá trị duy nhất</strong> (scalar) để so sánh.</li>
+            <li class="clue-item">Cùng bảng, cùng LHP → subquery có WHERE lọc LHP giống truy vấn ngoài.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="t9b">
+<pre><span class="kw">SELECT</span> sv.MaSV, sv.HoTen, lhpsv.DiemTKHP
+<span class="kw">FROM</span>   <span class="pl">LopHocPhan_SinhVien</span> lhpsv
+<span class="kw">JOIN</span>   <span class="pl">SinhVien</span> sv <span class="kw">ON</span> sv.MaSV = lhpsv.MaSV
+<span class="kw">WHERE</span>  lhpsv.MaHP  = <span class="str">'<span class="ph">MaHP</span>'</span>
+  <span class="kw">AND</span>  lhpsv.MaLHP = <span class="str">'<span class="ph">MaLHP</span>'</span>
+  <span class="kw">AND</span>  lhpsv.DiemTKHP &lt; (
+    <span class="kw">SELECT</span> <span class="fn">AVG</span>(DiemTKHP)
+    <span class="kw">FROM</span>   <span class="pl">LopHocPhan_SinhVien</span>
+    <span class="kw">WHERE</span>  MaHP = <span class="str">'<span class="ph">MaHP</span>'</span> <span class="kw">AND</span> MaLHP = <span class="str">'<span class="ph">MaLHP</span>'</span>
+  );</pre>
+        </div>
+        <div class="tab-panel" id="t9c">
+          <div class="sample-list">
+            <div class="sample-item"><span class="sample-num">Câu 18</span> SV có DiemTKHP < TB của LHP 'IT1.110.3' — '1-2-22-QT08'.</div>
+            <div class="sample-item"><span class="sample-num">Câu 23</span> SV có điểm &lt; 4 trong LHP cụ thể.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       CATEGORY 4 — UPDATE / DELETE
+  ════════════════════════════════════════════ -->
+  <div class="category-section c4" data-cat="update">
+    <div class="category-header">
+      <div class="category-icon">✏️</div>
+      <div>
+        <div class="category-title">UPDATE / DELETE</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px;">Cập nhật dữ liệu tính toán và xóa bản ghi thỏa điều kiện</div>
+      </div>
+      <div class="category-count">Câu 4, 5, 6, 7, 38</div>
+    </div>
+
+    <div class="pattern-box c4" id="p10">
+      <div class="pattern-header" onclick="toggle('p10')">
+        <div><div class="q-badges"><span class="q-badge">Câu 4</span><span class="q-badge">Câu 38</span></div></div>
+        <div>
+          <div class="pattern-name">UPDATE cột tính toán từ dữ liệu hiện có (DiemTKHP, LanHoc)</div>
+          <div class="pattern-desc">Tính giá trị mới dựa trên các cột trong cùng bảng hoặc bảng khác</div>
+        </div>
+        <div class="expand-icon">⌄</div>
+      </div>
+      <div class="pattern-body">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(this,'t10a')">Nhận biết</button>
+          <button class="tab-btn" onclick="switchTab(this,'t10b')">Khung giải</button>
+          <button class="tab-btn" onclick="switchTab(this,'t10c')">Câu hỏi mẫu</button>
+        </div>
+        <div class="tab-panel active" id="t10a">
+          <ul class="clue-list">
+            <li class="clue-item">Đề có <em>"cập nhật cột..."</em>, <em>"tính và lưu lại"</em>.</li>
+            <li class="clue-item">Giá trị mới = biểu thức toán học trên các cột đã có (<code>DiemQT * 0.4 + ...</code>).</li>
+            <li class="clue-item">Nếu cần join bảng khác để tính → dùng <code>UPDATE ... FROM ... JOIN</code>.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="t10b">
+<pre><span class="cm">-- Câu 4: Tính DiemTKHP = DiemQT * TrọngSo + DiemThi * TrọngSo</span>
+<span class="kw">UPDATE</span> <span class="pl">LopHocPhan_SinhVien</span>
+<span class="kw">SET</span>    DiemTKHP = <span class="fn">ROUND</span>(DiemQT * 0.4 + DiemThi * 0.6, 1)
+<span class="kw">WHERE</span>  DiemQT  <span class="kw">IS NOT NULL</span>
+  <span class="kw">AND</span>  DiemThi <span class="kw">IS NOT NULL</span>;
+
+<span class="cm">-- Câu 38: Cập nhật LanHoc = thứ tự học theo thời gian</span>
+<span class="kw">UPDATE</span> t
+<span class="kw">SET</span>    t.LanHoc = sub.LanHoc
+<span class="kw">FROM</span>   <span class="pl">LopHocPhan_SinhVien</span> t
+<span class="kw">JOIN</span>   (
+  <span class="kw">SELECT</span> MaSV, MaHP, MaLHP,
+         <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (
+           <span class="kw">PARTITION BY</span> MaSV, MaHP
+           <span class="kw">ORDER BY</span> NamHoc, HocKy       <span class="cm">-- cần join LopHocPhan</span>
+         ) <span class="kw">AS</span> LanHoc
+  <span class="kw">FROM</span>   <span class="pl">LopHocPhan_SinhVien</span> lhpsv2
+  <span class="kw">JOIN</span>   <span class="pl">LopHocPhan</span> lhp <span class="kw">ON</span> lhpsv2.MaHP = lhp.MaHP
+                         <span class="kw">AND</span> lhpsv2.MaLHP = lhp.MaLHP
+) sub <span class="kw">ON</span> t.MaSV = sub.MaSV <span class="kw">AND</span> t.MaHP = sub.MaHP
+       <span class="kw">AND</span> t.MaLHP = sub.MaLHP;</pre>
+        </div>
+        <div class="tab-panel" id="t10c">
+          <div class="sample-list">
+            <div class="sample-item"><span class="sample-num">Câu 4</span> Tính và lưu cột DiemTKHP cho bảng LopHocPhan_SinhVien.</div>
+            <div class="sample-item"><span class="sample-num">Câu 38</span> Cập nhật LanHoc dựa theo thứ tự thời gian của cùng một HP.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pattern-box c4" id="p11">
+      <div class="pattern-header" onclick="toggle('p11')">
+        <div><div class="q-badges"><span class="q-badge">Câu 5</span></div></div>
+        <div>
+          <div class="pattern-name">UPDATE điều kiện CASE WHEN — chuyển đổi bảng quy đổi điểm</div>
+          <div class="pattern-desc">Gán giá trị theo khoảng (hệ 4, hệ chữ) bằng CASE WHEN lồng nhau</div>
+        </div>
+        <div class="expand-icon">⌄</div>
+      </div>
+      <div class="pattern-body">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(this,'t11a')">Nhận biết</button>
+          <button class="tab-btn" onclick="switchTab(this,'t11b')">Khung giải</button>
+          <button class="tab-btn" onclick="switchTab(this,'t11c')">Câu hỏi mẫu</button>
+        </div>
+        <div class="tab-panel active" id="t11a">
+          <ul class="clue-list">
+            <li class="clue-item">Đề cung cấp <strong>bảng quy đổi điểm</strong> (thang điểm → hệ chữ / hệ 4).</li>
+            <li class="clue-item">Mỗi khoảng điểm → một giá trị cố định.</li>
+            <li class="clue-item">Dấu hiệu: cập nhật <em>hai cột trở lên</em> cùng một lúc theo cùng điều kiện khoảng.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="t11b">
+<pre><span class="kw">UPDATE</span> <span class="pl">LopHocPhan_SinhVien</span>
+<span class="kw">SET</span>
+  DiemHe4 = <span class="kw">CASE</span>
+    <span class="kw">WHEN</span> DiemTKHP >= 9.5               <span class="kw">THEN</span> 4.0
+    <span class="kw">WHEN</span> DiemTKHP >= 8.5               <span class="kw">THEN</span> 3.8
+    <span class="kw">WHEN</span> DiemTKHP >= 8.0               <span class="kw">THEN</span> 3.5
+    <span class="kw">WHEN</span> DiemTKHP >= 7.0               <span class="kw">THEN</span> 3.0
+    <span class="kw">WHEN</span> DiemTKHP >= 6.0               <span class="kw">THEN</span> 2.5
+    <span class="kw">WHEN</span> DiemTKHP >= 5.5               <span class="kw">THEN</span> 2.0
+    <span class="kw">WHEN</span> DiemTKHP >= 5.0               <span class="kw">THEN</span> 1.5
+    <span class="kw">WHEN</span> DiemTKHP >= 4.0               <span class="kw">THEN</span> 1.0
+    <span class="kw">WHEN</span> DiemTKHP >= 3.0               <span class="kw">THEN</span> 0.5
+    <span class="kw">ELSE</span> 0
+  <span class="kw">END</span>,
+  DiemHeChu = <span class="kw">CASE</span>
+    <span class="kw">WHEN</span> DiemTKHP >= 9.5 <span class="kw">THEN</span> <span class="str">'A+'</span>
+    <span class="kw">WHEN</span> DiemTKHP >= 8.5 <span class="kw">THEN</span> <span class="str">'A'</span>
+    <span class="cm">-- ... tương tự ...</span>
+    <span class="kw">ELSE</span> <span class="str">'F'</span>
+  <span class="kw">END</span>
+<span class="kw">WHERE</span> DiemTKHP <span class="kw">IS NOT NULL</span>;</pre>
+        </div>
+        <div class="tab-panel" id="t11c">
+          <div class="sample-list">
+            <div class="sample-item"><span class="sample-num">Câu 5</span> Cập nhật DiemHe4, DiemHeChu theo bảng quy đổi cho tất cả SV.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pattern-box c4" id="p12">
+      <div class="pattern-header" onclick="toggle('p12')">
+        <div><div class="q-badges"><span class="q-badge">Câu 6</span><span class="q-badge">Câu 7</span></div></div>
+        <div>
+          <div class="pattern-name">DELETE / UPDATE đơn giản theo điều kiện WHERE</div>
+          <div class="pattern-desc">Xóa bản ghi không thỏa điều kiện, cập nhật thông tin cụ thể một bản ghi</div>
+        </div>
+        <div class="expand-icon">⌄</div>
+      </div>
+      <div class="pattern-body">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(this,'t12a')">Nhận biết</button>
+          <button class="tab-btn" onclick="switchTab(this,'t12b')">Khung giải</button>
+          <button class="tab-btn" onclick="switchTab(this,'t12c')">Câu hỏi mẫu</button>
+        </div>
+        <div class="tab-panel active" id="t12a">
+          <ul class="clue-list">
+            <li class="clue-item">Đề có <em>"xóa những... không có..."</em> → DELETE + NOT EXISTS/subquery.</li>
+            <li class="clue-item">Đề có <em>"cập nhật địa chỉ/SĐT cho SV mã..."</em> → UPDATE + WHERE PK.</li>
+            <li class="clue-item">Đây là dạng DML đơn giản nhất, không cần GROUP BY hay window function.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="t12b">
+<pre><span class="cm">-- Câu 6: Xóa LHP không có SV</span>
+<span class="kw">DELETE FROM</span> <span class="pl">LopHocPhan</span>
+<span class="kw">WHERE NOT EXISTS</span> (
+  <span class="kw">SELECT</span> 1 <span class="kw">FROM</span> <span class="pl">LopHocPhan_SinhVien</span> lhpsv
+  <span class="kw">WHERE</span>  lhpsv.MaHP  = LopHocPhan.MaHP
+    <span class="kw">AND</span>  lhpsv.MaLHP = LopHocPhan.MaLHP
+);
+
+<span class="cm">-- Câu 7: Cập nhật thông tin SV cụ thể</span>
+<span class="kw">UPDATE</span> <span class="pl">SinhVien</span>
+<span class="kw">SET</span>    DiaChi = <span class="str">N'<span class="ph">DiaChi mới</span>'</span>,
+       SoDienThoai = <span class="str">'<span class="ph">SDT mới</span>'</span>
+<span class="kw">WHERE</span>  MaSV = <span class="str">'201200043'</span>;</pre>
+        </div>
+        <div class="tab-panel" id="t12c">
+          <div class="sample-list">
+            <div class="sample-item"><span class="sample-num">Câu 6</span> Xóa LHP không có SV đăng ký.</div>
+            <div class="sample-item"><span class="sample-num">Câu 7</span> Cập nhật địa chỉ và SĐT cho SV '201200043'.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       CATEGORY 5 — CTE / TÍNH TOÁN PHỨC TẠP
+  ════════════════════════════════════════════ -->
+  <div class="category-section c5" data-cat="cte">
+    <div class="category-header">
+      <div class="category-icon">🧮</div>
+      <div>
+        <div class="category-title">CTE / Tính Toán Phức Tạp</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px;">Điểm tích lũy, tổng tín chỉ, công thức nhiều bước</div>
+      </div>
+      <div class="category-count">Câu 11, 17, 27, 33, 34, 35, 36</div>
+    </div>
+
+    <div class="pattern-box c5" id="p13">
+      <div class="pattern-header" onclick="toggle('p13')">
+        <div><div class="q-badges"><span class="q-badge">Câu 11</span><span class="q-badge">Câu 14</span><span class="q-badge">Câu 35</span><span class="q-badge">Câu 36</span></div></div>
+        <div>
+          <div class="pattern-name">GPA / Điểm tích lũy — SUM(Điểm × TínChỉ) / SUM(TínChỉ)</div>
+          <div class="pattern-desc">Tính điểm tích lũy có trọng số theo công thức chuẩn</div>
+        </div>
+        <div class="expand-icon">⌄</div>
+      </div>
+      <div class="pattern-body">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(this,'t13a')">Nhận biết</button>
+          <button class="tab-btn" onclick="switchTab(this,'t13b')">Khung giải</button>
+          <button class="tab-btn" onclick="switchTab(this,'t13c')">Câu hỏi mẫu</button>
+        </div>
+        <div class="tab-panel active" id="t13a">
+          <ul class="clue-list">
+            <li class="clue-item">Đề có <em>"điểm tích lũy"</em>, <em>"GPA"</em>, <em>"điểm trung bình tích lũy"</em>.</li>
+            <li class="clue-item">Công thức: <code>SUM(Diem × SoTinChi) / SUM(SoTinChi)</code>.</li>
+            <li class="clue-item">Lưu ý: nếu học lại thì lấy điểm cao nhất → cần <code>MAX(DiemTKHP)</code> trước khi tính.</li>
+            <li class="clue-item">Nên dùng CTE để tính điểm cao nhất mỗi HP trước.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="t13b">
+<pre><span class="kw">WITH</span> DiemCaoNhat <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> MaSV, MaHP,
+         <span class="fn">MAX</span>(DiemTKHP) <span class="kw">AS</span> DiemMax
+  <span class="kw">FROM</span>   <span class="pl">LopHocPhan_SinhVien</span>
+  <span class="kw">WHERE</span>  MaSV = <span class="str">'<span class="ph">MaSV</span>'</span>
+    <span class="kw">AND</span>  DiemTKHP <span class="kw">IS NOT NULL</span>
+  <span class="kw">GROUP BY</span> MaSV, MaHP
+)
+<span class="kw">SELECT</span>
+  d.MaSV,
+  <span class="fn">ROUND</span>(
+    <span class="fn">SUM</span>(d.DiemMax * hp.SoTinChi)
+    / <span class="fn">SUM</span>(hp.SoTinChi), 2
+  ) <span class="kw">AS</span> DiemTichLuy
+<span class="kw">FROM</span>   DiemCaoNhat d
+<span class="kw">JOIN</span>   <span class="pl">HocPhan</span> hp <span class="kw">ON</span> d.MaHP = hp.MaHP
+<span class="kw">GROUP BY</span> d.MaSV;</pre>
+        </div>
+        <div class="tab-panel" id="t13c">
+          <div class="sample-list">
+            <div class="sample-item"><span class="sample-num">Câu 11</span> Tính điểm tích lũy SV '201200085'.</div>
+            <div class="sample-item"><span class="sample-num">Câu 14</span> Điểm tích lũy TB của SV CNTT theo CTDT.</div>
+            <div class="sample-item"><span class="sample-num">Câu 35</span> Danh sách điểm tích lũy SV lớp CNTT CLC Việt-Anh 2 khóa 62.</div>
+            <div class="sample-item"><span class="sample-num">Câu 36</span> Top 10 SV điểm tích lũy cao nhất khóa 61.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pattern-box c5" id="p14">
+      <div class="pattern-header" onclick="toggle('p14')">
+        <div><div class="q-badges"><span class="q-badge">Câu 17</span><span class="q-badge">Câu 27</span><span class="q-badge">Câu 33</span></div></div>
+        <div>
+          <div class="pattern-name">Tổng tín chỉ tích lũy — SUM tín chỉ các HP đạt (≥ 4)</div>
+          <div class="pattern-desc">Đếm số tín chỉ đã hoàn thành của SV, lọc theo điều kiện đạt</div>
+        </div>
+        <div class="expand-icon">⌄</div>
+      </div>
+      <div class="pattern-body">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(this,'t14a')">Nhận biết</button>
+          <button class="tab-btn" onclick="switchTab(this,'t14b')">Khung giải</button>
+          <button class="tab-btn" onclick="switchTab(this,'t14c')">Câu hỏi mẫu</button>
+        </div>
+        <div class="tab-panel active" id="t14a">
+          <ul class="clue-list">
+            <li class="clue-item">Đề yêu cầu <em>"tổng số tín chỉ tích lũy"</em>, <em>"số TC đã hoàn thành"</em>.</li>
+            <li class="clue-item">Điều kiện: HP đạt = DiemTKHP ≥ 4 (không tính trượt).</li>
+            <li class="clue-item">Nếu học lại: lấy điểm cao nhất → <code>MAX</code> trước <code>SUM</code>.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="t14b">
+<pre><span class="kw">WITH</span> HPDat <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> lhpsv.MaSV, lhpsv.MaHP,
+         <span class="fn">MAX</span>(lhpsv.DiemTKHP) <span class="kw">AS</span> DiemMax
+  <span class="kw">FROM</span>   <span class="pl">LopHocPhan_SinhVien</span> lhpsv
+  <span class="kw">WHERE</span>  lhpsv.MaSV = <span class="str">'<span class="ph">MaSV</span>'</span>
+  <span class="kw">GROUP BY</span> lhpsv.MaSV, lhpsv.MaHP
+  <span class="kw">HAVING</span> <span class="fn">MAX</span>(lhpsv.DiemTKHP) >= 4
+)
+<span class="kw">SELECT</span> h.MaSV,
+       <span class="fn">SUM</span>(hp.SoTinChi) <span class="kw">AS</span> TongTinChiTichLuy
+<span class="kw">FROM</span>   HPDat h
+<span class="kw">JOIN</span>   <span class="pl">HocPhan</span> hp <span class="kw">ON</span> h.MaHP = hp.MaHP
+<span class="kw">GROUP BY</span> h.MaSV;</pre>
+        </div>
+        <div class="tab-panel" id="t14c">
+          <div class="sample-list">
+            <div class="sample-item"><span class="sample-num">Câu 17</span> Tổng TC tích lũy của SV '212606016' (DiemTKHP ≥ 4).</div>
+            <div class="sample-item"><span class="sample-num">Câu 27</span> Tổng TC tích lũy của từng SV.</div>
+            <div class="sample-item"><span class="sample-num">Câu 33</span> Danh sách HP đạt (≥ 4) của SV '201200085'.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       CATEGORY 6 — WINDOW FUNCTION
+  ════════════════════════════════════════════ -->
+  <div class="category-section c6" data-cat="window">
+    <div class="category-header">
+      <div class="category-icon">🪟</div>
+      <div>
+        <div class="category-title">Window Function</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px;">RANK, ROW_NUMBER, DENSE_RANK, MAX OVER PARTITION</div>
+      </div>
+      <div class="category-count">Câu 20, 22, 28, 37, 39, 42</div>
+    </div>
+
+    <div class="pattern-box c6" id="p15">
+      <div class="pattern-header" onclick="toggle('p15')">
+        <div><div class="q-badges"><span class="q-badge">Câu 20</span><span class="q-badge">Câu 22</span><span class="q-badge">Câu 39</span></div></div>
+        <div>
+          <div class="pattern-name">Lấy bản ghi có điểm MAX theo nhóm (PARTITION BY)</div>
+          <div class="pattern-desc">Tìm SV điểm cao nhất mỗi LHP, không dùng GROUP BY thuần</div>
+        </div>
+        <div class="expand-icon">⌄</div>
+      </div>
+      <div class="pattern-body">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(this,'t15a')">Nhận biết</button>
+          <button class="tab-btn" onclick="switchTab(this,'t15b')">Khung giải</button>
+          <button class="tab-btn" onclick="switchTab(this,'t15c')">Câu hỏi mẫu</button>
+        </div>
+        <div class="tab-panel active" id="t15a">
+          <ul class="clue-list">
+            <li class="clue-item">Đề yêu cầu <em>"điểm cao nhất của LHP"</em>, <em>"đạt điểm cao nhất trong từng LHP"</em>.</li>
+            <li class="clue-item">Có thể có nhiều SV đồng điểm cao nhất → cần giữ tất cả → dùng <code>RANK()</code> hoặc so sánh với MAX.</li>
+            <li class="clue-item">Không thể GROUP BY đơn giản vì cần giữ thông tin từng dòng SV.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="t15b">
+<pre><span class="kw">WITH</span> Ranked <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> *,
+         <span class="fn">RANK</span>() <span class="kw">OVER</span> (
+           <span class="kw">PARTITION BY</span> MaHP, MaLHP
+           <span class="kw">ORDER BY</span> DiemTKHP <span class="kw">DESC</span>
+         ) <span class="kw">AS</span> Rank
+  <span class="kw">FROM</span>   <span class="pl">LopHocPhan_SinhVien</span>
+  <span class="kw">WHERE</span>  DiemTKHP <span class="kw">IS NOT NULL</span>
+)
+<span class="kw">SELECT</span> r.MaSV, sv.HoTen, r.MaHP, r.MaLHP, r.DiemTKHP
+<span class="kw">FROM</span>   Ranked r
+<span class="kw">JOIN</span>   <span class="pl">SinhVien</span> sv <span class="kw">ON</span> sv.MaSV = r.MaSV
+<span class="kw">WHERE</span>  r.Rank = 1;            <span class="cm">-- lấy điểm cao nhất, giữ đồng hạng</span></pre>
+          <p style="font-size:12px;color:var(--muted);margin-top:8px;">💡 RANK() giữ đồng hạng. ROW_NUMBER() chỉ lấy 1 dòng. Chọn theo yêu cầu.</p>
+        </div>
+        <div class="tab-panel" id="t15c">
+          <div class="sample-list">
+            <div class="sample-item"><span class="sample-num">Câu 20</span> SV điểm TKHP cao nhất LHP 'IT1.110.3' — '1-2-22-QT08'.</div>
+            <div class="sample-item"><span class="sample-num">Câu 22</span> SV điểm cao nhất trong từng LHP (tất cả LHP).</div>
+            <div class="sample-item"><span class="sample-num">Câu 39</span> SV có DiemTKHP cao nhất trong LHP 'LHP002'.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pattern-box c6" id="p16">
+      <div class="pattern-header" onclick="toggle('p16')">
+        <div><div class="q-badges"><span class="q-badge">Câu 28</span><span class="q-badge">Câu 42</span></div></div>
+        <div>
+          <div class="pattern-name">RANK() xếp hạng theo nhóm / tìm người dạy nhiều nhất</div>
+          <div class="pattern-desc">Xếp hạng SV theo GPA trong lớp, hoặc GV dạy nhiều LHP nhất</div>
+        </div>
+        <div class="expand-icon">⌄</div>
+      </div>
+      <div class="pattern-body">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(this,'t16a')">Nhận biết</button>
+          <button class="tab-btn" onclick="switchTab(this,'t16b')">Khung giải</button>
+          <button class="tab-btn" onclick="switchTab(this,'t16c')">Câu hỏi mẫu</button>
+        </div>
+        <div class="tab-panel active" id="t16a">
+          <ul class="clue-list">
+            <li class="clue-item">Đề có <em>"xếp hạng"</em>, <em>"thứ hạng"</em>, <em>"rank"</em> trong từng nhóm (lớp, khoa).</li>
+            <li class="clue-item">Cần PARTITION BY nhóm, ORDER BY tiêu chí.</li>
+            <li class="clue-item">Dạng <em>"dạy nhiều nhất"</em>: tính count trước (CTE/subquery), rồi lọc max.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="t16b">
+<pre><span class="cm">-- Câu 42: Xếp hạng SV theo GPA trong từng lớp</span>
+<span class="kw">WITH</span> GPA <span class="kw">AS</span> (
+  <span class="cm">-- tính GPA ở đây...</span>
+)
+<span class="kw">SELECT</span>
+  g.MaSV, sv.HoTen, sv.MaLop,
+  g.GPA,
+  <span class="fn">RANK</span>() <span class="kw">OVER</span> (
+    <span class="kw">PARTITION BY</span> sv.MaLop
+    <span class="kw">ORDER BY</span> g.GPA <span class="kw">DESC</span>
+  ) <span class="kw">AS</span> XepHang
+<span class="kw">FROM</span>   GPA g
+<span class="kw">JOIN</span>   <span class="pl">SinhVien</span> sv <span class="kw">ON</span> sv.MaSV = g.MaSV;
+
+<span class="cm">-- Câu 28: GV dạy nhiều LHP nhất HK2 2023-2024</span>
+<span class="kw">WITH</span> Count_LHP <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> MaGV, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> SoLHP
+  <span class="kw">FROM</span>   <span class="pl">LopHocPhan</span>
+  <span class="kw">WHERE</span>  NamHoc = <span class="str">'2023-2024'</span> <span class="kw">AND</span> HocKy = 2
+  <span class="kw">GROUP BY</span> MaGV
+)
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> Count_LHP
+<span class="kw">WHERE</span>  SoLHP = (<span class="kw">SELECT</span> <span class="fn">MAX</span>(SoLHP) <span class="kw">FROM</span> Count_LHP);</pre>
+        </div>
+        <div class="tab-panel" id="t16c">
+          <div class="sample-list">
+            <div class="sample-item"><span class="sample-num">Câu 28</span> GV dạy nhiều LHP nhất HK2 2023-2024.</div>
+            <div class="sample-item"><span class="sample-num">Câu 42</span> Xếp hạng SV theo GPA trong từng lớp.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pattern-box c6" id="p17">
+      <div class="pattern-header" onclick="toggle('p17')">
+        <div><div class="q-badges"><span class="q-badge">Câu 37</span></div></div>
+        <div>
+          <div class="pattern-name">TOP-N trong mỗi nhóm — 5 SV học bổng mỗi lớp</div>
+          <div class="pattern-desc">Lấy N bản ghi đứng đầu theo nhóm (PARTITION BY lớp)</div>
+        </div>
+        <div class="expand-icon">⌄</div>
+      </div>
+      <div class="pattern-body">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(this,'t17a')">Nhận biết</button>
+          <button class="tab-btn" onclick="switchTab(this,'t17b')">Khung giải</button>
+          <button class="tab-btn" onclick="switchTab(this,'t17c')">Câu hỏi mẫu</button>
+        </div>
+        <div class="tab-panel active" id="t17a">
+          <ul class="clue-list">
+            <li class="clue-item">Đề yêu cầu <em>"top N trong mỗi lớp/nhóm"</em>.</li>
+            <li class="clue-item">Khác TOP N toàn bảng — phải dùng <code>ROW_NUMBER()</code> hoặc <code>RANK()</code> với <code>PARTITION BY</code>.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="t17b">
+<pre><span class="kw">WITH</span> GPA_Ranked <span class="kw">AS</span> (
+  <span class="cm">-- ... tính GPA cho mỗi SV ...</span>
+),
+Ranked <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> g.*,
+         <span class="fn">DENSE_RANK</span>() <span class="kw">OVER</span> (
+           <span class="kw">PARTITION BY</span> sv.MaLop
+           <span class="kw">ORDER BY</span> g.GPA <span class="kw">DESC</span>
+         ) <span class="kw">AS</span> Rank
+  <span class="kw">FROM</span>   GPA_Ranked g
+  <span class="kw">JOIN</span>   <span class="pl">SinhVien</span> sv <span class="kw">ON</span> sv.MaSV = g.MaSV
+)
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> Ranked
+<span class="kw">WHERE</span>  Rank <= 5;   <span class="cm">-- top 5 mỗi lớp</span></pre>
+        </div>
+        <div class="tab-panel" id="t17c">
+          <div class="sample-list">
+            <div class="sample-item"><span class="sample-num">Câu 37</span> 5 SV điểm tích lũy cao nhất ở mỗi lớp (học bổng).</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       CATEGORY 7 — DATE / ĐIỀU KIỆN ĐẶC BIỆT
+  ════════════════════════════════════════════ -->
+  <div class="category-section c7" data-cat="date">
+    <div class="category-header">
+      <div class="category-icon">📅</div>
+      <div>
+        <div class="category-title">Date / Điều Kiện Đặc Biệt</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px;">MONTH(), GETDATE(), điều kiện thời gian và tháng hiện tại</div>
+      </div>
+      <div class="category-count">Câu 16, 41</div>
+    </div>
+
+    <div class="pattern-box c7" id="p18">
+      <div class="pattern-header" onclick="toggle('p18')">
+        <div><div class="q-badges"><span class="q-badge">Câu 16</span><span class="q-badge">Câu 41</span></div></div>
+        <div>
+          <div class="pattern-name">Lọc theo tháng hiện tại / học kỳ cụ thể</div>
+          <div class="pattern-desc">Dùng MONTH(GETDATE()) hoặc điều kiện NamHoc + HocKy để lọc thời gian</div>
+        </div>
+        <div class="expand-icon">⌄</div>
+      </div>
+      <div class="pattern-body">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(this,'t18a')">Nhận biết</button>
+          <button class="tab-btn" onclick="switchTab(this,'t18b')">Khung giải</button>
+          <button class="tab-btn" onclick="switchTab(this,'t18c')">Câu hỏi mẫu</button>
+        </div>
+        <div class="tab-panel active" id="t18a">
+          <ul class="clue-list">
+            <li class="clue-item">Đề có cụm <em>"sinh nhật trong tháng hiện tại"</em> → <code>MONTH(NgaySinh) = MONTH(GETDATE())</code>.</li>
+            <li class="clue-item">Đề có <em>"học kỳ 1 năm học 2024"</em> → <code>HocKy = 1 AND NamHoc LIKE '%2024%'</code>.</li>
+            <li class="clue-item">UNION nếu cần kết hợp nhiều bảng (SV + GV có cùng trường NgaySinh).</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="t18b">
+<pre><span class="cm">-- Câu 16: SV + GV sinh nhật tháng hiện tại</span>
+<span class="kw">SELECT</span> <span class="str">'SinhVien'</span> <span class="kw">AS</span> LoaiNguoi,
+       MaSV <span class="kw">AS</span> MaID, HoTen, NgaySinh
+<span class="kw">FROM</span>   <span class="pl">SinhVien</span> sv
+<span class="kw">JOIN</span>   <span class="pl">Lop</span> lp <span class="kw">ON</span> sv.MaLop = lp.MaLop
+<span class="kw">JOIN</span>   <span class="pl">Khoa</span>  k  <span class="kw">ON</span> lp.MaKhoa = k.MaKhoa
+<span class="kw">WHERE</span>  k.TenKhoa <span class="kw">LIKE</span> <span class="str">N'%Công nghệ thông tin%'</span>
+  <span class="kw">AND</span>  <span class="fn">MONTH</span>(sv.NgaySinh) = <span class="fn">MONTH</span>(<span class="fn">GETDATE</span>())
+
+<span class="kw">UNION ALL</span>
+
+<span class="kw">SELECT</span> <span class="str">'GiangVien'</span>,
+       MaGV, HoTen, NgaySinh
+<span class="kw">FROM</span>   <span class="pl">GiangVien</span> gv
+<span class="kw">JOIN</span>   <span class="pl">BoMon</span> bm <span class="kw">ON</span> gv.MaBM = bm.MaBM
+<span class="kw">JOIN</span>   <span class="pl">Khoa</span>  k  <span class="kw">ON</span> bm.MaKhoa = k.MaKhoa
+<span class="kw">WHERE</span>  k.TenKhoa <span class="kw">LIKE</span> <span class="str">N'%Công nghệ thông tin%'</span>
+  <span class="kw">AND</span>  <span class="fn">MONTH</span>(gv.NgaySinh) = <span class="fn">MONTH</span>(<span class="fn">GETDATE</span>());</pre>
+        </div>
+        <div class="tab-panel" id="t18c">
+          <div class="sample-list">
+            <div class="sample-item"><span class="sample-num">Câu 16</span> SV + GV Khoa CNTT có sinh nhật trong tháng hiện tại.</div>
+            <div class="sample-item"><span class="sample-num">Câu 41</span> Trưởng bộ môn dạy ít nhất 1 LHP trong HK1 năm học 2024.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       CATEGORY 8 — TOP-N / RANK TOÀN BẢN
+  ════════════════════════════════════════════ -->
+  <div class="category-section c8" data-cat="rank">
+    <div class="category-header">
+      <div class="category-icon">🏆</div>
+      <div>
+        <div class="category-title">TOP-N / Xếp Hạng Toàn Bảng</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px;">SELECT TOP, ORDER BY, điểm cao nhất / nhiều nhất toàn bộ</div>
+      </div>
+      <div class="category-count">Câu 31, 32, 36, 40, 43</div>
+    </div>
+
+    <div class="pattern-box c8" id="p19">
+      <div class="pattern-header" onclick="toggle('p19')">
+        <div><div class="q-badges"><span class="q-badge">Câu 31</span><span class="q-badge">Câu 32</span></div></div>
+        <div>
+          <div class="pattern-name">Tìm HP / LHP có giá trị MAX theo tiêu chí</div>
+          <div class="pattern-desc">Tính metric theo nhóm rồi lọc nhóm có giá trị MAX</div>
+        </div>
+        <div class="expand-icon">⌄</div>
+      </div>
+      <div class="pattern-body">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(this,'t19a')">Nhận biết</button>
+          <button class="tab-btn" onclick="switchTab(this,'t19b')">Khung giải</button>
+          <button class="tab-btn" onclick="switchTab(this,'t19c')">Câu hỏi mẫu</button>
+        </div>
+        <div class="tab-panel active" id="t19a">
+          <ul class="clue-list">
+            <li class="clue-item">Đề có <em>"nhiều nhất"</em>, <em>"cao hơn các HP khác"</em>, <em>"số SV dưới 4 nhiều nhất"</em>.</li>
+            <li class="clue-item">Tính metric (COUNT, AVG...) theo nhóm → lọc bằng <code>WHERE metric = MAX(metric)</code>.</li>
+            <li class="clue-item">Dùng CTE để tính metric, rồi truy vấn lọc WHERE = max của CTE.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="t19b">
+<pre><span class="kw">WITH</span> SoDuoi4 <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> MaHP, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> SoSVDuoi4
+  <span class="kw">FROM</span>   <span class="pl">LopHocPhan_SinhVien</span>
+  <span class="kw">WHERE</span>  DiemTKHP < 4
+  <span class="kw">GROUP BY</span> MaHP
+)
+<span class="kw">SELECT</span> MaHP, SoSVDuoi4
+<span class="kw">FROM</span>   SoDuoi4
+<span class="kw">WHERE</span>  SoSVDuoi4 = (
+  <span class="kw">SELECT</span> <span class="fn">MAX</span>(SoSVDuoi4) <span class="kw">FROM</span> SoDuoi4
+);</pre>
+        </div>
+        <div class="tab-panel" id="t19c">
+          <div class="sample-list">
+            <div class="sample-item"><span class="sample-num">Câu 31</span> HP CNTT có điểm tích lũy cao hơn tất cả HP khác trong HK2 2023-2024.</div>
+            <div class="sample-item"><span class="sample-num">Câu 32</span> HP có số SV điểm dưới 4 nhiều nhất.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pattern-box c8" id="p20">
+      <div class="pattern-header" onclick="toggle('p20')">
+        <div><div class="q-badges"><span class="q-badge">Câu 40</span><span class="q-badge">Câu 43</span></div></div>
+        <div>
+          <div class="pattern-name">HAVING COUNT ≥ N / Kiểm tra "tất cả" với COUNT = tổng điều kiện</div>
+          <div class="pattern-desc">Lọc GV dạy ≥ 3 LHP; kiểm tra SV hoàn thành tất cả HP bắt buộc</div>
+        </div>
+        <div class="expand-icon">⌄</div>
+      </div>
+      <div class="pattern-body">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(this,'t20a')">Nhận biết</button>
+          <button class="tab-btn" onclick="switchTab(this,'t20b')">Khung giải</button>
+          <button class="tab-btn" onclick="switchTab(this,'t20c')">Câu hỏi mẫu</button>
+        </div>
+        <div class="tab-panel active" id="t20a">
+          <ul class="clue-list">
+            <li class="clue-item">Đề có <em>"từ N trở lên"</em>, <em>"ít nhất N"</em> → <code>HAVING COUNT(*) >= N</code>.</li>
+            <li class="clue-item">Đề có <em>"tất cả HP bắt buộc"</em> → đếm HP đạt của SV = đếm HP bắt buộc trong CTDT → <code>COUNT đạt = COUNT tổng</code>.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="t20b">
+<pre><span class="cm">-- Câu 40: GV dạy từ 3 LHP trở lên năm học 2023-2024</span>
+<span class="kw">SELECT</span> gv.MaGV, gv.HoTen, <span class="fn">COUNT</span>(lhp.MaLHP) <span class="kw">AS</span> SoLHP
+<span class="kw">FROM</span>   <span class="pl">GiangVien</span> gv
+<span class="kw">JOIN</span>   <span class="pl">LopHocPhan</span> lhp <span class="kw">ON</span> gv.MaGV = lhp.MaGV
+<span class="kw">WHERE</span>  lhp.NamHoc = <span class="str">'2023-2024'</span>
+<span class="kw">GROUP BY</span> gv.MaGV, gv.HoTen
+<span class="kw">HAVING</span> <span class="fn">COUNT</span>(lhp.MaLHP) >= 3;
+
+<span class="cm">-- Câu 43: SV hoàn thành TẤT CẢ HP bắt buộc</span>
+<span class="kw">SELECT</span> sv.MaSV, sv.HoTen
+<span class="kw">FROM</span>   <span class="pl">SinhVien</span> sv
+<span class="kw">JOIN</span>   <span class="pl">CTDT_HocPhan</span> ctdthp
+       <span class="kw">ON</span> ctdthp.MaCTDT = sv.MaCTDT
+      <span class="kw">AND</span> ctdthp.BatBuoc = 1
+<span class="kw">LEFT JOIN</span> <span class="pl">LopHocPhan_SinhVien</span> lhpsv
+       <span class="kw">ON</span> lhpsv.MaSV  = sv.MaSV
+      <span class="kw">AND</span> lhpsv.MaHP  = ctdthp.MaHP
+      <span class="kw">AND</span> lhpsv.DiemTKHP >= 4
+<span class="kw">GROUP BY</span> sv.MaSV, sv.HoTen, sv.MaCTDT
+<span class="kw">HAVING</span>
+  <span class="fn">COUNT</span>(lhpsv.MaHP)       <span class="cm">-- số HP bắt buộc đã đạt</span>
+  = (<span class="kw">SELECT</span> <span class="fn">COUNT</span>(*) <span class="kw">FROM</span> <span class="pl">CTDT_HocPhan</span>
+     <span class="kw">WHERE</span> MaCTDT = sv.MaCTDT <span class="kw">AND</span> BatBuoc = 1);</pre>
+        </div>
+        <div class="tab-panel" id="t20c">
+          <div class="sample-list">
+            <div class="sample-item"><span class="sample-num">Câu 40</span> GV dạy từ 3 LHP trở lên trong năm học 2023-2024.</div>
+            <div class="sample-item"><span class="sample-num">Câu 43</span> SV đã đạt tất cả HP bắt buộc trong CTDT của mình.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /.container -->
+
+<script>
+function toggle(id) {
+  const box = document.getElementById(id);
+  box.classList.toggle('open');
+}
+
+function switchTab(btn, panelId) {
+  const body = btn.closest('.pattern-body');
+  body.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  body.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(panelId).classList.add('active');
+}
+
+function filterCat(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.category-section').forEach(sec => {
+    if (cat === 'all' || sec.dataset.cat === cat) {
+      sec.classList.remove('hidden');
+    } else {
+      sec.classList.add('hidden');
+    }
+  });
+}
+
+// Open first pattern in each section by default
+document.querySelectorAll('.category-section').forEach(sec => {
+  const first = sec.querySelector('.pattern-box');
+  if (first) first.classList.add('open');
+});
+</script>
+</body>
+</html>

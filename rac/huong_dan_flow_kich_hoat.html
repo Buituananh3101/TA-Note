@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toàn cảnh Luồng Đăng ký & Kích hoạt Email</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #0f172a;
+            --bg-surface: #1e293b;
+            --bg-highlight: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #3b82f6;
+            --accent: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #334155;
+            --code-bg: #0d1117;
+            
+            /* Syntax highlighting */
+            --st-keyword: #ff7b72;
+            --st-string: #a5d6ff;
+            --st-comment: #8b949e;
+            --st-function: #d2a8ff;
+            --st-variable: #79c0ff;
+            --st-class: #f0883e;
+            --st-annotation: #ff7b72;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            padding: 50px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 30px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #60a5fa, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Flow Overview */
+        .flow-diagram {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-surface);
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 50px;
+            border: 1px solid var(--border);
+            overflow-x: auto;
+        }
+
+        .flow-node {
+            text-align: center;
+            flex: 1;
+            padding: 15px;
+            background: var(--bg-highlight);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            min-width: 150px;
+        }
+        
+        .flow-arrow {
+            color: var(--primary);
+            font-size: 1.5rem;
+            padding: 0 15px;
+            font-weight: bold;
+        }
+
+        /* Từng block giải thích */
+        .step-block {
+            margin-bottom: 60px;
+            position: relative;
+        }
+
+        .step-title {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .step-badge {
+            background: var(--primary);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .code-breakdown {
+            background: var(--bg-surface);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .code-breakdown-header {
+            background: rgba(0,0,0,0.2);
+            padding: 15px 25px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fbbf24;
+        }
+
+        .line-explanation {
+            display: grid;
+            grid-template-columns: 1fr;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        @media (min-width: 1000px) {
+            .line-explanation {
+                grid-template-columns: 55% 45%;
+            }
+        }
+
+        .line-explanation:last-child {
+            border-bottom: none;
+        }
+
+        /* Phần Code */
+        .code-part {
+            background: var(--code-bg);
+            padding: 20px 25px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: flex-start;
+            border-right: 1px solid var(--border);
+            overflow-x: auto;
+        }
+
+        .line-number {
+            color: #484f58;
+            margin-right: 15px;
+            user-select: none;
+            min-width: 25px;
+            text-align: right;
+        }
+
+        .code-content {
+            white-space: pre;
+            /* word-break: break-all; */
+        }
+
+        /* Phần Giải thích */
+        .explanation-part {
+            padding: 20px 25px;
+            background: rgba(30, 41, 59, 0.4);
+        }
+
+        .explanation-text {
+            margin: 0 0 15px 0;
+            font-size: 0.95rem;
+        }
+        
+        .explanation-text:last-child {
+            margin-bottom: 0;
+        }
+
+        .explanation-text strong {
+            color: var(--accent);
+            padding-right: 5px;
+        }
+
+        /* Syntax colors */
+        .k { color: var(--st-keyword); }    
+        .s { color: var(--st-string); }     
+        .c { color: var(--st-comment); font-style: italic; } 
+        .f { color: var(--st-function); }   
+        .v { color: var(--st-variable); }   
+        .t { color: var(--st-class); }      
+        .a { color: var(--st-annotation); } 
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Toàn Cảnh Luồng Code: Đăng Ký & Kích Hoạt Bằng Email</h1>
+            <p>Tài liệu giúp bạn làm chủ 100% dòng chảy của dữ liệu: Từ lúc User ấn nút Đăng Ký, đến lúc Backend xử lý, Gửi Mail đi, và User Nhấn Link xác thực.</p>
+        </div>
+
+        <div class="flow-diagram">
+            <div class="flow-node">
+                <span class="step-badge" style="margin: 0 auto 10px; width: 30px; height:30px; font-size: 1rem;">1</span>
+                <strong>Controller Ghi Nhận</strong><br>
+                <span style="font-size: 0.85rem; color: var(--text-muted)">TaiKhoanController.java</span>
+            </div>
+            <div class="flow-arrow">➔</div>
+            <div class="flow-node">
+                <span class="step-badge" style="margin: 0 auto 10px; width: 30px; height:30px; font-size: 1rem;">2</span>
+                <strong>Service Lưu Vào DB</strong><br>
+                <span style="font-size: 0.85rem; color: var(--text-muted)">TaiKhoanService.java</span>
+            </div>
+            <div class="flow-arrow">➔</div>
+            <div class="flow-node">
+                <span class="step-badge" style="margin: 0 auto 10px; width: 30px; height:30px; font-size: 1rem;">3</span>
+                <strong>Bắn Email Token</strong><br>
+                <span style="font-size: 0.85rem; color: var(--text-muted)">EmailServiceImpl.java</span>
+            </div>
+            <div class="flow-arrow">➔</div>
+            <div class="flow-node" style="border-color: var(--accent);">
+                <span class="step-badge" style="margin: 0 auto 10px; width: 30px; height:30px; font-size: 1rem; background: var(--accent);">4</span>
+                <strong>Xử lý User Click URL</strong><br>
+                <span style="font-size: 0.85rem; color: var(--text-muted)">TaiKhoanService.java</span>
+            </div>
+        </div>
+
+        <!-- BƯỚC 1: CONTROLLER NHẬN REQUEST -->
+        <div class="step-block">
+            <div class="step-title">
+                <div class="step-badge">1</div>
+                Khởi nguồn: Frontend gọi API Đăng Ký
+            </div>
+            
+            <div class="code-breakdown">
+                <div class="code-breakdown-header">
+                    📄 File: src/main/java/.../controller/TaiKhoanController.java
+                </div>
+
+                <div class="line-explanation">
+                    <div class="code-part">
+                        <div class="line-number">37</div>
+                        <div class="code-content"><span class="a">@PostMapping</span>(<span class="s">"/dang-ky"</span>)
+<span class="k">public</span> <span class="t">ResponseEntity</span>&lt;?&gt; <span class="f">dangKyNguoiDung</span>(<span class="a">@Validated @RequestBody</span> <span class="t">NguoiDung</span> <span class="v">nguoiDung</span>){
+    <span class="t">ResponseEntity</span>&lt;?&gt; <span class="v">response</span> = <span class="v">taiKhoanService</span>.<span class="f">dangKyNguoiDung</span>(<span class="v">nguoiDung</span>);
+    <span class="k">return</span> <span class="v">response</span>;
+}</div>
+                    </div>
+                    <div class="explanation-part">
+                        <p class="explanation-text"><strong>@PostMapping:</strong> Mở đón đầu một kết nối "POST" từ Frontend (React/Vue) truyền lên địa chỉ <code>/tai-khoan/dang-ky</code>.</p>
+                        <p class="explanation-text"><strong>@RequestBody NguoiDung:</strong> Biến đổi (Mapping) cục dữ liệu JSON mà User gõ ở trang web (tên, email, password) biến thành đối tượng NguoiDung trong Java.</p>
+                        <p class="explanation-text"><strong>taiKhoanService.dangKyNguoiDung():</strong> Controller không làm nhiệm vụ phức tạp, nó cầm ngay cục dữ liệu đó ném qua cho tầng <strong>Service</strong> xử lý Logic nghiệp vụ bảo mật.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BƯỚC 2: SERVICE XỬ LÝ LOGIC NGHIỆP VỤ (SINH MÃ) -->
+        <div class="step-block">
+            <div class="step-title">
+                <div class="step-badge">2</div>
+                Tầng Service Mã Hóa & Lưu Dữ Liệu
+            </div>
+            
+            <div class="code-breakdown">
+                <div class="code-breakdown-header">
+                    📄 File: src/main/java/.../servive/TaiKhoanService.java (Phần Đăng Ký)
+                </div>
+
+                <div class="line-explanation">
+                    <div class="code-part">
+                        <div class="line-number">25</div>
+                        <div class="code-content"><span class="c">// Kiểm tra Trùng Lặp...</span>
+<span class="t">String</span> <span class="v">encryptPassword</span> = <span class="v">passwordEncoder</span>.<span class="f">encode</span>(<span class="v">nguoiDung</span>.<span class="f">getMatKhau</span>());
+<span class="v">nguoiDung</span>.<span class="f">setMatKhau</span>(<span class="v">encryptPassword</span>);</div>
+                    </div>
+                    <div class="explanation-part">
+                        <p class="explanation-text"><strong>Mã hóa mật khẩu:</strong> Sử dụng BCrypt (hoặc thư viện tương đương) để băm (hash) mật khẩu gốc thành chuỗi bảo mật. Dù hacker hack được Database cũng không dịch ngược lại được mật khẩu gốc.</p>
+                    </div>
+                </div>
+
+                <div class="line-explanation">
+                    <div class="code-part">
+                        <div class="line-number">39</div>
+                        <div class="code-content"><span class="v">nguoiDung</span>.<span class="f">setMakichHoat</span>(<span class="f">taoMaKichHoat</span>());
+<span class="v">nguoiDung</span>.<span class="f">setDaKichHoat</span>(<span class="k">false</span>);
+
+<span class="t">NguoiDung</span> <span class="v">nguoiDung_daDangKy</span> = <span class="v">nguoiDungRepository</span>.<span class="f">save</span>(<span class="v">nguoiDung</span>);</div>
+                    </div>
+                    <div class="explanation-part">
+                        <p class="explanation-text"><strong>Tạo Mã UUID Kích hoạt:</strong> Gọi hàm sinh chuẩn UUID (Ví dụ sinh ra 1 chuỗi ngẫu nhiên dài: <code>5b94f0eb-324...</code>).</p>
+                        <p class="explanation-text"><strong>Thiết lập trạng thái False:</strong> Đánh dấu tài khoản này vừa đăng ký nhưng <strong>chưa kích hoạt</strong> (DaKichHoat = false), không cho login.</p>
+                        <p class="explanation-text"><strong>Save (Lưu vào DB):</strong> Dùng Repository ghi toàn bộ thông tin tài khoản đó (kèm cái mã kích hoạt trên) vào Database.</p>
+                    </div>
+                </div>
+
+                <div class="line-explanation">
+                    <div class="code-part">
+                        <div class="line-number">46</div>
+                        <div class="code-content"><span class="f">guiEmailKichHoat</span>(<span class="v">nguoiDung</span>.<span class="f">getEmail</span>(), <span class="v">nguoiDung</span>.<span class="f">getMakichHoat</span>());</div>
+                    </div>
+                    <div class="explanation-part">
+                        <p class="explanation-text"><strong>Gọi lệnh chuyển tiếp:</strong> Sau khi đã có thông tin vững chắc trong DB rồi, ngay lập tức gọi hàm <code>guiEmailKichHoat</code> nội bộ truyền vào 2 thứ: (1) Email của khách và (2) Cái mã UUID vừa tạo lúc nãy.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BƯỚC 3: EMAIL SERVICE THỰC SỰ ĐẨY THƯ LÊN MẠNG -->
+        <div class="step-block">
+            <div class="step-title">
+                <div class="step-badge">3</div>
+                Sử Dụng JavaMailSender Gọi Internet
+            </div>
+            
+            <div class="code-breakdown">
+                <div class="code-breakdown-header">
+                    📄 File: src/main/java/.../servive/EmailServiceImpl.java
+                </div>
+
+                <div class="line-explanation">
+                    <div class="code-part">
+                        <div class="line-number">23</div>
+                        <div class="code-content"><span class="t">SimpleMailMessage</span> <span class="v">message</span> = <span class="k">new</span> <span class="t">SimpleMailMessage</span>();
+<span class="v">message</span>.<span class="f">setFrom</span>(<span class="v">from</span>);
+<span class="v">message</span>.<span class="f">setTo</span>(<span class="v">to</span>);
+<span class="v">message</span>.<span class="f">setSubject</span>(<span class="v">subject</span>);
+<span class="v">message</span>.<span class="f">setText</span>(<span class="v">text</span>);
+
+<span class="v">emailSender</span>.<span class="f">send</span>(<span class="v">message</span>);</div>
+                    </div>
+                    <div class="explanation-part">
+                        <p class="explanation-text"><strong>Khởi tạo bì thư SimpleMailMessage:</strong> Đối tượng chuyên đựng Text đơn giản của Java Spring Mail.</p>
+                        <p class="explanation-text"><strong>Set parameters:</strong> Nhồi nhét các thông tin mà Service ở trên gửi vào (Tiêu đề, Địa chỉ đích, Nội dung url + mã token).</p>
+                        <p class="explanation-text"><strong>Gửi đi (emailSender.send):</strong> Máy chủ của bạn mở cổng mạng (port 587 bằng TLS), lấy thông tin đăng nhập từ <code>application.properties</code> đã phân tích, và kết nối với Máy chủ Google để bắt nó ship cái thư này đi!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- BƯỚC 4: NGƯỜI DÙNG CLICK VÀO URL TRONG MAIL -->
+        <div class="step-block">
+            <div class="step-title">
+                <div class="step-badge" style="background: var(--warning)">4</div>
+                Nhận Lệnh Kích Hoạt Từ Frontend (Khi User Bấm Link)
+            </div>
+            
+            <div class="code-breakdown">
+                <div class="code-breakdown-header">
+                    📄 File: src/main/java/.../controller/TaiKhoanController.java (Đoạn 2)
+                </div>
+
+                <div class="line-explanation">
+                    <div class="code-part">
+                        <div class="line-number">44</div>
+                        <div class="code-content"><span class="a">@GetMapping</span>(<span class="s">"/kich-hoat"</span>)
+<span class="k">public</span> <span class="t">ResponseEntity</span>&lt;?&gt; <span class="f">kichHoatTaiKhoan</span>(
+    <span class="a">@RequestParam</span> <span class="t">String</span> <span class="v">email</span>, 
+    <span class="a">@RequestParam</span> <span class="t">String</span> <span class="v">maKichHoat</span>
+){
+    <span class="t">ResponseEntity</span>&lt;?&gt; <span class="v">response</span> = <span class="v">taiKhoanService</span>.<span class="f">kichHoatTaiKhoan</span>(<span class="v">email</span>,<span class="v">maKichHoat</span>);
+    <span class="k">return</span> <span class="v">response</span>;
+}</div>
+                    </div>
+                    <div class="explanation-part">
+                        <p class="explanation-text"><strong>Vòng Lặp Quay Về:</strong> Khi người dùng mở hộp thư, thấy dòng chữ: "Click vào link sau http://localhost:3000/kich-hoat/emailCuaHo/MaUUID". Khi họ bấm vào, Frontend React sẽ túm lấy cái Email và cái MaUUID trên thanh địa chỉ, sau đó bắn trả lại xuống Backend vào Endpoint <code>/tai-khoan/kich-hoat</code> này thông qua <strong>@RequestParam</strong>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BƯỚC 5: XÁC MINH VÀ BẬT TRẠNG THÁI -->
+        <div class="step-block">
+            <div class="step-title">
+                <div class="step-badge" style="background: var(--accent)">5</div>
+                Đóng Mạch (Mở Khóa Tài Khoản Trong Database)
+            </div>
+            
+            <div class="code-breakdown">
+                <div class="code-breakdown-header">
+                    📄 File: src/main/java/.../servive/TaiKhoanService.java (Phần Kích Hoạt)
+                </div>
+
+                <div class="line-explanation">
+                    <div class="code-part">
+                        <div class="line-number">66</div>
+                        <div class="code-content"><span class="k">public</span> <span class="t">ResponseEntity</span>&lt;?&gt; <span class="f">kichHoatTaiKhoan</span>(<span class="t">String</span> <span class="v">email</span>, <span class="t">String</span> <span class="v">maKichHoat</span>){
+    <span class="t">NguoiDung</span> <span class="v">nguoiDung</span> = <span class="v">nguoiDungRepository</span>.<span class="f">findByEmail</span>(<span class="v">email</span>);
+    
+    <span class="c">// ... Kiểm tra null hay Đã kích hoạt rồi bỏ qua</span>
+    
+    <span class="k">if</span>(<span class="v">maKichHoat</span>.<span class="f">equals</span>((<span class="v">nguoiDung</span>.<span class="f">getMakichHoat</span>()))){
+        <span class="v">nguoiDung</span>.<span class="f">setDaKichHoat</span>(<span class="k">true</span>);
+        <span class="v">nguoiDungRepository</span>.<span class="f">save</span>(<span class="v">nguoiDung</span>);
+        <span class="k">return</span>  <span class="t">ResponseEntity</span>.<span class="f">ok</span>(<span class="s">"Kích hoạt tài khoản thành công"</span>);
+    } <span class="k">else</span> {
+        <span class="k">return</span> <span class="t">ResponseEntity</span>.<span class="f">badRequest</span>().<span class="f">body</span>(<span class="s">"Mã kích hoạt sai!"</span>);
+    }
+}</div>
+                    </div>
+                    <div class="explanation-part">
+                        <p class="explanation-text"><strong>Tìm Người Dùng Trước:</strong> Dùng cái Email nhận được từ Client, truy vấn móc từ Database con người dùng thật sự mang Email đó lên.</p>
+                        <p class="explanation-text"><strong>So Khớp Mã Bảo Mật:</strong> Đây là linh hồn của hệ thống (Dòng chữ maKichHoat.equals(...)). Ta lấy mã kích hoạt VỪA NHẬN TỪ CLIENT, so sánh có bằng với mã kích hoạt ĐÃ LƯU TRONG DATABASE TỪ BƯỚC 2 hay không.</p>
+                        <p class="explanation-text"><strong>Bật Cờ Kích Hoạt (True):</strong> Rất tuyệt vời! Nếu 2 cái mã khớp nhau, ta set <code>setDaKichHoat(true)</code>, và cập nhật (save) lại xuống DB. Từ giờ trở đi, User này đã được cấp quyền login hợp lệ mà không bị khóa nữa.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

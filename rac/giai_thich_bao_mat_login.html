@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giải Thích Chức Năng: Đăng nhập & Đăng Ký</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-base: #0f172a; --bg-surface: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8; --primary: #3b82f6; --accent: #10b981; --border: #334155; --code-bg: #0d1117;}
+        body { font-family: 'Inter', sans-serif; background: var(--bg-base); color: var(--text-main); line-height: 1.6; display: flex; justify-content: center; padding: 40px 20px;}
+        .container { max-width: 900px; width: 100%; }
+        h1 { color: #a78bfa; border-bottom: 2px solid var(--border); padding-bottom: 10px;}
+        .card { background: var(--bg-surface); padding: 25px; border-radius: 12px; margin-bottom: 25px; border: 1px solid var(--border); }
+        .filename { font-weight: bold; color: #fbbf24; margin-bottom: 15px; }
+        pre { background: var(--code-bg); padding: 15px; border-radius: 8px; overflow-x: auto; color: #a5d6ff; border: 1px solid var(--border);}
+        .explanation { padding-top: 15px; border-top: 1px solid var(--border); margin-top: 15px; }
+        strong { color: #a78bfa; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cơ Chế Bảo Mật Đăng Nhập & Đăng Ký (JWT)</h1>
+
+        <div class="card">
+            <div class="filename">📄 Mã hóa mật khẩu khi lưu xuống (Đăng Ký)</div>
+            <pre><code>// TaiKhoanService.java
+String encryptPassword = passwordEncoder.encode(nguoiDung.getMatKhau());
+nguoiDung.setMatKhau(encryptPassword);
+nguoiDungRepository.save(nguoiDung);</code></pre>
+            <div class="explanation">
+                <p><strong>Phòng thủ bị lộ DB:</strong> Mọi khách hàng khi Đăng Ký, mật khẩu dạng Plain-text (chữ thường) gõ trên web đều bị hàm <code>BCryptPasswordEncoder</code> băm nát thành hàng chục ký tự mã hóa trước khi ghi vào Database. Đây là hàm Hash một chiều (One-Way Hash), ngay cả Admin cũng không biết pass thật là gì.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="filename">📄 Xác thực thông tin lúc Đăng Nhập & Cấp Token</div>
+            <pre><code>// TaiKhoanController.java
+Authentication authentication = authenticationManager.authenticate(
+    new UsernamePasswordAuthenticationToken(loginReq.getUsername(), loginReq.getPassword())
+);
+if(authentication.isAuthenticated()){
+    final String jwt = jwtService.generateToken(loginReq.getUsername());
+    return ResponseEntity.ok(new JwtResponse(jwt));
+}</code></pre>
+            <div class="explanation">
+                <p><strong>Quy trình Xác Thực (Authentication):</strong> Khi React bấm nút Đăng nhập lên, hàm <code>authenticate</code> của thư viện Spring Security sẽ lấy Mật khẩu gõ vào lúc đó đem đi <strong>kiểm tra xem có khớp Hash</strong> với trong Database không. Hơn thế, nó kiểm tra các tiêu chí nội bộ: Tài khoản có đang bị vô hiệu lúc gửi mail hay không?</p>
+                <p><strong>Cấp Thẻ Qua Cửa (JWT):</strong> Nếu khớp toàn bộ, hệ thống gọi service tự chế của bạn (<code>JwtService</code>) để đóng dấu mộc lên một chuỗi String lằng nhằng gọi là <strong>(JWT Token)</strong> rồi trả Token đó xuống lại cho máy React Cất Giữ đi vòng quanh.</p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="filename">📄 Trạm thu phí chằng đường (Bộ Lọc Filter)</div>
+            <pre><code>// SecurityConfiguration.java
+http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);</code></pre>
+            <div class="explanation">
+                <p><strong>Xác thực mọi lúc đi qua ranh giới:</strong> Sau khi có Token được cấp ở trên. Những lần sau nếu User click vào chức năng nào của web (sửa, xem, xóa giỏ hàng), React sẽ nhét cái cục Token đó vào Headers HTTP gọi là <code>Authorization: Bearer [Token]</code>. Lệnh Cấu hình này xếp cái bộ máy chặn đường có tên là <code>JwtFilter</code> đứng trước các cổng để soi thẻ.</p>
+                <p>Nếu JWT Filter soi thẻ thấy Thẻ hợp lệ, Không bị mạo danh, Chưa Hết Hạn => Lục ra xem Quyền truy cập là ai, báo cho Spring Security mở cửa nhường đường. Cực kì linh hoạt và gọi là kiến trúc Không Cần Nhớ Lịch Sử (STATELESS).</p>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

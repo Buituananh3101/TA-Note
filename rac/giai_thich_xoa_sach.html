@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giải Thích Chức Năng: Xóa Sách</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-base: #0f172a; --bg-surface: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8; --primary: #3b82f6; --accent: #10b981; --border: #334155; --code-bg: #0d1117;}
+        body { font-family: 'Inter', sans-serif; background: var(--bg-base); color: var(--text-main); line-height: 1.6; display: flex; justify-content: center; padding: 40px 20px;}
+        .container { max-width: 900px; width: 100%; }
+        h1 { color: #f87171; border-bottom: 2px solid var(--border); padding-bottom: 10px;}
+        .card { background: var(--bg-surface); padding: 25px; border-radius: 12px; margin-bottom: 25px; border: 1px solid var(--border); }
+        .filename { font-weight: bold; color: #fbbf24; margin-bottom: 15px; }
+        pre { background: var(--code-bg); padding: 15px; border-radius: 8px; overflow-x: auto; color: #a5d6ff; border: 1px solid var(--border);}
+        .explanation { padding-top: 15px; border-top: 1px solid var(--border); margin-top: 15px; }
+        strong { color: #f87171; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cơ Chế Xóa Sách Và Hình Ảnh</h1>
+        <p style="color: var(--text-muted)">Cũng giống như chức năng sửa, Xóa dữ liệu dựa hoàn toàn vào khả năng của Spring Data REST.</p>
+
+        <div class="card">
+            <div class="filename">📄 File: src/.../dao/SachRepository.java</div>
+            <pre><code>@RepositoryRestResource(path="sach")
+public interface SachRepository extends JpaRepository&lt;Sach, Integer&gt; {
+}</code></pre>
+            <div class="explanation">
+                <p><strong>API Ngầm Định Của Xóa Sách:</strong> Do bạn kế thừa `JpaRepository` và có cài cục `@RepositoryRestResource=sach`, Spring Boot tự động tạo ra một Endpoint xóa dữ liệu tên là <code>DELETE /sach/{id}</code>. Khi Frontend ấn nút Xóa trên giao diện React, React sẽ gửi HTTP DELETE tới URL đó cùng số ID của quyền sách. Backend nhận được sẽ gọi lệnh Xóa mềm hoặc cứng trực tiếp vào Database thông qua Hibernate.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="filename">📄 File: src/.../security/Endpoints.java</div>
+            <pre><code>public static final String[] ADMIN_DELETE_ENDPOINTS = { //123SuaSach
+    "/sach/**",    //123SuaSach - Admin được phép DELETE sách
+    "/hinh-anh/**", //123SuaSach - Admin được phép DELETE ảnh
+};</code></pre>
+            <div class="explanation">
+                <p><strong>Cấu Hình Link Xóa:</strong> Kẻ thù xâm nhập rất dễ dùng Postman để gọi lệnh Delete, do đó class tĩnh này gom một loạt các Endpoints liên quan tới hành vi xóa thành 1 hạm đội chung có tên là <code>ADMIN_DELETE_ENDPOINTS</code>.</p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="filename">📄 File: src/.../security/SecurityConfiguration.java</div>
+            <pre><code>http.authorizeHttpRequests(config -> config
+     // ...
+     .requestMatchers(HttpMethod.DELETE, Endpoints.ADMIN_DELETE_ENDPOINTS)
+           .hasAnyAuthority("ROLE_ADMIN")
+);</code></pre>
+            <div class="explanation">
+                <p><strong>Thiết lập hàng rào bảo vệ:</strong> Hàm này kết hợp cùng bộ lọc Jwt Filter. Nó lắng nghe và xét duyệt các Yêu cầu HTTP dạng <code>DELETE</code>. Nó cầm danh sách các URL cần được canh gác, và yêu cầu phải có quyền (Authority) là "ROLE_ADMIN" móc ra từ trong Token giải mã thì cái lệnh `DELETE /sach/id` đó mới được chạy, nếu không sẽ bị ném lỗi `403 Forbidden` (Cấm Truy Cập) hoặc `401 Unauthorized`.</p>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

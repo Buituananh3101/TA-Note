@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giải Thích Chức Năng: Sửa Sách</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-base: #0f172a; --bg-surface: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8; --primary: #3b82f6; --accent: #10b981; --border: #334155; --code-bg: #0d1117;}
+        body { font-family: 'Inter', sans-serif; background: var(--bg-base); color: var(--text-main); line-height: 1.6; display: flex; justify-content: center; padding: 40px 20px;}
+        .container { max-width: 900px; width: 100%; }
+        h1 { color: #60a5fa; border-bottom: 2px solid var(--border); padding-bottom: 10px;}
+        .card { background: var(--bg-surface); padding: 25px; border-radius: 12px; margin-bottom: 25px; border: 1px solid var(--border); }
+        .filename { font-weight: bold; color: #fbbf24; margin-bottom: 15px; }
+        pre { background: var(--code-bg); padding: 15px; border-radius: 8px; overflow-x: auto; color: #a5d6ff; border: 1px solid var(--border);}
+        .explanation { padding-top: 15px; border-top: 1px solid var(--border); margin-top: 15px; }
+        strong { color: var(--primary); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cơ Chế Sửa Sự Sách Trong Hệ Thống</h1>
+        <p style="color: var(--text-muted)">Project không có file SachController riêng biệt để sửa sách, vậy chức năng Sửa Sách hoạt động như thế nào?</p>
+
+        <div class="card">
+            <div class="filename">📄 File: src/.../dao/SachRepository.java</div>
+            <pre><code>@RepositoryRestResource(path="sach")
+public interface SachRepository extends JpaRepository&lt;Sach, Integer&gt; {
+    // ... các hàm find ...
+}</code></pre>
+            <div class="explanation">
+                <p><strong>Cơ chế Spring Data REST:</strong> Thay vì phải viết các hàm Controller phức tạp để Sửa dữ liệu (như truyền thống), bạn đã sử dụng Annotation tĩnh <code>@RepositoryRestResource</code>. Nó tự động phơi bày (expose) toàn bộ các Endpoints thao tác CRUD cơ bản ra ngoài trực tiếp từ Interface Repository.</p>
+                <p>Nghĩa là nếu Frontend gửi Yêu cầu HTTP kiểu <code>PUT /sach/{id}</code> hoặc <code>PATCH /sach/{id}</code> với cục dữ liệu JSON mới, Spring Boot sẽ <strong>tự động tóm lấy ID đó, tìm cuốn sách, đắp dữ liệu JSON mới đè lên, và lưu xuống DB</strong> mà không cần bạn phải rờ tay viết 1 dòng code logic nào cả.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="filename">📄 File: src/.../security/Endpoints.java</div>
+            <pre><code>public static final String[] ADMIN_PUT_ENDPOINTS = { //123SuaSach
+    "/sach/**",    //123SuaSach - Admin được phép PUT (sửa) sách
+};</code></pre>
+            <div class="explanation">
+                <p><strong>Bảo vệ đầu mút (Endpoints):</strong> Bởi vì Endpoints sửa sách là tự động lộ ra do Spring Data Rest, nên bạn định nghĩa một danh sách các đường dẫn cần được bảo mật trong class Endpoints. Mọi yêu cầu đi vào `/sach/...` qua phương thức PUT và PATCH đều được gom vào một hạm đội bảo vệ chống lại User bình thường.</p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="filename">📄 File: src/.../security/SecurityConfiguration.java</div>
+            <pre><code>http.authorizeHttpRequests(config -> config
+     // ...
+     .requestMatchers(HttpMethod.PUT, Endpoints.ADMIN_PUT_ENDPOINTS).hasAnyAuthority("ROLE_ADMIN")
+     .requestMatchers(HttpMethod.PATCH, Endpoints.ADMIN_PUT_ENDPOINTS).hasAnyAuthority("ROLE_ADMIN")
+);</code></pre>
+            <div class="explanation">
+                <p><strong>Xác Thực Quyền Hạn:</strong> Dòng code này khóa cứng 2 phương pháp là <code>PUT</code> và <code>PATCH</code> (2 phương thức đại diện cho việc Sửa/Cập nhật dữ liệu), và chỉ cho phép những người nào mang thẻ <code>ROLE_ADMIN</code> trong Token của họ đi qua cổng này.</p>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
