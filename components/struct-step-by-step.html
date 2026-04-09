@@ -1,0 +1,1925 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Struct C — Học từng bước</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1a1a2e;
+  --ink2: #16213e;
+  --ink3: #0f3460;
+  --paper: #f5f0e8;
+  --paper2: #ede8dc;
+  --paper3: #e0d9cc;
+  --line: #c8bfae;
+  --accent: #e94560;
+  --accent2: #0f3460;
+  --green: #1a7a4a;
+  --green-bg: #d4edda;
+  --red: #c0392b;
+  --red-bg: #fde8e6;
+  --yellow: #b8860b;
+  --yellow-bg: #fef9e7;
+  --blue: #1565c0;
+  --blue-bg: #e3f2fd;
+  --code-bg: #1e1e2e;
+  --code-text: #cdd6f4;
+  --kw: #cba6f7;
+  --ty: #89b4fa;
+  --st: #a6e3a1;
+  --nm: #fab387;
+  --cm: #6c7086;
+  --fn: #89dceb;
+  --vr: #cdd6f4;
+  --mc: #f9e2af;
+  --op: #89dceb;
+  --radius: 6px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.12);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  background-image:
+    linear-gradient(rgba(200,191,174,0.4) 1px, transparent 1px);
+  background-size: 100% 32px;
+  background-position: 0 28px;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+  background: var(--ink);
+  color: #fff;
+  padding: 0 2rem;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.topbar-left { display: flex; align-items: center; gap: 16px; }
+.topbar-logo { font-weight: 600; font-size: 1rem; letter-spacing: -0.5px; }
+.topbar-logo span { color: var(--accent); }
+.topbar-sub { font-size: 0.72rem; color: #888; letter-spacing: 0.04em; }
+.topbar-right { display: flex; align-items: center; gap: 16px; font-size: 0.78rem; }
+.progress-pill {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 100px;
+  padding: 4px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+}
+.progress-fill {
+  width: 80px;
+  height: 3px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 100px;
+  overflow: hidden;
+}
+.progress-fill-inner {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 100px;
+  transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  width: 0%;
+}
+.step-counter { color: #aaa; font-size: 0.75rem; }
+
+/* ── STEP NAV ── */
+.step-nav {
+  background: var(--ink2);
+  border-bottom: 2px solid var(--accent);
+  padding: 0 2rem;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.step-nav::-webkit-scrollbar { display: none; }
+.step-dot {
+  padding: 10px 16px;
+  font-size: 0.72rem;
+  font-family: 'IBM Plex Mono', monospace;
+  color: #555;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  white-space: nowrap;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.step-dot:hover { color: #aaa; }
+.step-dot.active { color: #fff; border-bottom-color: var(--accent); }
+.step-dot.done { color: var(--st); }
+.step-dot .dot-num {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem; font-weight: 600;
+}
+.step-dot.done .dot-num { background: rgba(166,227,161,0.2); color: var(--st); }
+.step-dot.active .dot-num { background: var(--accent); color: #fff; }
+
+/* ── MAIN LAYOUT ── */
+.layout {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 6rem;
+}
+
+/* ── STEP PANEL ── */
+.step-panel { display: none; animation: fadeSlide 0.3s ease; }
+.step-panel.active { display: block; }
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── STEP HEADER ── */
+.step-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--line);
+}
+.step-num-big {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 3rem;
+  font-weight: 600;
+  color: var(--line);
+  line-height: 1;
+  flex-shrink: 0;
+  min-width: 56px;
+}
+.step-title h2 { font-size: 1.6rem; font-weight: 700; line-height: 1.2; margin-bottom: 6px; }
+.step-title p { color: #555; font-size: 0.93rem; line-height: 1.6; }
+
+/* ── LESSON CONTENT ── */
+.lesson p { font-size: 0.95rem; line-height: 1.8; color: #2a2a3a; margin-bottom: 1rem; }
+.lesson strong { color: var(--ink); }
+.lesson h3 { font-size: 1rem; font-weight: 700; margin: 1.5rem 0 0.6rem; color: var(--accent2); font-family: 'IBM Plex Mono', monospace; }
+.lesson h3::before { content: '// '; color: var(--cm); }
+.lesson ul { padding-left: 1.5rem; margin-bottom: 1rem; }
+.lesson li { font-size: 0.92rem; line-height: 1.8; color: #333; }
+.lesson li::marker { color: var(--accent); }
+
+/* ── NOTE BOX ── */
+.note {
+  border-left: 3px solid;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 0.85rem 1.1rem;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+.note.warn { border-color: var(--yellow); background: var(--yellow-bg); color: #7a5c00; }
+.note.info { border-color: var(--blue); background: var(--blue-bg); color: #0a3d6e; }
+.note.ok   { border-color: var(--green); background: var(--green-bg); color: #0d4a2a; }
+.note-label { font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+
+/* ── CODE BLOCK ── */
+.codeblock {
+  background: var(--code-bg);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin: 1rem 0;
+  box-shadow: var(--shadow);
+}
+.codeblock-bar {
+  background: #11111b;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.codeblock-bar .dots { display: flex; gap: 5px; }
+.codeblock-bar .dots span {
+  width: 10px; height: 10px; border-radius: 50%;
+}
+.d1 { background: #ff5f57; } .d2 { background: #febc2e; } .d3 { background: #28c840; }
+.codeblock-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: #555; }
+.copy-code-btn {
+  background: transparent; border: 1px solid #333; color: #666;
+  font-size: 0.7rem; padding: 2px 10px; border-radius: 4px; cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace; transition: all 0.2s;
+}
+.copy-code-btn:hover { border-color: #89b4fa; color: #89b4fa; }
+pre.code {
+  padding: 1.1rem 1.25rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.83rem;
+  line-height: 1.75;
+  overflow-x: auto;
+  color: var(--code-text);
+}
+.kw  { color: var(--kw); }
+.ty  { color: var(--ty); }
+.st  { color: var(--st); }
+.nm  { color: var(--nm); }
+.cm  { color: var(--cm); font-style: italic; }
+.fn  { color: var(--fn); }
+.vr  { color: var(--vr); }
+.mc  { color: var(--mc); }
+.hl  { background: rgba(249,226,175,0.12); display: block; margin: 0 -1.25rem; padding: 0 1.25rem; }
+.hl2 { background: rgba(137,220,235,0.08); display: block; margin: 0 -1.25rem; padding: 0 1.25rem; }
+
+/* OUTPUT */
+.output {
+  background: #0d0d1a;
+  border: 1px solid #222;
+  border-top: none;
+  border-radius: 0 0 var(--radius) var(--radius);
+  padding: 0.75rem 1.25rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+  color: #a6e3a1;
+}
+.out-label { font-size: 0.65rem; color: #555; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 5px; }
+
+/* MEMORY VISUAL */
+.mem-visual {
+  background: var(--code-bg);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin: 1rem 0;
+  overflow-x: auto;
+}
+.mem-struct-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  color: #666;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.mem-row { display: flex; gap: 2px; align-items: stretch; }
+.mem-cell {
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 3px;
+  text-align: center;
+  font-family: 'IBM Plex Mono', monospace;
+  padding: 8px 6px 6px;
+  min-width: 70px;
+  flex: 1;
+}
+.mem-cell .mf { font-size: 0.68rem; color: #666; margin-bottom: 3px; }
+.mem-cell .mv { font-size: 0.82rem; font-weight: 600; }
+.mem-cell .mb { font-size: 0.6rem; color: #444; margin-top: 3px; }
+.mc1 { background: rgba(137,180,250,0.1); } .mc1 .mv { color: var(--ty); }
+.mc2 { background: rgba(203,166,247,0.08); } .mc2 .mv { color: var(--kw); }
+.mc3 { background: rgba(250,179,135,0.1); } .mc3 .mv { color: var(--nm); }
+.mc4 { background: rgba(166,227,161,0.08); } .mc4 .mv { color: var(--st); }
+
+/* ── DIVIDER ── */
+.section-divider {
+  margin: 2rem 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--line);
+}
+.section-divider::before, .section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+/* ── QUIZ SECTION ── */
+.quiz-section {
+  background: white;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 2rem;
+  box-shadow: var(--shadow);
+}
+.quiz-section-header {
+  background: var(--ink);
+  color: white;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.quiz-section-header .qs-icon {
+  background: var(--accent);
+  width: 24px; height: 24px;
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem;
+}
+.quiz-section-header .qs-sub { color: #888; font-size: 0.7rem; margin-left: auto; }
+
+.quiz-inner { padding: 1.25rem 1.5rem; }
+
+.q-block { margin-bottom: 1.5rem; }
+.q-block:last-child { margin-bottom: 0; }
+
+.q-label {
+  font-size: 0.7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 6px;
+}
+.q-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.55;
+  margin-bottom: 10px;
+  color: var(--ink);
+}
+.q-text code {
+  font-family: 'IBM Plex Mono', monospace;
+  background: #f0ebe0;
+  border: 1px solid var(--line);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 0.87em;
+  color: var(--red);
+}
+.q-snippet { margin-bottom: 10px; }
+
+.opts { display: grid; gap: 7px; grid-template-columns: 1fr 1fr; }
+@media (max-width: 580px) { .opts { grid-template-columns: 1fr; } }
+
+.opt {
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius);
+  padding: 9px 12px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  background: #fafaf8;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: left;
+  font-family: 'IBM Plex Sans', sans-serif;
+  color: var(--ink);
+  line-height: 1.4;
+}
+.opt:hover:not(:disabled) { border-color: var(--ink3); background: #f0ebe0; }
+.opt-key {
+  width: 22px; height: 22px;
+  border-radius: 4px;
+  background: var(--paper3);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: #666;
+}
+.opt code {
+  font-family: 'IBM Plex Mono', monospace;
+  background: rgba(0,0,0,0.06);
+  padding: 1px 5px; border-radius: 3px;
+  font-size: 0.85em;
+  color: inherit;
+}
+.opt:disabled { cursor: default; }
+.opt.correct { background: var(--green-bg); border-color: var(--green); color: #0a3a20; }
+.opt.correct .opt-key { background: var(--green); color: white; }
+.opt.wrong   { background: var(--red-bg); border-color: var(--red); color: #5a0a0a; }
+.opt.wrong   .opt-key { background: var(--red); color: white; }
+
+.q-result {
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  display: none;
+}
+.q-result.show { display: block; }
+.q-result.ok  { background: var(--green-bg); border: 1px solid rgba(26,122,74,0.3); color: #0a3a20; }
+.q-result.bad { background: var(--red-bg); border: 1px solid rgba(192,57,43,0.3); color: #5a0a0a; }
+.q-result strong { font-weight: 700; }
+
+.q-separator { border: none; border-top: 1px dashed var(--line); margin: 1.25rem 0; }
+
+/* QUIZ DONE STATE */
+.quiz-done {
+  display: none;
+  background: #f9f5f0;
+  border-top: 1px solid var(--line);
+  padding: 1.1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.quiz-done-score { font-size: 1.4rem; font-weight: 700; font-family: 'IBM Plex Mono', monospace; }
+.quiz-done-msg { font-size: 0.87rem; color: #555; flex: 1; }
+.quiz-done.hidden { display: none !important; }
+
+/* ── CODE EXERCISE ── */
+.exercise-section {
+  background: white;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 1.5rem;
+  box-shadow: var(--shadow);
+}
+.exercise-header {
+  background: var(--ink2);
+  color: white;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.ex-header-left { display: flex; align-items: center; gap: 10px; }
+.ex-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-family: 'IBM Plex Mono', monospace;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 3px;
+  letter-spacing: 0.05em;
+}
+.ex-badge.easy   { background: rgba(166,227,161,0.2); color: #a6e3a1; border: 1px solid rgba(166,227,161,0.3); }
+.ex-badge.medium { background: rgba(249,226,175,0.2); color: #f9e2af; border: 1px solid rgba(249,226,175,0.3); }
+.ex-badge.hard   { background: rgba(243,139,168,0.2); color: #f38ba8; border: 1px solid rgba(243,139,168,0.3); }
+.ex-title { font-size: 0.9rem; font-weight: 600; }
+.ex-body { padding: 1.25rem 1.5rem; }
+.ex-desc { font-size: 0.9rem; line-height: 1.7; color: #333; margin-bottom: 1rem; }
+.ex-desc code {
+  font-family: 'IBM Plex Mono', monospace;
+  background: #f0ebe0;
+  border: 1px solid var(--line);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 0.87em;
+  color: var(--red);
+}
+.ex-req { background: var(--paper2); border-radius: var(--radius); padding: 0.75rem 1rem; margin-bottom: 1rem; font-size: 0.86rem; }
+.ex-req-label { font-weight: 700; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.05em; color: #888; margin-bottom: 6px; font-family: 'IBM Plex Mono', monospace; }
+.ex-req ul { padding-left: 1.2rem; }
+.ex-req li { color: #333; line-height: 1.8; }
+
+.editor-frame {
+  border: 1px solid #ddd;
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.editor-topbar {
+  background: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+  padding: 6px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.72rem;
+  color: #888;
+  font-family: 'IBM Plex Mono', monospace;
+}
+textarea.editor {
+  width: 100%;
+  background: #1e1e2e;
+  color: #cdd6f4;
+  border: none;
+  outline: none;
+  padding: 14px 16px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.82rem;
+  line-height: 1.75;
+  resize: vertical;
+  min-height: 180px;
+  tab-size: 4;
+}
+
+.ex-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+
+.btn {
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'IBM Plex Sans', sans-serif;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1.5px solid;
+}
+.btn-ghost { background: white; border-color: var(--line); color: #555; }
+.btn-ghost:hover { border-color: #888; color: var(--ink); }
+.btn-dark { background: var(--ink); border-color: var(--ink); color: white; }
+.btn-dark:hover { background: var(--ink3); border-color: var(--ink3); }
+.btn-green { background: white; border-color: var(--green); color: var(--green); }
+.btn-green:hover { background: var(--green-bg); }
+
+.hint-panel {
+  background: var(--yellow-bg);
+  border: 1px solid rgba(184,134,11,0.3);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  font-size: 0.87rem;
+  color: #5a3e00;
+  margin-top: 8px;
+  display: none;
+  line-height: 1.7;
+}
+.hint-panel.show { display: block; }
+.hint-panel code {
+  font-family: 'IBM Plex Mono', monospace;
+  background: rgba(0,0,0,0.08);
+  padding: 1px 5px; border-radius: 3px;
+  font-size: 0.88em;
+}
+.solution-panel { margin-top: 8px; display: none; }
+.solution-panel.show { display: block; }
+
+/* ── NEXT STEP BUTTON ── */
+.next-wrap {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+}
+.btn-next {
+  background: var(--accent);
+  border: none;
+  color: white;
+  padding: 11px 28px;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'IBM Plex Sans', sans-serif;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 3px 10px rgba(233,69,96,0.35);
+}
+.btn-next:hover { background: #c73352; transform: translateY(-1px); box-shadow: 0 5px 16px rgba(233,69,96,0.4); }
+.btn-next:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; transform: none; }
+.btn-prev {
+  background: transparent;
+  border: 1.5px solid var(--line);
+  color: #888;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  cursor: pointer;
+  font-family: 'IBM Plex Sans', sans-serif;
+  transition: all 0.15s;
+}
+.btn-prev:hover { border-color: #888; color: var(--ink); }
+
+/* FINISH SCREEN */
+.finish-screen {
+  display: none;
+  text-align: center;
+  padding: 4rem 2rem;
+}
+.finish-screen.show { display: block; }
+.finish-big { font-size: 4rem; margin-bottom: 1rem; }
+.finish-title { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+.finish-sub { color: #666; font-size: 1rem; margin-bottom: 2rem; }
+.finish-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  max-width: 500px;
+  margin: 0 auto 2rem;
+}
+.fstat {
+  background: white;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  padding: 1rem;
+}
+.fstat-val { font-size: 2rem; font-weight: 700; font-family: 'IBM Plex Mono', monospace; color: var(--accent); }
+.fstat-label { font-size: 0.78rem; color: #888; margin-top: 4px; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  .topbar { padding: 0 1rem; }
+  .topbar-sub, .step-counter { display: none; }
+  .layout { padding: 1.5rem 1rem 5rem; }
+  .step-num-big { font-size: 2rem; min-width: 40px; }
+  .step-title h2 { font-size: 1.25rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">struct<span>.c</span></div>
+    <div class="topbar-sub">Học từng bước · 6 bước</div>
+  </div>
+  <div class="topbar-right">
+    <span class="step-counter" id="step-counter">Bước 1 / 6</span>
+    <div class="progress-pill">
+      <div class="progress-fill"><div class="progress-fill-inner" id="prog-bar"></div></div>
+      <span id="prog-pct">0%</span>
+    </div>
+  </div>
+</div>
+
+<div class="step-nav" id="step-nav">
+  <div class="step-dot active" onclick="goStep(0)" id="snav-0"><span class="dot-num">1</span>Struct là gì?</div>
+  <div class="step-dot" onclick="goStep(1)" id="snav-1"><span class="dot-num">2</span>Cú pháp & typedef</div>
+  <div class="step-dot" onclick="goStep(2)" id="snav-2"><span class="dot-num">3</span>Truy cập thành viên</div>
+  <div class="step-dot" onclick="goStep(3)" id="snav-3"><span class="dot-num">4</span>Con trỏ & Mũi tên</div>
+  <div class="step-dot" onclick="goStep(4)" id="snav-4"><span class="dot-num">5</span>Struct lồng nhau</div>
+  <div class="step-dot" onclick="goStep(5)" id="snav-5"><span class="dot-num">6</span>Struct + Hàm</div>
+</div>
+
+<div class="layout">
+
+<!-- ═══════════════════════════════════════════════════════
+     BƯỚC 1 — Struct là gì?
+═══════════════════════════════════════════════════════ -->
+<div class="step-panel active" id="step-0">
+  <div class="step-header">
+    <div class="step-num-big">01</div>
+    <div class="step-title">
+      <h2>Struct là gì và tại sao cần nó?</h2>
+      <p>Hiểu vấn đề trước khi học giải pháp — đây là cách tư duy của lập trình viên giỏi.</p>
+    </div>
+  </div>
+
+  <div class="lesson">
+    <p>Giả sử bạn cần lưu thông tin một sinh viên: tên, tuổi, điểm trung bình. Cách đơn giản nhất:</p>
+
+    <div class="codeblock">
+      <div class="codeblock-bar"><div class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="codeblock-label">problem.c</span><button class="copy-code-btn" onclick="cp(this)">copy</button></div>
+      <pre class="code"><span class="ty">char</span>  <span class="vr">ten</span>[<span class="nm">50</span>];
+<span class="ty">int</span>   <span class="vr">tuoi</span>;
+<span class="ty">float</span> <span class="vr">diem</span>;
+</pre>
+    </div>
+
+    <p>Ổn cho 1 sinh viên. Nhưng nếu cần <strong>100 sinh viên</strong>?</p>
+
+    <div class="codeblock">
+      <div class="codeblock-bar"><div class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="codeblock-label">nightmare.c</span><button class="copy-code-btn" onclick="cp(this)">copy</button></div>
+      <pre class="code"><span class="ty">char</span>  <span class="vr">ten1</span>[<span class="nm">50</span>], <span class="vr">ten2</span>[<span class="nm">50</span>], <span class="vr">ten3</span>[<span class="nm">50</span>]; <span class="cm">// ... đến ten100</span>
+<span class="ty">int</span>   <span class="vr">tuoi1</span>, <span class="vr">tuoi2</span>, <span class="vr">tuoi3</span>;         <span class="cm">// ... đến tuoi100</span>
+<span class="ty">float</span> <span class="vr">diem1</span>, <span class="vr">diem2</span>, <span class="vr">diem3</span>;         <span class="cm">// ... đến diem100</span>
+<span class="cm">// 300 biến rời rạc — không thể bảo trì được!</span></pre>
+    </div>
+
+    <div class="note warn">
+      <div class="note-label">⚠ Vấn đề thực</div>
+      Các biến rời rạc không có "quan hệ" với nhau trong mắt trình biên dịch. Bạn có thể dễ dàng truyền nhầm <code style="background:#fff8e1;padding:1px 4px;border-radius:3px">tuoi2</code> trong khi muốn dùng <code style="background:#fff8e1;padding:1px 4px;border-radius:3px">tuoi1</code>.
+    </div>
+
+    <h3>Giải pháp: struct</h3>
+    <p><strong>Struct</strong> (structure) cho phép bạn gom nhiều biến liên quan thành một kiểu dữ liệu mới. Trình biên dịch sẽ cấp phát chúng liền kề trong bộ nhớ:</p>
+
+    <div class="codeblock">
+      <div class="codeblock-bar"><div class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="codeblock-label">solution.c</span><button class="copy-code-btn" onclick="cp(this)">copy</button></div>
+      <pre class="code"><span class="kw">struct</span> <span class="ty">SinhVien</span> {
+    <span class="ty">char</span>  <span class="vr">ten</span>[<span class="nm">50</span>];   <span class="cm">// trường (field / member)</span>
+    <span class="ty">int</span>   <span class="vr">tuoi</span>;
+    <span class="ty">float</span> <span class="vr">diem</span>;
+};  <span class="cm">// ← dấu ; BẮT BUỘC sau dấu }</span>
+
+<span class="kw">struct</span> <span class="ty">SinhVien</span> <span class="vr">sv1</span>, <span class="vr">sv2</span>, <span class="vr">sv3</span>;  <span class="cm">// 3 sinh viên độc lập</span>
+<span class="kw">struct</span> <span class="ty">SinhVien</span> <span class="vr">lop</span>[<span class="nm">100</span>];         <span class="cm">// mảng 100 sinh viên!</span></pre>
+    </div>
+
+    <h3>Bộ nhớ trông như thế nào?</h3>
+    <p>Các trường được lưu <strong>liền kề nhau</strong> trong bộ nhớ (có thể có padding giữa các trường):</p>
+
+    <div class="mem-visual">
+      <div class="mem-struct-label">struct SinhVien sv = {"Le An", 20, 8.5f}</div>
+      <div class="mem-row">
+        <div class="mem-cell mc1" style="flex:5">
+          <div class="mf">ten [char×50]</div>
+          <div class="mv">"Le An"</div>
+          <div class="mb">offset 0 · 50 bytes</div>
+        </div>
+        <div class="mem-cell mc2" style="flex:1.2">
+          <div class="mf">tuoi [int]</div>
+          <div class="mv">20</div>
+          <div class="mb">offset 52 · 4 bytes</div>
+        </div>
+        <div class="mem-cell mc3" style="flex:1.2">
+          <div class="mf">diem [float]</div>
+          <div class="mv">8.5</div>
+          <div class="mb">offset 56 · 4 bytes</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note info">
+      <div class="note-label">ℹ Struct vs Array</div>
+      Array lưu nhiều phần tử <strong>cùng kiểu</strong>. Struct lưu nhiều phần tử <strong>khác kiểu</strong> có liên quan với nhau. Đây là sự khác biệt cốt lõi.
+    </div>
+  </div>
+
+  <div class="section-divider">KIỂM TRA NHANH — BƯỚC 1</div>
+
+  <!-- QUIZ 1 -->
+  <div class="quiz-section">
+    <div class="quiz-section-header">
+      <div class="qs-icon">?</div>
+      <span>Trắc nghiệm — 2 câu gây nhầm</span>
+      <span class="qs-sub" id="q1-score">0/2 đúng</span>
+    </div>
+    <div class="quiz-inner">
+
+      <div class="q-block" id="q1a">
+        <div class="q-label">Câu 1.1 — Phân biệt khái niệm</div>
+        <div class="q-text">Đoạn code sau có <strong>bao nhiêu lỗi cú pháp</strong>?<br><small style="color:#888;font-weight:400">Đọc kỹ từng ký tự trước khi chọn.</small></div>
+        <div class="q-snippet">
+          <div class="codeblock"><div class="codeblock-bar"><div class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="codeblock-label">guess.c</span></div>
+          <pre class="code"><span class="kw">struct</span> <span class="ty">Diem</span> {
+    <span class="ty">int</span> <span class="vr">x</span>;
+    <span class="ty">int</span> <span class="vr">y</span>;
+}</pre></div>
+        </div>
+        <div class="opts">
+          <button class="opt" onclick="ans(this,'wrong','q1a','correct-a','q1-score',2)"><span class="opt-key">A</span> 0 lỗi — hoàn toàn đúng</button>
+          <button class="opt" onclick="ans(this,'correct','q1a','correct-a','q1-score',2)"><span class="opt-key">B</span> 1 lỗi — thiếu <code>;</code> sau <code>}</code></button>
+          <button class="opt" onclick="ans(this,'wrong','q1a','correct-a','q1-score',2)"><span class="opt-key">C</span> 2 lỗi — thiếu <code>;</code> và cần <code>typedef</code></button>
+          <button class="opt" onclick="ans(this,'wrong','q1a','correct-a','q1-score',2)"><span class="opt-key">D</span> Lỗi tên: tên struct phải viết thường</button>
+        </div>
+        <div class="q-result" id="res-q1a"></div>
+      </div>
+
+      <hr class="q-separator">
+
+      <div class="q-block" id="q1b">
+        <div class="q-label">Câu 1.2 — Điểm khác nhau cốt lõi</div>
+        <div class="q-text">Điều nào <strong>ĐÚNG</strong> khi so sánh <code>struct</code> với <code>array</code> trong C?</div>
+        <div class="opts">
+          <button class="opt" onclick="ans(this,'wrong','q1b','correct-b','q1-score',2)"><span class="opt-key">A</span> Struct và array đều lưu nhiều phần tử <strong>cùng kiểu</strong></button>
+          <button class="opt" onclick="ans(this,'wrong','q1b','correct-b','q1-score',2)"><span class="opt-key">B</span> Array có thể chứa nhiều kiểu dữ liệu khác nhau, struct thì không</button>
+          <button class="opt" onclick="ans(this,'correct','q1b','correct-b','q1-score',2)"><span class="opt-key">C</span> Struct có thể chứa các trường <strong>khác kiểu</strong>, array chỉ chứa các phần tử <strong>cùng kiểu</strong></button>
+          <button class="opt" onclick="ans(this,'wrong','q1b','correct-b','q1-score',2)"><span class="opt-key">D</span> Struct lưu không liên tục trong bộ nhớ, array lưu liên tục</button>
+        </div>
+        <div class="q-result" id="res-q1b"></div>
+      </div>
+
+    </div>
+    <div class="quiz-done hidden" id="qd-0">
+      <div class="quiz-done-score" id="qdval-0">—</div>
+      <div class="quiz-done-msg" id="qdmsg-0"></div>
+    </div>
+  </div>
+
+  <!-- EXERCISE 1 -->
+  <div class="exercise-section">
+    <div class="exercise-header">
+      <div class="ex-header-left"><span class="ex-badge easy">easy</span><span class="ex-title">Bài tập — Khai báo struct đầu tiên</span></div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-desc">Viết struct <code>ToaDo</code> biểu diễn một điểm trong không gian 2D với tọa độ x, y kiểu <code>float</code>. Sau đó khai báo 2 điểm và in khoảng cách giữa chúng.</div>
+      <div class="ex-req"><div class="ex-req-label">Yêu cầu</div><ul><li>Struct có 2 trường: <code>x</code> và <code>y</code> kiểu float</li><li>Dùng <code>sqrt()</code> từ <code>math.h</code> để tính khoảng cách</li><li>In ra: <code>Khoang cach: 5.00</code></li></ul></div>
+      <div class="editor-frame">
+        <div class="editor-topbar"><span>main.c</span><span>Tab = 4 spaces</span></div>
+        <textarea class="editor" spellcheck="false">#include <stdio.h>
+#include <math.h>
+
+// TODO: định nghĩa struct ToaDo
+
+int main() {
+    // TODO: khai báo 2 điểm A(0,0) và B(3,4)
+    
+    // TODO: tính và in khoảng cách
+    // Gợi ý: khoang_cach = sqrt((x2-x1)^2 + (y2-y1)^2)
+    
+    return 0;
+}</textarea>
+      </div>
+      <div class="ex-actions">
+        <button class="btn btn-ghost" onclick="toggleHint(this,'hint-ex1')">💡 Gợi ý</button>
+        <button class="btn btn-green" onclick="toggleSol(this,'sol-ex1')">📋 Xem đáp án</button>
+      </div>
+      <div class="hint-panel" id="hint-ex1">
+        Dùng <code>struct ToaDo { float x; float y; };</code> — nhớ dấu <code>;</code> ở cuối!<br>
+        Khoảng cách AB: <code>sqrt((b.x-a.x)*(b.x-a.x) + (b.y-a.y)*(b.y-a.y))</code>. Compile với <code>gcc main.c -lm</code> (cần <code>-lm</code> để link thư viện math).
+      </div>
+      <div class="solution-panel" id="sol-ex1">
+        <div class="codeblock"><div class="codeblock-bar"><div class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="codeblock-label">đáp án</span><button class="copy-code-btn" onclick="cp(this)">copy</button></div>
+        <pre class="code"><span class="mc">#include &lt;stdio.h&gt;</span>
+<span class="mc">#include &lt;math.h&gt;</span>
+
+<span class="kw">struct</span> <span class="ty">ToaDo</span> {
+    <span class="ty">float</span> <span class="vr">x</span>;
+    <span class="ty">float</span> <span class="vr">y</span>;
+};
+
+<span class="ty">int</span> <span class="fn">main</span>() {
+    <span class="kw">struct</span> <span class="ty">ToaDo</span> <span class="vr">a</span> = {<span class="nm">0</span>, <span class="nm">0</span>};
+    <span class="kw">struct</span> <span class="ty">ToaDo</span> <span class="vr">b</span> = {<span class="nm">3</span>, <span class="nm">4</span>};
+
+    <span class="ty">float</span> <span class="vr">dx</span> = <span class="vr">b</span>.<span class="vr">x</span> - <span class="vr">a</span>.<span class="vr">x</span>;
+    <span class="ty">float</span> <span class="vr">dy</span> = <span class="vr">b</span>.<span class="vr">y</span> - <span class="vr">a</span>.<span class="vr">y</span>;
+    <span class="ty">float</span> <span class="vr">d</span>  = <span class="fn">sqrt</span>(<span class="vr">dx</span>*<span class="vr">dx</span> + <span class="vr">dy</span>*<span class="vr">dy</span>);
+
+    <span class="fn">printf</span>(<span class="st">"Khoang cach: %.2f\n"</span>, <span class="vr">d</span>);
+    <span class="kw">return</span> <span class="nm">0</span>;
+}</pre></div>
+        <div class="output"><div class="out-label">output</div>Khoang cach: 5.00</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="next-wrap">
+    <button class="btn-prev" onclick="goStep(null,-1)" disabled>← Trước</button>
+    <button class="btn-next" onclick="goStep(1)">Bước 2: Cú pháp & typedef →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     BƯỚC 2 — Cú pháp & typedef
+═══════════════════════════════════════════════════════ -->
+<div class="step-panel" id="step-1">
+  <div class="step-header">
+    <div class="step-num-big">02</div>
+    <div class="step-title">
+      <h2>Cú pháp đầy đủ và typedef</h2>
+      <p>Nắm vững các cách khai báo — kể cả cái bẫy hay nhầm nhất.</p>
+    </div>
+  </div>
+
+  <div class="lesson">
+    <h3>Cách 1 — Struct thông thường</h3>
+    <div class="codeblock"><div class="codeblock-bar"><div class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="codeblock-label">way1.c</span><button class="copy-code-btn" onclick="cp(this)">copy</button></div>
+    <pre class="code"><span class="kw">struct</span> <span class="ty">NhanVien</span> {
+    <span class="ty">char</span>  <span class="vr">ten</span>[<span class="nm">50</span>];
+    <span class="ty">int</span>   <span class="vr">tuoi</span>;
+    <span class="ty">float</span> <span class="vr">luong</span>;
+};
+
+<span class="cm">// Khai báo biến: phải viết từ khóa "struct" mỗi lần</span>
+<span class="kw">struct</span> <span class="ty">NhanVien</span> <span class="vr">nv1</span>;
+<span class="kw">struct</span> <span class="ty">NhanVien</span> <span class="vr">nv2</span>, <span class="vr">nv3</span>;</pre></div>
+
+    <h3>Cách 2 — typedef: đặt bí danh</h3>
+    <p><code style="background:#f0ebe0;border:1px solid #c8bfae;padding:1px 6px;border-radius:3px;font-family:'IBM Plex Mono',monospace">typedef</code> tạo một tên mới (alias) cho kiểu dữ liệu. Sau đó bạn không cần viết <code style="background:#f0ebe0;border:1px solid #c8bfae;padding:1px 6px;border-radius:3px;font-family:'IBM Plex Mono',monospace">struct</code> mỗi lần khai báo:</p>
+
+    <div class="codeblock"><div class="codeblock-bar"><div class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="codeblock-label">way2.c</span><button class="copy-code-btn" onclick="cp(this)">copy</button></div>
+    <pre class="code"><span class="kw">typedef struct</span> {          <span class="cm">// không cần tên sau "struct"</span>
+    <span class="ty">char</span>  <span class="vr">ten</span>[<span class="nm">50</span>];
+    <span class="ty">int</span>   <span class="vr">tuoi</span>;
+    <span class="ty">float</span> <span class="vr">luong</span>;
+} <span class="ty">NhanVien</span>;               <span class="cm">// ← tên alias đặt Ở ĐÂY</span>
+
+<span class="cm">// Khai báo biến: ngắn gọn hơn</span>
+<span class="ty">NhanVien</span> <span class="vr">nv1</span>;
+<span class="ty">NhanVien</span> <span class="vr">nv2</span>, <span class="vr">nv3</span>;</pre></div>
+
+    <h3>Cách 3 — typedef với tên struct (dùng khi struct tự tham chiếu)</h3>
+    <div class="codeblock"><div class="codeblock-bar"><div class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="codeblock-label">way3.c</span><button class="copy-code-btn" onclick="cp(this)">copy</button></div>
+    <pre class="code"><span class="kw">typedef struct</span> <span class="ty">Node</span> {    <span class="cm">// có tên sau "struct"</span>
+    <span class="ty">int</span>          <span class="vr">data</span>;
+    <span class="kw">struct</span> <span class="ty">Node</span> *<span class="vr">next</span>; <span class="cm">// ← cần tên struct để tự tham chiếu</span>
+} <span class="ty">Node</span>;
+
+<span class="ty">Node</span> *<span class="vr">head</span> = <span class="nm">NULL</span>;  <span class="cm">// linked list!</span></pre></div>
+
+    <h3>Khởi tạo struct — 3 cách</h3>
+    <div class="codeblock"><div class="codeblock-bar"><div class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="codeblock-label">init.c</span><button class="copy-code-btn" onclick="cp(this)">copy</button></div>
+    <pre class="code"><span class="ty">NhanVien</span> <span class="vr">a</span>;                          <span class="cm">// cách 1: chưa khởi tạo (rác)</span>
+<span class="fn">strcpy</span>(<span class="vr">a</span>.<span class="vr">ten</span>, <span class="st">"Nguyen A"</span>); <span class="vr">a</span>.<span class="vr">tuoi</span> = <span class="nm">25</span>; <span class="vr">a</span>.<span class="vr">luong</span> = <span class="nm">10e6</span>;
+
+<span class="ty">NhanVien</span> <span class="vr">b</span> = {<span class="st">"Tran B"</span>, <span class="nm">30</span>, <span class="nm">15e6</span>};    <span class="cm">// cách 2: theo thứ tự</span>
+
+<span class="ty">NhanVien</span> <span class="vr">c</span> = {                         <span class="cm">// cách 3: designated (C99)</span>
+    .<span class="vr">luong</span> = <span class="nm">12e6</span>,   <span class="cm">// thứ tự tùy ý!</span>
+    .<span class="vr">ten</span>   = <span class="st">"Le C"</span>,
+    .<span class="vr">tuoi</span>  = <span class="nm">28</span>
+};</pre></div>
+
+    <div class="note warn">
+      <div class="note-label">⚠ Bẫy phổ biến nhất</div>
+      Cách 2 (theo thứ tự) rất nguy hiểm: nếu bạn thêm/đổi thứ tự trường trong struct, tất cả code khởi tạo theo thứ tự sẽ <strong>sai im lặng</strong> — không có lỗi compiler! Cách 3 (designated) an toàn hơn nhiều trong dự án lớn.
+    </div>
+  </div>
+
+  <div class="section-divider">KIỂM TRA NHANH — BƯỚC 2</div>
+
+  <div class="quiz-section">
+    <div class="quiz-section-header">
+      <div class="qs-icon">?</div>
+      <span>Trắc nghiệm — 3 câu</span>
+      <span class="qs-sub" id="q2-score">0/3 đúng</span>
+    </div>
+    <div class="quiz-inner">
+
+      <div class="q-block" id="q2a">
+        <div class="q-label">Câu 2.1 — typedef</div>
+        <div class="q-text">Sau khai báo <code>typedef struct { int x; } Point;</code>, cách nào <strong>ĐÚNG</strong> để khai báo biến?</div>
+        <div class="opts">
+          <button class="opt" onclick="ans(this,'wrong','q2a','x','q2-score',3)"><span class="opt-key">A</span> <code>struct Point p;</code></button>
+          <button class="opt" onclick="ans(this,'correct','q2a','x','q2-score',3)"><span class="opt-key">B</span> <code>Point p;</code></button>
+          <button class="opt" onclick="ans(this,'wrong','q2a','x','q2-score',3)"><span class="opt-key">C</span> <code>typedef Point p;</code></button>
+          <button class="opt" onclick="ans(this,'wrong','q2a','x','q2-score',3)"><span class="opt-key">D</span> Cả A và B đều đúng</button>
+        </div>
+        <div class="q-result" id="res-q2a"></div>
+      </div>
+
+      <hr class="q-separator">
+
+      <div class="q-block" id="q2b">
+        <div class="q-label">Câu 2.2 — Khởi tạo theo thứ tự (bẫy nguy hiểm!)</div>
+        <div class="q-text">Cho struct <code>typedef struct { int tuoi; char ten[20]; float diem; } SV;</code>. Đoạn code nào khởi tạo <strong>đúng theo thứ tự</strong> trường trong struct?</div>
+        <div class="opts">
+          <button class="opt" onclick="ans(this,'wrong','q2b','x','q2-score',3)"><span class="opt-key">A</span> <code>SV s = {"An", 20, 8.5};</code></button>
+          <button class="opt" onclick="ans(this,'correct','q2b','x','q2-score',3)"><span class="opt-key">B</span> <code>SV s = {20, "An", 8.5};</code></button>
+          <button class="opt" onclick="ans(this,'wrong','q2b','x','q2-score',3)"><span class="opt-key">C</span> <code>SV s = {8.5, "An", 20};</code></button>
+          <button class="opt" onclick="ans(this,'wrong','q2b','x','q2-score',3)"><span class="opt-key">D</span> <code>SV s = {20, 8.5, "An"};</code></button>
+        </div>
+        <div class="q-result" id="res-q2b"></div>
+      </div>
+
+      <hr class="q-separator">
+
+      <div class="q-block" id="q2c">
+        <div class="q-label">Câu 2.3 — Khi nào cần tên sau struct trong typedef?</div>
+        <div class="q-text">Tại sao đoạn code này <strong>bắt buộc</strong> phải có tên <code>Node</code> sau từ khóa <code>struct</code>?
+        <div style="margin-top:6px"><code>typedef struct Node { int v; struct Node *next; } Node;</code></div></div>
+        <div class="opts">
+          <button class="opt" onclick="ans(this,'wrong','q2c','x','q2-score',3)"><span class="opt-key">A</span> Vì quy tắc bắt buộc của C99</button>
+          <button class="opt" onclick="ans(this,'wrong','q2c','x','q2-score',3)"><span class="opt-key">B</span> Để compiler tính được sizeof</button>
+          <button class="opt" onclick="ans(this,'correct','q2c','x','q2-score',3)"><span class="opt-key">C</span> Vì bên trong struct cần dùng <code>struct Node *next</code> — alias <code>Node</code> chưa tồn tại tại thời điểm đó</button>
+          <button class="opt" onclick="ans(this,'wrong','q2c','x','q2-score',3)"><span class="opt-key">D</span> Để tránh trùng tên với typedef</button>
+        </div>
+        <div class="q-result" id="res-q2c"></div>
+      </div>
+
+    </div>
+    <div class="quiz-done hidden" id="qd-1">
+      <div class="quiz-done-score" id="qdval-1">—</div>
+      <div class="quiz-done-msg" id="qdmsg-1"></div>
+    </div>
+  </div>
+
+  <div class="exercise-section">
+    <div class="exercise-header">
+      <div class="ex-header-left"><span class="ex-badge easy">easy</span><span class="ex-title">Bài tập — typedef và khởi tạo</span></div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-desc">Viết lại struct <code>SanPham</code> bằng <code>typedef</code> với các trường: <code>ten</code> (char[40]), <code>gia</code> (float), <code>soLuong</code> (int). Khởi tạo 3 sản phẩm bằng <strong>designated initializer</strong> rồi in ra.</div>
+      <div class="editor-frame">
+        <div class="editor-topbar"><span>main.c</span><span>dùng designated init: .ten = "..."</span></div>
+        <textarea class="editor" spellcheck="false">#include <stdio.h>
+#include <string.h>
+
+// TODO: typedef struct SanPham
+
+int main() {
+    // TODO: khởi tạo 3 sản phẩm bằng designated initializer
+    // SanPham sp1 = { .ten = "...", .gia = ..., .soLuong = ... };
+    
+    // TODO: in ra dạng: "Laptop | 15000000 VND | 5 cai"
+    
+    return 0;
+}</textarea>
+      </div>
+      <div class="ex-actions">
+        <button class="btn btn-ghost" onclick="toggleHint(this,'hint-ex2')">💡 Gợi ý</button>
+        <button class="btn btn-green" onclick="toggleSol(this,'sol-ex2')">📋 Xem đáp án</button>
+      </div>
+      <div class="hint-panel" id="hint-ex2">
+        <code>typedef struct { char ten[40]; float gia; int soLuong; } SanPham;</code><br>
+        Designated: <code>SanPham sp = { .ten = "X", .gia = 100, .soLuong = 5 };</code><br>
+        Vì <code>ten</code> là array, dùng <code>= "..."</code> trực tiếp trong initializer (không dùng strcpy ở đây).
+      </div>
+      <div class="solution-panel" id="sol-ex2">
+        <div class="codeblock"><div class="codeblock-bar"><div class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="codeblock-label">đáp án</span><button class="copy-code-btn" onclick="cp(this)">copy</button></div>
+        <pre class="code"><span class="mc">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">typedef struct</span> {
+    <span class="ty">char</span>  <span class="vr">ten</span>[<span class="nm">40</span>];
+    <span class="ty">float</span> <span class="vr">gia</span>;
+    <span class="ty">int</span>   <span class="vr">soLuong</span>;
+} <span class="ty">SanPham</span>;
+
+<span class="ty">int</span> <span class="fn">main</span>() {
+    <span class="ty">SanPham</span> <span class="vr">sp</span>[<span class="nm">3</span>] = {
+        { .<span class="vr">ten</span>="Laptop",   .<span class="vr">gia</span>=<span class="nm">15000000</span>, .<span class="vr">soLuong</span>=<span class="nm">5</span>  },
+        { .<span class="vr">ten</span>="Chuot",    .<span class="vr">gia</span>=<span class="nm">250000</span>,   .<span class="vr">soLuong</span>=<span class="nm">20</span> },
+        { .<span class="vr">ten</span>="Ban_phim", .<span class="vr">gia</span>=<span class="nm">500000</span>,   .<span class="vr">soLuong</span>=<span class="nm">15</span> },
+    };
+    <span class="kw">for</span> (<span class="ty">int</span> <span class="vr">i</span>=<span class="nm">0</span>; <span class="vr">i</span>&lt;<span class="nm">3</span>; <span class="vr">i</span>++)
+        <span class="fn">printf</span>(<span class="st">"%s | %.0f VND | %d cai\n"</span>,
+               <span class="vr">sp</span>[<span class="vr">i</span>].<span class="vr">ten</span>, <span class="vr">sp</span>[<span class="vr">i</span>].<span class="vr">gia</span>, <span class="vr">sp</span>[<span class="vr">i</span>].<span class="vr">soLuong</span>);
+    <span class="kw">return</span> <span class="nm">0</span>;
+}</pre></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="next-wrap">
+    <button class="btn-prev" onclick="goStep(0)">← Trước</button>
+    <button class="btn-next" onclick="goStep(2)">Bước 3: Truy cập thành viên →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     BƯỚC 3 — Truy cập thành viên
+═══════════════════════════════════════════════════════ -->
+<div class="step-panel" id="step-2">
+  <div class="step-header">
+    <div class="step-num-big">03</div>
+    <div class="step-title">
+      <h2>Truy cập & gán thành viên</h2>
+      <p>Toán tử <code style="background:#f0ebe0;border:1px solid #c8bfae;padding:1px 6px;border-radius:3px;font-family:monospace">.</code> và những điều không ai nói với bạn.</p>
+    </div>
+  </div>
+
+  <div class="lesson">
+    <p>Để đọc hoặc ghi trường của struct, dùng toán tử chấm <code style="background:#f0ebe0;border:1px solid #c8bfae;padding:1px 6px;border-radius:3px;font-family:monospace">.</code>:</p>
+    <div class="codeblock"><div class="codeblock-bar"><div class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="codeblock-label">access.c</span><button class="copy-code-btn" onclick="cp(this)">copy</button></div>
+    <pre class="code"><span class="ty">NhanVien</span> <span class="vr">nv</span>;
+<span class="fn">strcpy</span>(<span class="vr">nv</span>.<span class="vr">ten</span>, <span class="st">"Nguyen Van A"</span>);  <span class="cm">// gán chuỗi</span>
+<span class="vr">nv</span>.<span class="vr">tuoi</span>  = <span class="nm">28</span>;                    <span class="cm">// gán số</span>
+<span class="vr">nv</span>.<span class="vr">luong</span> = <span class="nm">15000000.0f</span>;
+
+<span class="fn">printf</span>(<span class="st">"%s - %d - %.0f\n"</span>, <span class="vr">nv</span>.<span class="vr">ten</span>, <span class="vr">nv</span>.<span class="vr">tuoi</span>, <span class="vr">nv</span>.<span class="vr">luong</span>);</pre></div>
+
+    <h3>Gán struct cho nhau — hoạt động như bạn nghĩ</h3>
+    <div class="codeblock"><div class="codeblock-bar"><div class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="codeblock-label">copy.c</span><button class="copy-code-btn" onclick="cp(this)">copy</button></div>
+    <pre class="code"><span class="ty">NhanVien</span> <span class="vr">nv1</span> = {<span class="st">"Tran B"</span>, <span class="nm">30</span>, <span class="nm">20e6</span>};
+<span class="ty">NhanVien</span> <span class="vr">nv2</span> = <span class="vr">nv1</span>;   <span class="cm">// COPY TOÀN BỘ — hợp lệ trong C!</span>
+
+<span class="vr">nv2</span>.<span class="vr">tuoi</span> = <span class="nm">35</span>;        <span class="cm">// nv1.tuoi vẫn là 30</span>
+<span class="cm">// Khác mảng: arr2 = arr1 bị LỖI, nhưng struct thì ổn!</span></pre></div>
+
+    <div class="note info">
+      <div class="note-label">ℹ Khác với array!</div>
+      Bạn <strong>không thể</strong> gán mảng như <code style="background:#e3f2fd;padding:1px 5px;border-radius:3px;font-family:monospace">arr2 = arr1</code>, nhưng <strong>có thể</strong> gán struct <code style="background:#e3f2fd;padding:1px 5px;border-radius:3px;font-family:monospace">sv2 = sv1</code>. Tuy nhiên nếu struct chứa con trỏ thì chỉ copy địa chỉ (shallow copy) — cẩn thận với trường hợp này!
+    </div>
+
+    <h3>Chuỗi trong struct — bẫy quan trọng</h3>
+    <div class="codeblock"><div class="codeblock-bar"><div class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="codeblock-label">string_trap.c</span><button class="copy-code-btn" onclick="cp(this)">copy</button></div>
+    <pre class="code"><span class="ty">NhanVien</span> <span class="vr">nv</span>;
+
+<span class="cm">// ❌ SAI — không gán chuỗi trực tiếp sau khởi tạo</span>
+<span class="vr">nv</span>.<span class="vr">ten</span> = <span class="st">"Nguyen A"</span>;   <span class="cm">// LỖI: array không thể gán như vậy</span>
+
+<span class="cm">// ✓ ĐÚNG — dùng strcpy</span>
+<span class="fn">strcpy</span>(<span class="vr">nv</span>.<span class="vr">ten</span>, <span class="st">"Nguyen A"</span>);
+
+<span class="cm">// ✓ ĐÚNG — khi khởi tạo trực tiếp thì được</span>
+<span class="ty">NhanVien</span> <span class="vr">nv2</span> = {<span class="st">"Nguyen A"</span>, <span class="nm">25</span>, <span class="nm">10e6</span>};  <span class="cm">// OK!</span></pre></div>
+  </div>
+
+  <div class="section-divider">KIỂM TRA NHANH — BƯỚC 3</div>
+
+  <div class="quiz-section">
+    <div class="quiz-section-header">
+      <div class="qs-icon">?</div>
+      <span>Trắc nghiệm — 2 câu</span>
+      <span class="qs-sub" id="q3-score">0/2 đúng</span>
+    </div>
+    <div class="quiz-inner">
+
+      <div class="q-block" id="q3a">
+        <div class="q-label">Câu 3.1 — Bẫy chuỗi</div>
+        <div class="q-text">Sau khi khai báo <code>typedef struct { char ten[20]; int tuoi; } SV; SV s;</code>, dòng nào <strong>HỢP LỆ</strong>?</div>
+        <div class="opts">
+          <button class="opt" onclick="ans(this,'wrong','q3a','x','q3-score',2)"><span class="opt-key">A</span> <code>s.ten = "Le Minh";</code></button>
+          <button class="opt" onclick="ans(this,'correct','q3a','x','q3-score',2)"><span class="opt-key">B</span> <code>strcpy(s.ten, "Le Minh");</code></button>
+          <button class="opt" onclick="ans(this,'wrong','q3a','x','q3-score',2)"><span class="opt-key">C</span> <code>*s.ten = "Le Minh";</code></button>
+          <button class="opt" onclick="ans(this,'wrong','q3a','x','q3-score',2)"><span class="opt-key">D</span> <code>s->ten = "Le Minh";</code></button>
+        </div>
+        <div class="q-result" id="res-q3a"></div>
+      </div>
+
+      <hr class="q-separator">
+
+      <div class="q-block" id="q3b">
+        <div class="q-label">Câu 3.2 — Gán struct (rất hay nhầm)</div>
+        <div class="q-text">Cho <code>SV a = {"An", 20};</code> và <code>SV b = a;</code>. Sau đó <code>b.tuoi = 30;</code>. Giá trị <code>a.tuoi</code> là bao nhiêu?</div>
+        <div class="opts">
+          <button class="opt" onclick="ans(this,'correct','q3b','x','q3-score',2)"><span class="opt-key">A</span> 20 — a không bị ảnh hưởng vì b là bản sao độc lập</button>
+          <button class="opt" onclick="ans(this,'wrong','q3b','x','q3-score',2)"><span class="opt-key">B</span> 30 — b và a cùng trỏ đến vùng nhớ</button>
+          <button class="opt" onclick="ans(this,'wrong','q3b','x','q3-score',2)"><span class="opt-key">C</span> Lỗi compile vì không thể gán struct</button>
+          <button class="opt" onclick="ans(this,'wrong','q3b','x','q3-score',2)"><span class="opt-key">D</span> Undefined behavior</button>
+        </div>
+        <div class="q-result" id="res-q3b"></div>
+      </div>
+
+    </div>
+    <div class="quiz-done hidden" id="qd-2">
+      <div class="quiz-done-score" id="qdval-2">—</div>
+      <div class="quiz-done-msg" id="qdmsg-2"></div>
+    </div>
+  </div>
+
+  <div class="exercise-section">
+    <div class="exercise-header">
+      <div class="ex-header-left"><span class="ex-badge medium">medium</span><span class="ex-title">Bài tập — Hoán đổi hai struct</span></div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-desc">Viết hàm <code>swap(SinhVien *a, SinhVien *b)</code> hoán đổi hai sinh viên. Sau đó in mảng trước và sau khi swap phần tử đầu và cuối.</div>
+      <div class="editor-frame">
+        <div class="editor-topbar"><span>main.c</span></div>
+        <textarea class="editor" spellcheck="false">#include <stdio.h>
+#include <string.h>
+
+typedef struct {
+    char  ten[30];
+    float diem;
+} SinhVien;
+
+// TODO: viết hàm swap(SinhVien *a, SinhVien *b)
+
+void in(SinhVien ds[], int n) {
+    for (int i = 0; i < n; i++)
+        printf("%d. %-15s %.1f\n", i+1, ds[i].ten, ds[i].diem);
+}
+
+int main() {
+    SinhVien ds[] = {
+        {"Nguyen An", 7.5},
+        {"Tran Binh", 9.1},
+        {"Le Cuong",  5.0}
+    };
+    printf("--- Truoc ---\n"); in(ds, 3);
+    // TODO: swap ds[0] và ds[2]
+    printf("--- Sau ---\n");   in(ds, 3);
+    return 0;
+}</textarea>
+      </div>
+      <div class="ex-actions">
+        <button class="btn btn-ghost" onclick="toggleHint(this,'hint-ex3')">💡 Gợi ý</button>
+        <button class="btn btn-green" onclick="toggleSol(this,'sol-ex3')">📋 Xem đáp án</button>
+      </div>
+      <div class="hint-panel" id="hint-ex3">
+        Dùng biến tạm: <code>SinhVien tmp = *a; *a = *b; *b = tmp;</code> — gán struct hoàn toàn hợp lệ và copy toàn bộ các trường!
+      </div>
+      <div class="solution-panel" id="sol-ex3">
+        <div class="codeblock"><div class="codeblock-bar"><div class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="codeblock-label">đáp án</span><button class="copy-code-btn" onclick="cp(this)">copy</button></div>
+        <pre class="code"><span class="kw">void</span> <span class="fn">swap</span>(<span class="ty">SinhVien</span> *<span class="vr">a</span>, <span class="ty">SinhVien</span> *<span class="vr">b</span>) {
+    <span class="ty">SinhVien</span> <span class="vr">tmp</span> = *<span class="vr">a</span>;  <span class="cm">// copy toàn bộ struct vào tmp</span>
+    *<span class="vr">a</span> = *<span class="vr">b</span>;           <span class="cm">// copy b vào vị trí a</span>
+    *<span class="vr">b</span> = <span class="vr">tmp</span>;          <span class="cm">// copy tmp (a cũ) vào b</span>
+}
+<span class="cm">// trong main: swap(&ds[0], &ds[2]);</span></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="next-wrap">
+    <button class="btn-prev" onclick="goStep(1)">← Trước</button>
+    <button class="btn-next" onclick="goStep(3)">Bước 4: Con trỏ & Mũi tên →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     BƯỚC 4 — Con trỏ & Mũi tên
+═══════════════════════════════════════════════════════ -->
+<div class="step-panel" id="step-3">
+  <div class="step-header">
+    <div class="step-num-big">04</div>
+    <div class="step-title">
+      <h2>Con trỏ struct và toán tử <code style="font-size:1.2rem">-></code></h2>
+      <p>Nắm chắc phần này là nền tảng để học linked list, tree và mọi cấu trúc dữ liệu động.</p>
+    </div>
+  </div>
+
+  <div class="lesson">
+    <h3>Tại sao cần con trỏ struct?</h3>
+    <p>Khi truyền struct vào hàm theo giá trị, C tạo một bản sao hoàn toàn. Với struct lớn (vài KB), điều này rất tốn kém. Con trỏ chỉ truyền địa chỉ (8 bytes trên 64-bit), không quan trọng struct to cỡ nào.</p>
+
+    <div class="codeblock"><div class="codeblock-bar"><div class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="codeblock-label">pointer.c</span><button class="copy-code-btn" onclick="cp(this)">copy</button></div>
+    <pre class="code"><span class="ty">NhanVien</span>  <span class="vr">nv</span>  = {<span class="st">"Nam"</span>, <span class="nm">28</span>, <span class="nm">15e6</span>};
+<span class="ty">NhanVien</span> *<span class="vr">ptr</span> = &<span class="vr">nv</span>;   <span class="cm">// ptr trỏ đến nv</span>
+
+<span class="cm">// Hai cách truy cập qua con trỏ — TƯƠNG ĐƯƠNG NHAU:</span>
+<span class="fn">printf</span>(<span class="st">"%s\n"</span>, (*<span class="vr">ptr</span>).<span class="vr">ten</span>);  <span class="cm">// cách 1: dereference rồi dùng .</span>
+<span class="fn">printf</span>(<span class="st">"%s\n"</span>, <span class="vr">ptr</span>-><span class="vr">ten</span>);    <span class="cm">// cách 2: toán tử -> (ngắn hơn, ưu tiên)</span>
+
+<span class="cm">// ptr->ten  ≡  (*ptr).ten — hoàn toàn tương đương</span></pre></div>
+
+    <div class="note warn">
+      <div class="note-label">⚠ Bẫy ưu tiên toán tử</div>
+      <code style="background:#fff8e1;padding:1px 5px;border-radius:3px;font-family:monospace">*ptr.ten</code> là SAI! Vì <code>.</code> có độ ưu tiên cao hơn <code>*</code>, nên đây thực ra là <code>*(ptr.ten)</code> — nghĩa là "lấy địa chỉ từ ptr rồi dereference" — hoàn toàn khác ý định. Luôn dùng <code>(*ptr).ten</code> hoặc tốt hơn là <code>ptr->ten</code>.
+    </div>
+
+    <h3>malloc — cấp phát động</h3>
+    <div class="codeblock"><div class="codeblock-bar"><div class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="codeblock-label">malloc.c</span><button class="copy-code-btn" onclick="cp(this)">copy</button></div>
+    <pre class="code"><span class="mc">#include &lt;stdlib.h&gt;</span>
+
+<span class="ty">NhanVien</span> *<span class="vr">p</span> = (<span class="ty">NhanVien</span>*) <span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="ty">NhanVien</span>));
+<span class="kw">if</span> (<span class="vr">p</span> == <span class="nm">NULL</span>) { <span class="cm">/* xử lý lỗi */</span> <span class="kw">return</span> <span class="nm">1</span>; }
+
+<span class="fn">strcpy</span>(<span class="vr">p</span>-><span class="vr">ten</span>, <span class="st">"Thi C"</span>);
+<span class="vr">p</span>-><span class="vr">tuoi</span>  = <span class="nm">26</span>;
+<span class="vr">p</span>-><span class="vr">luong</span> = <span class="nm">12e6</span>;
+
+<span class="fn">printf</span>(<span class="st">"%s %d\n"</span>, <span class="vr">p</span>-><span class="vr">ten</span>, <span class="vr">p</span>-><span class="vr">tuoi</span>);
+<span class="fn">free</span>(<span class="vr">p</span>);   <span class="cm">// BẮT BUỘC — không free = memory leak!</span>
+<span class="vr">p</span> = <span class="nm">NULL</span>;  <span class="cm">// good practice: NULL sau free</span></pre></div>
+  </div>
+
+  <div class="section-divider">KIỂM TRA NHANH — BƯỚC 4</div>
+
+  <div class="quiz-section">
+    <div class="quiz-section-header">
+      <div class="qs-icon">?</div>
+      <span>Trắc nghiệm — 3 câu (khó!)</span>
+      <span class="qs-sub" id="q4-score">0/3 đúng</span>
+    </div>
+    <div class="quiz-inner">
+
+      <div class="q-block" id="q4a">
+        <div class="q-label">Câu 4.1 — Ưu tiên toán tử (bẫy kinh điển)</div>
+        <div class="q-text">Cho <code>NhanVien nv = {"An", 25}; NhanVien *p = &nv;</code>. Biểu thức nào <strong>ĐÚNG</strong> để lấy tuổi?</div>
+        <div class="opts">
+          <button class="opt" onclick="ans(this,'wrong','q4a','x','q4-score',3)"><span class="opt-key">A</span> <code>*p.tuoi</code> — dereference rồi lấy trường</button>
+          <button class="opt" onclick="ans(this,'correct','q4a','x','q4-score',3)"><span class="opt-key">B</span> <code>(*p).tuoi</code> và <code>p->tuoi</code> đều đúng, kết quả như nhau</button>
+          <button class="opt" onclick="ans(this,'wrong','q4a','x','q4-score',3)"><span class="opt-key">C</span> Chỉ <code>p->tuoi</code> đúng, <code>(*p).tuoi</code> sai</button>
+          <button class="opt" onclick="ans(this,'wrong','q4a','x','q4-score',3)"><span class="opt-key">D</span> <code>&p->tuoi</code></button>
+        </div>
+        <div class="q-result" id="res-q4a"></div>
+      </div>
+
+      <hr class="q-separator">
+
+      <div class="q-block" id="q4b">
+        <div class="q-label">Câu 4.2 — Thay đổi qua con trỏ</div>
+        <div class="q-text">Sau <code>NhanVien nv = {"Binh", 30}; NhanVien *p = &nv; p->tuoi = 40;</code>. Giá trị <code>nv.tuoi</code> là bao nhiêu?</div>
+        <div class="opts">
+          <button class="opt" onclick="ans(this,'wrong','q4b','x','q4-score',3)"><span class="opt-key">A</span> 30 — p là bản sao nên không ảnh hưởng nv</button>
+          <button class="opt" onclick="ans(this,'correct','q4b','x','q4-score',3)"><span class="opt-key">B</span> 40 — p trỏ đến nv, thay đổi qua p = thay đổi nv</button>
+          <button class="opt" onclick="ans(this,'wrong','q4b','x','q4-score',3)"><span class="opt-key">C</span> Lỗi — không thể gán qua con trỏ struct</button>
+          <button class="opt" onclick="ans(this,'wrong','q4b','x','q4-score',3)"><span class="opt-key">D</span> Undefined behavior</button>
+        </div>
+        <div class="q-result" id="res-q4b"></div>
+      </div>
+
+      <hr class="q-separator">
+
+      <div class="q-block" id="q4c">
+        <div class="q-label">Câu 4.3 — sizeof và malloc</div>
+        <div class="q-text">Cách cấp phát nào <strong>ĐÚNG VÀ AN TOÀN NHẤT</strong> cho một NhanVien?</div>
+        <div class="opts">
+          <button class="opt" onclick="ans(this,'wrong','q4c','x','q4-score',3)"><span class="opt-key">A</span> <code>NhanVien *p = malloc(64);</code> — tự tính kích thước</button>
+          <button class="opt" onclick="ans(this,'wrong','q4c','x','q4-score',3)"><span class="opt-key">B</span> <code>NhanVien *p = malloc(sizeof(NhanVien*));</code></button>
+          <button class="opt" onclick="ans(this,'correct','q4c','x','q4-score',3)"><span class="opt-key">C</span> <code>NhanVien *p = malloc(sizeof(NhanVien));</code> — sizeof kiểu, không phải con trỏ</button>
+          <button class="opt" onclick="ans(this,'wrong','q4c','x','q4-score',3)"><span class="opt-key">D</span> <code>NhanVien *p = malloc(sizeof(*NhanVien));</code></button>
+        </div>
+        <div class="q-result" id="res-q4c"></div>
+      </div>
+
+    </div>
+    <div class="quiz-done hidden" id="qd-3">
+      <div class="quiz-done-score" id="qdval-3">—</div>
+      <div class="quiz-done-msg" id="qdmsg-3"></div>
+    </div>
+  </div>
+
+  <div class="exercise-section">
+    <div class="exercise-header">
+      <div class="ex-header-left"><span class="ex-badge medium">medium</span><span class="ex-title">Bài tập — Tăng lương qua con trỏ</span></div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-desc">Viết hàm <code>tangLuong(NhanVien *nv, float phanTram)</code> tăng lương theo phần trăm. Thử với mảng 3 nhân viên, tăng 10% cho tất cả.</div>
+      <div class="editor-frame">
+        <div class="editor-topbar"><span>main.c</span></div>
+        <textarea class="editor" spellcheck="false">#include <stdio.h>
+#include <string.h>
+
+typedef struct {
+    char  ten[30];
+    float luong;
+} NhanVien;
+
+// TODO: void tangLuong(NhanVien *nv, float phanTram)
+// Ví dụ: luong 10tr, tăng 10% -> luong = 11tr
+
+int main() {
+    NhanVien ds[3] = {
+        {"An",   10000000},
+        {"Binh", 15000000},
+        {"Cuong", 8000000}
+    };
+    
+    printf("Truoc:\n");
+    for (int i = 0; i < 3; i++)
+        printf("  %s: %.0f\n", ds[i].ten, ds[i].luong);
+    
+    // TODO: gọi tangLuong 10% cho từng người
+    
+    printf("Sau khi tang 10%%:\n");
+    for (int i = 0; i < 3; i++)
+        printf("  %s: %.0f\n", ds[i].ten, ds[i].luong);
+    
+    return 0;
+}</textarea>
+      </div>
+      <div class="ex-actions">
+        <button class="btn btn-ghost" onclick="toggleHint(this,'hint-ex4')">💡 Gợi ý</button>
+        <button class="btn btn-green" onclick="toggleSol(this,'sol-ex4')">📋 Xem đáp án</button>
+      </div>
+      <div class="hint-panel" id="hint-ex4">
+        Trong hàm: <code>nv->luong *= (1 + phanTram/100);</code> hoặc <code>nv->luong += nv->luong * phanTram / 100;</code>
+      </div>
+      <div class="solution-panel" id="sol-ex4">
+        <div class="codeblock"><div class="codeblock-bar"><div class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="codeblock-label">đáp án</span><button class="copy-code-btn" onclick="cp(this)">copy</button></div>
+        <pre class="code"><span class="kw">void</span> <span class="fn">tangLuong</span>(<span class="ty">NhanVien</span> *<span class="vr">nv</span>, <span class="ty">float</span> <span class="vr">phanTram</span>) {
+    <span class="vr">nv</span>-><span class="vr">luong</span> *= (<span class="nm">1.0f</span> + <span class="vr">phanTram</span> / <span class="nm">100.0f</span>);
+}
+<span class="cm">// gọi: for(int i=0;i&lt;3;i++) tangLuong(&ds[i], 10);</span></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="next-wrap">
+    <button class="btn-prev" onclick="goStep(2)">← Trước</button>
+    <button class="btn-next" onclick="goStep(4)">Bước 5: Struct lồng nhau →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     BƯỚC 5 — Struct lồng nhau
+═══════════════════════════════════════════════════════ -->
+<div class="step-panel" id="step-4">
+  <div class="step-header">
+    <div class="step-num-big">05</div>
+    <div class="step-title">
+      <h2>Struct lồng nhau</h2>
+      <p>Mô hình hóa dữ liệu thực tế phức tạp — và chuỗi truy cập nhiều tầng.</p>
+    </div>
+  </div>
+
+  <div class="lesson">
+    <div class="codeblock"><div class="codeblock-bar"><div class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="codeblock-label">nested.c</span><button class="copy-code-btn" onclick="cp(this)">copy</button></div>
+    <pre class="code"><span class="kw">typedef struct</span> { <span class="ty">int</span> <span class="vr">ngay</span>, <span class="vr">thang</span>, <span class="vr">nam</span>; } <span class="ty">Date</span>;
+
+<span class="kw">typedef struct</span> {
+    <span class="ty">char</span> <span class="vr">duong</span>[<span class="nm">80</span>];
+    <span class="ty">char</span> <span class="vr">thanhPho</span>[<span class="nm">40</span>];
+} <span class="ty">DiaChi</span>;
+
+<span class="kw">typedef struct</span> {
+    <span class="ty">char</span>    <span class="vr">ten</span>[<span class="nm">50</span>];
+    <span class="ty">Date</span>    <span class="vr">ngaySinh</span>;   <span class="cm">// struct trong struct</span>
+    <span class="ty">DiaChi</span>  <span class="vr">diaChi</span>;     <span class="cm">// struct trong struct</span>
+} <span class="ty">KhachHang</span>;
+
+<span class="ty">KhachHang</span> <span class="vr">kh</span> = {
+    <span class="st">"Nguyen Lan"</span>,
+    {<span class="nm">15</span>, <span class="nm">8</span>, <span class="nm">1998</span>},           <span class="cm">// khởi tạo Date</span>
+    {<span class="st">"123 Le Loi"</span>, <span class="st">"HCM"</span>}    <span class="cm">// khởi tạo DiaChi</span>
+};
+
+<span class="cm">// Truy cập chuỗi nhiều tầng</span>
+<span class="fn">printf</span>(<span class="st">"%d/%d/%d\n"</span>,
+    <span class="vr">kh</span>.<span class="vr">ngaySinh</span>.<span class="vr">ngay</span>,     <span class="cm">// struct.struct.field</span>
+    <span class="vr">kh</span>.<span class="vr">ngaySinh</span>.<span class="vr">thang</span>,
+    <span class="vr">kh</span>.<span class="vr">ngaySinh</span>.<span class="vr">nam</span>);</pre></div>
+
+    <div class="note ok">
+      <div class="note-label">✓ Quy tắc chuỗi truy cập</div>
+      Có bao nhiêu tầng lồng thì có bấy nhiêu dấu chấm (hoặc mũi tên nếu qua con trỏ). <code style="background:#d4edda;padding:1px 5px;border-radius:3px;font-family:monospace">kh.ngaySinh.nam</code> = "đi vào kh, lấy ngaySinh, lấy nam".
+    </div>
+
+    <h3>Con trỏ đến struct lồng nhau</h3>
+    <div class="codeblock"><div class="codeblock-bar"><div class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="codeblock-label">nested_ptr.c</span><button class="copy-code-btn" onclick="cp(this)">copy</button></div>
+    <pre class="code"><span class="ty">KhachHang</span> *<span class="vr">p</span> = &<span class="vr">kh</span>;
+
+<span class="cm">// Con trỏ đến struct ngoài cùng → dùng -></span>
+<span class="cm">// Struct bên trong không phải con trỏ → dùng .</span>
+<span class="fn">printf</span>(<span class="st">"%d\n"</span>, <span class="vr">p</span>-><span class="vr">ngaySinh</span>.<span class="vr">nam</span>);  <span class="cm">// ✓</span>
+<span class="fn">printf</span>(<span class="st">"%s\n"</span>, <span class="vr">p</span>-><span class="vr">diaChi</span>.<span class="vr">thanhPho</span>); <span class="cm">// ✓</span>
+
+<span class="cm">// Nếu diaChi cũng là con trỏ thì: p->diaChi->thanhPho</span></pre></div>
+  </div>
+
+  <div class="section-divider">KIỂM TRA NHANH — BƯỚC 5</div>
+
+  <div class="quiz-section">
+    <div class="quiz-section-header">
+      <div class="qs-icon">?</div>
+      <span>Trắc nghiệm — 2 câu</span>
+      <span class="qs-sub" id="q5-score">0/2 đúng</span>
+    </div>
+    <div class="quiz-inner">
+
+      <div class="q-block" id="q5a">
+        <div class="q-label">Câu 5.1 — Chuỗi truy cập</div>
+        <div class="q-text">Với <code>KhachHang kh</code> như trên, cú pháp nào lấy đúng tên thành phố?</div>
+        <div class="opts">
+          <button class="opt" onclick="ans(this,'wrong','q5a','x','q5-score',2)"><span class="opt-key">A</span> <code>kh.thanhPho</code></button>
+          <button class="opt" onclick="ans(this,'wrong','q5a','x','q5-score',2)"><span class="opt-key">B</span> <code>kh->diaChi.thanhPho</code></button>
+          <button class="opt" onclick="ans(this,'correct','q5a','x','q5-score',2)"><span class="opt-key">C</span> <code>kh.diaChi.thanhPho</code></button>
+          <button class="opt" onclick="ans(this,'wrong','q5a','x','q5-score',2)"><span class="opt-key">D</span> <code>kh.diaChi->thanhPho</code></button>
+        </div>
+        <div class="q-result" id="res-q5a"></div>
+      </div>
+
+      <hr class="q-separator">
+
+      <div class="q-block" id="q5b">
+        <div class="q-label">Câu 5.2 — Con trỏ + lồng nhau (khó!)</div>
+        <div class="q-text">Cho <code>KhachHang *p = &kh;</code>. Cú pháp nào đúng để lấy năm sinh?</div>
+        <div class="opts">
+          <button class="opt" onclick="ans(this,'wrong','q5b','x','q5-score',2)"><span class="opt-key">A</span> <code>p.ngaySinh.nam</code></button>
+          <button class="opt" onclick="ans(this,'wrong','q5b','x','q5-score',2)"><span class="opt-key">B</span> <code>p->ngaySinh->nam</code></button>
+          <button class="opt" onclick="ans(this,'correct','q5b','x','q5-score',2)"><span class="opt-key">C</span> <code>p->ngaySinh.nam</code></button>
+          <button class="opt" onclick="ans(this,'wrong','q5b','x','q5-score',2)"><span class="opt-key">D</span> <code>(*p).ngaySinh->nam</code></button>
+        </div>
+        <div class="q-result" id="res-q5b"></div>
+      </div>
+
+    </div>
+    <div class="quiz-done hidden" id="qd-4">
+      <div class="quiz-done-score" id="qdval-4">—</div>
+      <div class="quiz-done-msg" id="qdmsg-4"></div>
+    </div>
+  </div>
+
+  <div class="exercise-section">
+    <div class="exercise-header">
+      <div class="ex-header-left"><span class="ex-badge hard">hard</span><span class="ex-title">Bài tập — Hệ thống hóa đơn lồng nhau</span></div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-desc">Xây dựng struct <code>HoaDon</code> có: <code>maHD</code> (char[10]), <code>khachHang</code> (struct KH gồm ten, sdt), <code>ngayLap</code> (struct Date gồm ngay/thang/nam), <code>tongTien</code> (float). In ra hóa đơn định dạng đẹp.</div>
+      <div class="editor-frame">
+        <div class="editor-topbar"><span>hoadon.c</span></div>
+        <textarea class="editor" spellcheck="false">#include <stdio.h>
+#include <string.h>
+
+// TODO: định nghĩa struct KhachHang, Date, HoaDon
+
+void inHoaDon(const HoaDon *hd) {
+    // TODO: in ra dạng:
+    // ============================
+    //  HOA DON: HD001
+    //  Ngay: 09/04/2026
+    //  Khach: Nguyen An  | 0901234567
+    //  Tong: 1,500,000 VND
+    // ============================
+}
+
+int main() {
+    HoaDon hd = {
+        "HD001",
+        {"Nguyen An", "0901234567"},
+        {9, 4, 2026},
+        1500000
+    };
+    inHoaDon(&hd);
+    return 0;
+}</textarea>
+      </div>
+      <div class="ex-actions">
+        <button class="btn btn-ghost" onclick="toggleHint(this,'hint-ex5')">💡 Gợi ý</button>
+        <button class="btn btn-green" onclick="toggleSol(this,'sol-ex5')">📋 Xem đáp án</button>
+      </div>
+      <div class="hint-panel" id="hint-ex5">
+        Truy cập: <code>hd->ngayLap.ngay</code>, <code>hd->khachHang.ten</code>, <code>hd->tongTien</code>
+      </div>
+      <div class="solution-panel" id="sol-ex5">
+        <div class="codeblock"><div class="codeblock-bar"><div class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="codeblock-label">đáp án</span><button class="copy-code-btn" onclick="cp(this)">copy</button></div>
+        <pre class="code"><span class="kw">typedef struct</span> { <span class="ty">char</span> <span class="vr">ten</span>[<span class="nm">50</span>]; <span class="ty">char</span> <span class="vr">sdt</span>[<span class="nm">15</span>]; } <span class="ty">KhachHang</span>;
+<span class="kw">typedef struct</span> { <span class="ty">int</span> <span class="vr">ngay</span>, <span class="vr">thang</span>, <span class="vr">nam</span>; } <span class="ty">Date</span>;
+<span class="kw">typedef struct</span> {
+    <span class="ty">char</span>       <span class="vr">maHD</span>[<span class="nm">10</span>];
+    <span class="ty">KhachHang</span>  <span class="vr">khachHang</span>;
+    <span class="ty">Date</span>       <span class="vr">ngayLap</span>;
+    <span class="ty">float</span>      <span class="vr">tongTien</span>;
+} <span class="ty">HoaDon</span>;
+
+<span class="kw">void</span> <span class="fn">inHoaDon</span>(<span class="kw">const</span> <span class="ty">HoaDon</span> *<span class="vr">hd</span>) {
+    <span class="fn">printf</span>(<span class="st">"============================\n"</span>);
+    <span class="fn">printf</span>(<span class="st">" HOA DON : %s\n"</span>,          <span class="vr">hd</span>-><span class="vr">maHD</span>);
+    <span class="fn">printf</span>(<span class="st">" Ngay    : %02d/%02d/%d\n"</span>,
+           <span class="vr">hd</span>-><span class="vr">ngayLap</span>.<span class="vr">ngay</span>, <span class="vr">hd</span>-><span class="vr">ngayLap</span>.<span class="vr">thang</span>, <span class="vr">hd</span>-><span class="vr">ngayLap</span>.<span class="vr">nam</span>);
+    <span class="fn">printf</span>(<span class="st">" Khach   : %s | %s\n"</span>,
+           <span class="vr">hd</span>-><span class="vr">khachHang</span>.<span class="vr">ten</span>, <span class="vr">hd</span>-><span class="vr">khachHang</span>.<span class="vr">sdt</span>);
+    <span class="fn">printf</span>(<span class="st">" Tong    : %.0f VND\n"</span>,   <span class="vr">hd</span>-><span class="vr">tongTien</span>);
+    <span class="fn">printf</span>(<span class="st">"============================\n"</span>);
+}</pre></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="next-wrap">
+    <button class="btn-prev" onclick="goStep(3)">← Trước</button>
+    <button class="btn-next" onclick="goStep(5)">Bước 6: Struct + Hàm →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     BƯỚC 6 — Struct + Hàm
+═══════════════════════════════════════════════════════ -->
+<div class="step-panel" id="step-5">
+  <div class="step-header">
+    <div class="step-num-big">06</div>
+    <div class="step-title">
+      <h2>Struct với Hàm — giá trị vs con trỏ</h2>
+      <p>Bước cuối và quan trọng nhất — khi nào dùng cái nào, và tại sao.</p>
+    </div>
+  </div>
+
+  <div class="lesson">
+    <h3>3 cách truyền struct vào hàm</h3>
+    <div class="codeblock"><div class="codeblock-bar"><div class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="codeblock-label">passing.c</span><button class="copy-code-btn" onclick="cp(this)">copy</button></div>
+    <pre class="code"><span class="cm">// ① Theo giá trị — nhận BẢN SAO, không sửa được gốc</span>
+<span class="kw">void</span> <span class="fn">inThongTin</span>(<span class="ty">NhanVien</span> <span class="vr">nv</span>) {           <span class="cm">// copy ~58 bytes</span>
+    <span class="fn">printf</span>(<span class="st">"%s\n"</span>, <span class="vr">nv</span>.<span class="vr">ten</span>);
+    <span class="vr">nv</span>.<span class="vr">tuoi</span>++;  <span class="cm">// không ảnh hưởng bên ngoài</span>
+}
+
+<span class="cm">// ② Theo con trỏ — nhận ĐỊA CHỈ, có thể sửa gốc</span>
+<span class="kw">void</span> <span class="fn">tangTuoi</span>(<span class="ty">NhanVien</span> *<span class="vr">nv</span>) {            <span class="cm">// chỉ copy 8 bytes</span>
+    <span class="vr">nv</span>-><span class="vr">tuoi</span>++;  <span class="cm">// SỬA biến gốc!</span>
+}
+
+<span class="cm">// ③ Const pointer — nhận địa chỉ, KHÔNG sửa được</span>
+<span class="kw">void</span> <span class="fn">inAn</span>(<span class="kw">const</span> <span class="ty">NhanVien</span> *<span class="vr">nv</span>) {          <span class="cm">// best practice cho read-only</span>
+    <span class="fn">printf</span>(<span class="st">"%s %d\n"</span>, <span class="vr">nv</span>-><span class="vr">ten</span>, <span class="vr">nv</span>-><span class="vr">tuoi</span>);
+    <span class="cm">// nv->tuoi++ → lỗi compiler: readonly!</span>
+}</pre></div>
+
+    <div class="note info">
+      <div class="note-label">ℹ Quy tắc thực tế</div>
+      Luôn dùng <code style="background:#e3f2fd;padding:1px 5px;border-radius:3px;font-family:monospace">const Type*</code> khi hàm chỉ đọc, <code style="background:#e3f2fd;padding:1px 5px;border-radius:3px;font-family:monospace">Type*</code> khi cần sửa. Chỉ dùng pass-by-value cho struct <strong>rất nhỏ</strong> (2-3 trường nhỏ) mà bạn muốn hàm không ảnh hưởng biến gốc.
+    </div>
+
+    <h3>Hàm trả về struct</h3>
+    <div class="codeblock"><div class="codeblock-bar"><div class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="codeblock-label">return_struct.c</span><button class="copy-code-btn" onclick="cp(this)">copy</button></div>
+    <pre class="code"><span class="cm">// Hàm TẠO struct và trả về — hợp lệ!</span>
+<span class="ty">NhanVien</span> <span class="fn">taoNV</span>(<span class="kw">const</span> <span class="ty">char</span> *<span class="vr">ten</span>, <span class="ty">int</span> <span class="vr">tuoi</span>, <span class="ty">float</span> <span class="vr">luong</span>) {
+    <span class="ty">NhanVien</span> <span class="vr">nv</span>;
+    <span class="fn">strncpy</span>(<span class="vr">nv</span>.<span class="vr">ten</span>, <span class="vr">ten</span>, <span class="nm">49</span>);
+    <span class="vr">nv</span>.<span class="vr">ten</span>[<span class="nm">49</span>] = <span class="st">'\0'</span>;
+    <span class="vr">nv</span>.<span class="vr">tuoi</span>  = <span class="vr">tuoi</span>;
+    <span class="vr">nv</span>.<span class="vr">luong</span> = <span class="vr">luong</span>;
+    <span class="kw">return</span> <span class="vr">nv</span>;   <span class="cm">// trả về bản sao — OK</span>
+}
+
+<span class="ty">NhanVien</span> <span class="vr">nv1</span> = <span class="fn">taoNV</span>(<span class="st">"Le Anh"</span>, <span class="nm">27</span>, <span class="nm">13e6</span>);</pre></div>
+
+    <div class="note warn">
+      <div class="note-label">⚠ Không trả về địa chỉ biến local!</div>
+      <code style="background:#fff8e1;padding:1px 5px;border-radius:3px;font-family:monospace">return &nv;</code> trong hàm trên là <strong>undefined behavior</strong> — biến <code>nv</code> bị hủy khi hàm kết thúc! Hoặc trả về struct theo giá trị, hoặc nhận con trỏ đã được cấp phát từ bên ngoài.
+    </div>
+  </div>
+
+  <div class="section-divider">KIỂM TRA NHANH — BƯỚC 6</div>
+
+  <div class="quiz-section">
+    <div class="quiz-section-header">
+      <div class="qs-icon">?</div>
+      <span>Trắc nghiệm — 3 câu tổng hợp</span>
+      <span class="qs-sub" id="q6-score">0/3 đúng</span>
+    </div>
+    <div class="quiz-inner">
+
+      <div class="q-block" id="q6a">
+        <div class="q-label">Câu 6.1 — Ảnh hưởng bên ngoài</div>
+        <div class="q-text">Hàm <code>void f(NhanVien nv) { nv.tuoi = 99; }</code> được gọi với <code>f(x)</code>. Sau lời gọi, <code>x.tuoi</code> có thay đổi không?</div>
+        <div class="opts">
+          <button class="opt" onclick="ans(this,'correct','q6a','x','q6-score',3)"><span class="opt-key">A</span> Không — f nhận bản sao, x không bị ảnh hưởng</button>
+          <button class="opt" onclick="ans(this,'wrong','q6a','x','q6-score',3)"><span class="opt-key">B</span> Có — struct luôn truyền theo tham chiếu</button>
+          <button class="opt" onclick="ans(this,'wrong','q6a','x','q6-score',3)"><span class="opt-key">C</span> Có — vì tuổi là int nên bị ảnh hưởng</button>
+          <button class="opt" onclick="ans(this,'wrong','q6a','x','q6-score',3)"><span class="opt-key">D</span> Phụ thuộc kích thước struct</button>
+        </div>
+        <div class="q-result" id="res-q6a"></div>
+      </div>
+
+      <hr class="q-separator">
+
+      <div class="q-block" id="q6b">
+        <div class="q-label">Câu 6.2 — Trả về con trỏ (bẫy kinh điển)</div>
+        <div class="q-text">Hàm nào sau đây có <strong>lỗi nghiêm trọng</strong>?</div>
+        <div class="opts">
+          <button class="opt" onclick="ans(this,'wrong','q6b','x','q6-score',3)"><span class="opt-key">A</span> <code>NhanVien f() { NhanVien nv = {"A",25,10e6}; return nv; }</code></button>
+          <button class="opt" onclick="ans(this,'correct','q6b','x','q6-score',3)"><span class="opt-key">B</span> <code>NhanVien* f() { NhanVien nv = {"A",25,10e6}; return &nv; }</code></button>
+          <button class="opt" onclick="ans(this,'wrong','q6b','x','q6-score',3)"><span class="opt-key">C</span> <code>void f(NhanVien *nv) { nv->tuoi = 30; }</code></button>
+          <button class="opt" onclick="ans(this,'wrong','q6b','x','q6-score',3)"><span class="opt-key">D</span> <code>void f(const NhanVien *nv) { printf("%s\n", nv->ten); }</code></button>
+        </div>
+        <div class="q-result" id="res-q6b"></div>
+      </div>
+
+      <hr class="q-separator">
+
+      <div class="q-block" id="q6c">
+        <div class="q-label">Câu 6.3 — Lựa chọn tốt nhất</div>
+        <div class="q-text">Bạn cần hàm chỉ <strong>in thông tin</strong> struct (không sửa). Cách khai báo nào <strong>tốt nhất</strong> về cả hiệu năng và an toàn?</div>
+        <div class="opts">
+          <button class="opt" onclick="ans(this,'wrong','q6c','x','q6-score',3)"><span class="opt-key">A</span> <code>void in(NhanVien nv)</code> — pass by value</button>
+          <button class="opt" onclick="ans(this,'wrong','q6c','x','q6-score',3)"><span class="opt-key">B</span> <code>void in(NhanVien *nv)</code> — pointer</button>
+          <button class="opt" onclick="ans(this,'correct','q6c','x','q6-score',3)"><span class="opt-key">C</span> <code>void in(const NhanVien *nv)</code> — const pointer</button>
+          <button class="opt" onclick="ans(this,'wrong','q6c','x','q6-score',3)"><span class="opt-key">D</span> <code>NhanVien* in(NhanVien nv)</code> — trả về con trỏ</button>
+        </div>
+        <div class="q-result" id="res-q6c"></div>
+      </div>
+
+    </div>
+    <div class="quiz-done hidden" id="qd-5">
+      <div class="quiz-done-score" id="qdval-5">—</div>
+      <div class="quiz-done-msg" id="qdmsg-5"></div>
+    </div>
+  </div>
+
+  <div class="exercise-section">
+    <div class="exercise-header">
+      <div class="ex-header-left"><span class="ex-badge hard">hard</span><span class="ex-title">Bài tập cuối — Sắp xếp mảng struct</span></div>
+    </div>
+    <div class="ex-body">
+      <div class="ex-desc">Viết đầy đủ: hàm <code>nhap()</code> truyền con trỏ để đọc từ bàn phím, hàm <code>in()</code> dùng const pointer để in, hàm <code>sapXep()</code> sắp xếp bubble sort giảm dần theo lương. Dùng dữ liệu mẫu sẵn có.</div>
+      <div class="editor-frame">
+        <div class="editor-topbar"><span>final.c</span></div>
+        <textarea class="editor" style="min-height:260px;" spellcheck="false">#include <stdio.h>
+#include <string.h>
+
+typedef struct {
+    char  ten[30];
+    int   tuoi;
+    float luong;
+} NhanVien;
+
+// TODO: void nhap(NhanVien *nv)  — đọc thông tin từ bàn phím (dùng scanf)
+// TODO: void in(const NhanVien *nv)  — in 1 nhân viên
+// TODO: void sapXep(NhanVien ds[], int n)  — bubble sort giảm dần theo luong
+
+int main() {
+    NhanVien ds[4] = {
+        {"An",   28, 10000000},
+        {"Binh", 35, 18000000},
+        {"Cuong",24,  8000000},
+        {"Dung", 30, 14000000}
+    };
+    int n = 4;
+    
+    printf("=== TRUOC SAP XEP ===\n");
+    for (int i = 0; i < n; i++) in(&ds[i]);
+    
+    sapXep(ds, n);
+    
+    printf("\n=== SAU SAP XEP (giam dan theo luong) ===\n");
+    for (int i = 0; i < n; i++) in(&ds[i]);
+    
+    return 0;
+}</textarea>
+      </div>
+      <div class="ex-actions">
+        <button class="btn btn-ghost" onclick="toggleHint(this,'hint-ex6')">💡 Gợi ý</button>
+        <button class="btn btn-green" onclick="toggleSol(this,'sol-ex6')">📋 Xem đáp án</button>
+      </div>
+      <div class="hint-panel" id="hint-ex6">
+        Bubble sort: điều kiện hoán đổi là <code>ds[j].luong < ds[j+1].luong</code>. Hoán đổi 2 struct bằng biến tạm: <code>NhanVien tmp = ds[j]; ds[j] = ds[j+1]; ds[j+1] = tmp;</code>
+      </div>
+      <div class="solution-panel" id="sol-ex6">
+        <div class="codeblock"><div class="codeblock-bar"><div class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="codeblock-label">đáp án đầy đủ</span><button class="copy-code-btn" onclick="cp(this)">copy</button></div>
+        <pre class="code"><span class="kw">void</span> <span class="fn">nhap</span>(<span class="ty">NhanVien</span> *<span class="vr">nv</span>) {
+    <span class="fn">printf</span>(<span class="st">"Ten: "</span>); <span class="fn">scanf</span>(<span class="st">"%s"</span>, <span class="vr">nv</span>-><span class="vr">ten</span>);
+    <span class="fn">printf</span>(<span class="st">"Tuoi: "</span>); <span class="fn">scanf</span>(<span class="st">"%d"</span>, &<span class="vr">nv</span>-><span class="vr">tuoi</span>);
+    <span class="fn">printf</span>(<span class="st">"Luong: "</span>); <span class="fn">scanf</span>(<span class="st">"%f"</span>, &<span class="vr">nv</span>-><span class="vr">luong</span>);
+}
+
+<span class="kw">void</span> <span class="fn">in</span>(<span class="kw">const</span> <span class="ty">NhanVien</span> *<span class="vr">nv</span>) {
+    <span class="fn">printf</span>(<span class="st">"%-10s %3d tuoi  %.0f VND\n"</span>,
+           <span class="vr">nv</span>-><span class="vr">ten</span>, <span class="vr">nv</span>-><span class="vr">tuoi</span>, <span class="vr">nv</span>-><span class="vr">luong</span>);
+}
+
+<span class="kw">void</span> <span class="fn">sapXep</span>(<span class="ty">NhanVien</span> <span class="vr">ds</span>[], <span class="ty">int</span> <span class="vr">n</span>) {
+    <span class="kw">for</span> (<span class="ty">int</span> <span class="vr">i</span>=<span class="nm">0</span>; <span class="vr">i</span>&lt;<span class="vr">n</span>-<span class="nm">1</span>; <span class="vr">i</span>++)
+        <span class="kw">for</span> (<span class="ty">int</span> <span class="vr">j</span>=<span class="nm">0</span>; <span class="vr">j</span>&lt;<span class="vr">n</span>-<span class="vr">i</span>-<span class="nm">1</span>; <span class="vr">j</span>++)
+            <span class="kw">if</span> (<span class="vr">ds</span>[<span class="vr">j</span>].<span class="vr">luong</span> &lt; <span class="vr">ds</span>[<span class="vr">j</span>+<span class="nm">1</span>].<span class="vr">luong</span>) {
+                <span class="ty">NhanVien</span> <span class="vr">tmp</span> = <span class="vr">ds</span>[<span class="vr">j</span>];
+                <span class="vr">ds</span>[<span class="vr">j</span>]   = <span class="vr">ds</span>[<span class="vr">j</span>+<span class="nm">1</span>];
+                <span class="vr">ds</span>[<span class="vr">j</span>+<span class="nm">1</span>] = <span class="vr">tmp</span>;
+            }
+}</pre></div>
+        <div class="output"><div class="out-label">output sau sắp xếp</div>Binh       35 tuoi  18000000 VND<br>Dung       30 tuoi  14000000 VND<br>An         28 tuoi  10000000 VND<br>Cuong      24 tuoi  8000000 VND</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="next-wrap">
+    <button class="btn-prev" onclick="goStep(4)">← Trước</button>
+    <button class="btn-next" onclick="finish()">🎉 Hoàn thành khóa học!</button>
+  </div>
+</div>
+
+<!-- FINISH -->
+<div class="finish-screen" id="finish">
+  <div class="finish-big">🎓</div>
+  <div class="finish-title">Chúc mừng!</div>
+  <div class="finish-sub">Bạn đã hoàn thành toàn bộ 6 bước học Struct trong C</div>
+  <div class="finish-stats">
+    <div class="fstat"><div class="fstat-val" id="fs-steps">6</div><div class="fstat-label">Bước hoàn thành</div></div>
+    <div class="fstat"><div class="fstat-val" id="fs-score">—</div><div class="fstat-label">Điểm quiz</div></div>
+    <div class="fstat"><div class="fstat-val">5</div><div class="fstat-label">Bài tập</div></div>
+  </div>
+  <p style="color:#666;font-size:0.9rem;margin-bottom:1.5rem">Bước tiếp theo: áp dụng struct để xây dựng <strong>Linked List</strong> và <strong>Binary Tree</strong></p>
+  <button class="btn-next" onclick="restart()" style="margin:0 auto">↺ Học lại từ đầu</button>
+</div>
+
+</div><!-- /layout -->
+
+<script>
+// ── STATE ──
+const STEPS = 6;
+let currentStep = 0;
+const stepDone = new Array(STEPS).fill(false);
+const quizScores = {};   // { stepIdx: {got, total} }
+const quizAnswered = {}; // { 'q1a': true, ... }
+
+// ── NAVIGATION ──
+function goStep(idx, delta) {
+  if (delta !== undefined) idx = currentStep + delta;
+  if (idx < 0 || idx >= STEPS) return;
+  document.getElementById('step-' + currentStep).classList.remove('active');
+  document.getElementById('snav-' + currentStep).classList.remove('active');
+  currentStep = idx;
+  document.getElementById('step-' + idx).classList.add('active');
+  const nav = document.getElementById('snav-' + idx);
+  nav.classList.add('active');
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function finish() {
+  document.getElementById('step-' + currentStep).classList.remove('active');
+  document.getElementById('snav-' + currentStep).classList.remove('active');
+  stepDone[currentStep] = true;
+  document.getElementById('snav-' + currentStep).classList.add('done');
+  document.getElementById('finish').classList.add('show');
+  let totalGot = 0, totalMax = 0;
+  for (const k in quizScores) { totalGot += quizScores[k].got; totalMax += quizScores[k].total; }
+  document.getElementById('fs-score').textContent = totalGot + '/' + totalMax;
+  document.getElementById('prog-bar').style.width = '100%';
+  document.getElementById('prog-pct').textContent = '100%';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function restart() {
+  document.getElementById('finish').classList.remove('show');
+  goStep(0);
+}
+
+function updateProgress() {
+  const pct = Math.round((currentStep / STEPS) * 100);
+  document.getElementById('prog-bar').style.width = pct + '%';
+  document.getElementById('prog-pct').textContent = pct + '%';
+  document.getElementById('step-counter').textContent = 'Bước ' + (currentStep+1) + ' / ' + STEPS;
+}
+
+// ── QUIZ ──
+const feedbacks = {
+  correct: [
+    '✓ Chính xác! Bạn hiểu đúng điểm mấu chốt.',
+    '✓ Đúng rồi! Đây là lỗi rất nhiều người mắc phải.',
+    '✓ Xuất sắc! Nắm chắc khái niệm này rồi.',
+  ],
+  wrong: {
+    'q1a': '✗ Sai. Khai báo struct <strong>bắt buộc</strong> kết thúc bằng dấu <code>;</code> sau <code>}</code>. Đây là khác biệt với block code thông thường và là lỗi syntax hay gặp nhất.',
+    'q1b': '✗ Sai. Ngược lại mới đúng: Array = nhiều phần tử cùng kiểu; Struct = nhiều trường khác kiểu liên quan nhau.',
+    'q2a': '✗ Sai. Với <code>typedef</code>, bạn đã tạo alias <code>Point</code> — không cần từ khóa <code>struct</code> nữa. Nếu khai báo không dùng typedef mới cần <code>struct Point p</code>.',
+    'q2b': '✗ Bẫy! Thứ tự trong <code>{ }</code> phải khớp đúng thứ tự khai báo: <code>tuoi</code> (int) trước, rồi <code>ten</code> (char[]), rồi <code>diem</code> (float). Đây là lý do designated init <code>.field = val</code> an toàn hơn.',
+    'q2c': '✗ Sai. Nguyên nhân chính xác: Khi parser đọc đến <code>struct Node *next</code> bên trong định nghĩa, alias <code>Node</code> chưa được tạo ra (nó chỉ tạo ra sau dấu <code>}</code>). Nên cần tên struct gốc <code>struct Node</code> để forward-reference.',
+    'q3a': '✗ Sai. <code>nv.ten</code> là một array — trong C, bạn không thể gán array bằng <code>=</code> sau khi đã khai báo. Chỉ dùng <code>strcpy()</code> hoặc khởi tạo trực tiếp.',
+    'q3b': '✗ Sai. <code>b = a</code> tạo ra bản sao độc lập — khác hoàn toàn với con trỏ. Đây là điểm hay nhầm: gán struct KHÔNG giống gán con trỏ (cùng vùng nhớ).',
+    'q4a': '✗ Sai. <code>*p.tuoi</code> parse thành <code>*(p.tuoi)</code> vì dấu <code>.</code> có độ ưu tiên cao hơn <code>*</code> — đây là lỗi biên dịch vì <code>p.tuoi</code> không phải con trỏ.',
+    'q4b': '✗ Sai. <code>p</code> là con trỏ trỏ đến <code>nv</code>, không phải bản sao. Mọi thay đổi qua <code>p-></code> đều tác động trực tiếp lên vùng nhớ của <code>nv</code>.',
+    'q4c': '✗ Sai. <code>sizeof(NhanVien*)</code> là kích thước CON TRỎ (8 bytes trên 64-bit), không phải kích thước struct! Cần <code>sizeof(NhanVien)</code> — sizeof của kiểu dữ liệu, không phải con trỏ.',
+    'q5a': '✗ Sai. <code>kh</code> là biến thông thường (không phải con trỏ) nên dùng <code>.</code>. Và <code>thanhPho</code> nằm bên trong <code>diaChi</code> nên phải đi qua <code>kh.diaChi.thanhPho</code>.',
+    'q5b': '✗ Bẫy! <code>p</code> là con trỏ nên <code>p->ngaySinh</code>. Nhưng <code>ngaySinh</code> là trường kiểu <code>Date</code> (không phải con trỏ), nên tiếp theo dùng <code>.</code>: <code>p->ngaySinh.nam</code>. Rule: con trỏ → <code>-></code>, giá trị → <code>.</code>.',
+    'q6a': '✗ Sai. Struct trong C truyền theo giá trị mặc định — hàm nhận bản sao. Muốn sửa biến gốc phải truyền địa chỉ (<code>&x</code>) và hàm nhận con trỏ (<code>*</code>).',
+    'q6b': '✗ Sai. Option B mới là lỗi nghiêm trọng: trả về địa chỉ của biến local <code>nv</code> — biến này bị destroy khi hàm kết thúc, con trỏ trả về là "dangling pointer".',
+    'q6c': '✗ Sai. <code>const NhanVien *</code> là best practice: truyền địa chỉ (8 bytes, không copy) VÀ compiler ngăn hàm vô tình sửa dữ liệu. Pass-by-value copy toàn bộ struct, lãng phí khi struct lớn.',
+  }
+};
+
+function ans(btn, verdict, qId, correctId, scoreId, total) {
+  if (quizAnswered[qId]) return;
+  quizAnswered[qId] = true;
+
+  const block = btn.closest('.q-block');
+  const allBtns = block.querySelectorAll('.opt');
+  allBtns.forEach(b => b.disabled = true);
+
+  const fb = document.getElementById('res-' + qId);
+
+  if (verdict === 'correct') {
+    btn.classList.add('correct');
+    fb.className = 'q-result show ok';
+    fb.innerHTML = feedbacks.correct[Math.floor(Math.random() * feedbacks.correct.length)];
+    // update score
+    if (!quizScores[scoreId]) quizScores[scoreId] = { got: 0, total };
+    quizScores[scoreId].got++;
+  } else {
+    btn.classList.add('wrong');
+    // show correct answer
+    allBtns.forEach(b => {
+      if (b.onclick && b.onclick.toString().includes("'correct'")) b.classList.add('correct');
+    });
+    fb.className = 'q-result show bad';
+    fb.innerHTML = feedbacks.wrong[qId] || '✗ Sai. Xem lại lý thuyết và chú ý highlight.';
+    if (!quizScores[scoreId]) quizScores[scoreId] = { got: 0, total };
+  }
+
+  // Check if all questions in this step's quiz are answered
+  updateQuizScore(scoreId, total);
+}
+
+function updateQuizScore(scoreId, total) {
+  const el = document.getElementById(scoreId);
+  if (!el) return;
+  const scores = quizScores[scoreId] || { got: 0 };
+  const answered = Object.keys(quizAnswered).filter(k => k.startsWith('q' + scoreId[1])).length;
+  el.textContent = scores.got + '/' + answered + ' đúng';
+
+  // All answered for this step?
+  if (answered >= total) {
+    const stepIdx = parseInt(scoreId[1]) - 1;
+    showQuizDone(stepIdx, scores.got, total);
+    stepDone[stepIdx] = true;
+    document.getElementById('snav-' + stepIdx).classList.add('done');
+    updateProgress();
+  }
+}
+
+function showQuizDone(stepIdx, got, total) {
+  const el = document.getElementById('qd-' + stepIdx);
+  if (!el) return;
+  el.classList.remove('hidden');
+  document.getElementById('qdval-' + stepIdx).textContent = got + '/' + total;
+  const pct = got / total;
+  const msgs = ['Cần xem lại lý thuyết phần này! 💪', 'Khá đấy, nhưng còn 1 điểm cần chú ý.', 'Tốt lắm! Hiểu chắc rồi.', 'Hoàn hảo! Nắm vững toàn bộ.'];
+  const idx = pct === 0 ? 0 : pct < 0.6 ? 0 : pct < 0.8 ? 1 : pct < 1 ? 2 : 3;
+  document.getElementById('qdmsg-' + stepIdx).textContent = msgs[idx];
+}
+
+// ── HINT / SOLUTION TOGGLE ──
+function toggleHint(btn, id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('show');
+  btn.textContent = el.classList.contains('show') ? '💡 Ẩn gợi ý' : '💡 Gợi ý';
+}
+
+function toggleSol(btn, id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('show');
+  btn.textContent = el.classList.contains('show') ? '📋 Ẩn đáp án' : '📋 Xem đáp án';
+}
+
+// ── COPY CODE ──
+function cp(btn) {
+  const pre = btn.closest('.codeblock').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = 'copied!';
+    setTimeout(() => btn.textContent = 'copy', 1800);
+  });
+}
+
+// ── TAB IN TEXTAREA ──
+document.querySelectorAll('textarea.editor').forEach(ta => {
+  ta.addEventListener('keydown', e => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const s = ta.selectionStart, end = ta.selectionEnd;
+      ta.value = ta.value.substring(0,s) + '    ' + ta.value.substring(end);
+      ta.selectionStart = ta.selectionEnd = s + 4;
+    }
+  });
+});
+
+// init
+updateProgress();
+</script>
+</body>
+</html>
