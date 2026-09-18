@@ -2,137 +2,144 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0f1c17"><title>Ôn MMT · Trắc nghiệm</title>
+<meta name="theme-color" content="#3d0f1a"><title>Ôn MMT · Trắc nghiệm</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <style>
 :root{
   color-scheme:light;
-  --ink:#13201b;--muted:#5b6a62;--line:#d9ddd1;
-  --paper:#fff;--bg:#eef1eb;--panel:#f6f7f2;
-  --accent:#12594a;--accent-2:#0d4238;--accent-soft:#e5efe9;
-  --amber:#a8641b;--amber-soft:#f6ead9;
-  --good:#1f7a4c;--good-soft:#e6f3ea;
-  --bad:#ac3a30;--bad-soft:#fae9e6;
-  --sans:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --ink:#2b1c12;--muted:#7c6a54;--line:#d8c69a;
+  --paper:#fbf6e9;--bg:#ece0c1;
+  --wine:#6d1526;--wine-deep:#4a0e1a;--wine-soft:#f2e1de;
+  --gold:#93701d;--gold-deep:#6f5416;--gold-soft:#f2e7c9;
+  --good:#2e6a3a;--good-soft:#e6efe1;
+  --bad:#8a231f;--bad-soft:#f5e2df;
+  --serif-display:'Playfair Display',Georgia,serif;
+  --serif:'Lora',Georgia,serif;
+  --caps:'Cinzel',Georgia,serif;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--sans)}
+body{margin:0;background:radial-gradient(ellipse at top,#f6ecd3 0%,var(--bg) 78%);color:var(--ink);font:17px/1.65 var(--serif)}
 button,input,select,textarea{font:inherit;color:inherit}
 button,select,label.file{min-height:48px}
 button,label.file{cursor:pointer;touch-action:manipulation}
-button{border:1px solid var(--line);border-radius:8px;padding:11px 18px;color:var(--ink);background:var(--paper);font-weight:600;font-family:var(--sans);transition:border-color .12s,background .12s}
-button:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
-button:disabled{cursor:default;opacity:.4}
-button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,textarea:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
-.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
-.primary:hover:not(:disabled){background:var(--accent-2);color:#fff}
+button{border:1.5px solid var(--line);border-radius:3px;padding:12px 20px;color:var(--wine);background:var(--paper);font-weight:600;font-family:var(--serif);letter-spacing:.01em;transition:border-color .15s,background .15s,color .15s}
+button:hover:not(:disabled){border-color:var(--gold);background:var(--gold-soft)}
+button:disabled{cursor:default;opacity:.42}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,textarea:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.primary{background:var(--wine);color:var(--paper);border-color:var(--gold)}
+.primary:hover:not(:disabled){background:var(--wine-deep);color:var(--paper);border-color:var(--gold)}
 
 /* header */
-.top{background:#0f1c17;color:#eef1ea;padding:22px max(20px,env(safe-area-inset-left)) 24px;position:relative}
-.top::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:repeating-linear-gradient(90deg,#3c8a72 0 14px,transparent 14px 22px)}
+.top{background:linear-gradient(180deg,#4a0e1a,#3a0a14);color:#f3e6d2;padding:22px max(20px,env(safe-area-inset-left)) 20px;border-bottom:3px double #b08a3a;position:relative}
+.top::before{content:"";position:absolute;left:0;right:0;top:4px;height:1px;background:rgba(176,138,58,.5)}
 .top-inner{max-width:1040px;margin:auto;display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap}
-.brand{font-family:var(--mono);font-size:17px;font-weight:600;letter-spacing:.01em}
-.brand b{color:#7fd2b3;font-weight:700}
-.tag{font-family:var(--mono);font-size:12px;color:#9fb8ac}
+.brand{font-size:18px;letter-spacing:.02em}
+.brand .crest{color:#c9a24a;margin-right:6px}
+.brand b{font-family:var(--caps);font-weight:700;color:#e9cf8f;letter-spacing:.06em}
+.tag{font-family:var(--serif);font-style:italic;font-size:13.5px;color:#d8bd8c}
 
-.shell{max-width:1040px;margin:0 auto;padding:36px 20px calc(48px + env(safe-area-inset-bottom))}
-h1{font-size:clamp(28px,4.6vw,40px);line-height:1.16;letter-spacing:-.02em;margin:8px 0 14px;font-weight:700}
-h2{font-size:21px;line-height:1.4;margin:0 0 4px;font-weight:700}
-h3{font-size:16px;margin:0 0 10px;font-weight:700}
+.shell{max-width:1040px;margin:0 auto;padding:40px 20px calc(48px + env(safe-area-inset-bottom))}
+h1{font-family:var(--serif-display);font-size:clamp(30px,4.8vw,44px);line-height:1.18;letter-spacing:-.01em;margin:6px 0 8px;font-weight:700;color:var(--wine-deep)}
+h2{font-family:var(--serif-display);font-size:22px;line-height:1.4;margin:0 0 4px;font-weight:700;color:var(--wine-deep)}
+h3{font-family:var(--serif-display);font-size:17px;margin:0 0 10px;font-weight:700;color:var(--wine-deep)}
 p{margin:8px 0 16px}
 .muted{color:var(--muted)}
-.intro{max-width:640px;margin-bottom:8px}
-.kicker{font-family:var(--mono);font-size:13px;color:var(--accent);margin:0 0 10px;display:flex;align-items:center;gap:8px}
-.kicker::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--accent);display:inline-block}
+.intro{max-width:620px;margin-bottom:6px}
+.kicker{font-family:var(--serif);font-style:italic;font-size:14.5px;color:var(--gold-deep);margin:0 0 2px;display:flex;align-items:center;gap:10px}
+.kicker::before{content:"❦";font-size:15px}
+.divider{display:flex;align-items:center;gap:14px;margin:16px 0 22px;color:var(--gold)}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--line)}
+.divider span{font-size:15px}
 
-.layout{display:grid;grid-template-columns:1fr 300px;gap:28px;align-items:start;margin-top:28px}
+.layout{display:grid;grid-template-columns:1fr 300px;gap:28px;align-items:start;margin-top:8px}
 
-/* panels: document-style, not uniform boxed cards */
-.panel{background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:26px 28px}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:2px;padding:28px 30px;position:relative}
 .panel + .panel{margin-top:18px}
-.side{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:20px 22px}
+.side{background:#f6efdc;border:1px solid var(--line);border-radius:2px;padding:20px 22px}
 .side + .side{margin-top:16px}
-.side.lift{background:var(--paper);border-top:3px solid var(--accent)}
+.side.lift{background:var(--paper);border-top:3px solid var(--wine)}
 
-.field{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
-.field .idx{font-family:var(--mono);font-size:13px;color:var(--muted);flex:0 0 22px}
+.ornate::before,.ornate::after{content:"";position:absolute;width:20px;height:20px;border:2px solid var(--gold);opacity:.75;pointer-events:none}
+.ornate::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+.ornate::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+
+.field{display:flex;align-items:baseline;gap:14px;margin-bottom:18px}
+.field .idx{font-family:var(--serif-display);font-style:italic;font-size:21px;color:var(--gold);flex:0 0 26px}
 .field h2{margin:0}
 
-select,input[type=text]{width:100%;border:1px solid #c3cec5;border-radius:6px;padding:12px;background:#fff;color:var(--ink);min-width:0;font-family:var(--sans)}
-label.label{display:block;font-weight:600;margin:16px 0 7px;font-size:14px}
-.modes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0 20px}
-.mode{border:1px solid var(--line);padding:14px;border-radius:6px;display:block;cursor:pointer;line-height:1.5;background:#fff}
-.mode:has(input:checked){border:1.5px solid var(--accent);background:var(--accent-soft)}
-.mode strong{display:block;margin:7px 0 2px;font-size:15px}
+select,input[type=text]{width:100%;border:1px solid #c9b781;border-radius:3px;padding:12px;background:#fffdf6;color:var(--ink);min-width:0;font-family:var(--serif)}
+label.label{display:block;font-weight:600;margin:16px 0 7px;font-size:14.5px;color:var(--wine-deep)}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0 22px}
+.mode{border:1px solid var(--line);padding:14px;border-radius:2px;display:block;cursor:pointer;line-height:1.5;background:#fffdf6}
+.mode:has(input:checked){border:1.5px solid var(--gold);background:var(--gold-soft)}
+.mode strong{display:block;margin:7px 0 2px;font-size:15.5px;font-family:var(--serif-display);color:var(--wine-deep)}
 .mode small{color:var(--muted)}
-input[type=radio]{accent-color:var(--accent);width:18px;height:18px}
+input[type=radio]{accent-color:var(--wine);width:18px;height:18px}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .wide{width:100%}
 details{margin-top:6px;border-top:1px solid var(--line);padding-top:16px}
-summary{cursor:pointer;font-weight:600;padding:4px 0;list-style:none;display:flex;align-items:baseline;gap:12px}
+summary{cursor:pointer;font-weight:600;padding:4px 0;list-style:none;display:flex;align-items:baseline;gap:12px;color:var(--wine-deep);font-family:var(--serif-display)}
 summary::-webkit-details-marker{display:none}
-summary::before{content:"+";font-family:var(--mono);color:var(--accent);width:14px}
-details[open] summary::before{content:"–"}
-.file{display:inline-flex;align-items:center;justify-content:center;border:1px dashed #9fb6a8;border-radius:6px;padding:10px 14px;background:var(--panel);font-weight:600;position:relative}
+summary::before{content:"✦";font-size:12px;color:var(--gold);width:14px}
+.file{display:inline-flex;align-items:center;justify-content:center;border:1px dashed #b89a56;border-radius:3px;padding:10px 14px;background:#f6efdc;font-weight:600;position:relative}
 .file input{position:absolute;opacity:0;width:1px;height:1px}
-.file:focus-within{outline:3px solid var(--amber)}
-.message{font-family:var(--mono);font-size:13px;color:var(--muted);margin-top:12px;overflow-wrap:anywhere}
+.file:focus-within{outline:3px solid var(--gold)}
+.message{font-style:italic;font-size:13.5px;color:var(--muted);margin-top:12px;overflow-wrap:anywhere}
 .error{color:var(--bad)}
-.notice{padding:12px 14px;background:var(--amber-soft);border-radius:6px;font-size:14px;color:#6e4614;border:1px solid #e3c592}
+.notice{padding:12px 14px;background:var(--gold-soft);border-radius:2px;font-size:14px;color:#5c4413;border:1px solid #cdae5c}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.stat{padding:12px 4px;border-radius:6px;background:var(--bg);text-align:center}
-.stat b{display:block;font-size:24px;line-height:1.3;font-family:var(--mono);font-weight:600}
+.stat{padding:12px 4px;border-radius:2px;background:var(--bg);text-align:center;border:1px solid var(--line)}
+.stat b{display:block;font-size:25px;line-height:1.3;font-family:var(--serif-display);font-weight:700;color:var(--wine-deep)}
 .stat span{font-size:11px;color:var(--muted)}
-.instructions{padding-left:18px;color:var(--muted);font-size:14px;margin:0}
+.instructions{padding-left:18px;color:var(--muted);font-size:14.5px;margin:0}
 .instructions li{margin-bottom:9px}
-.eyebrow{font-family:var(--mono);font-size:12.5px;color:var(--accent);font-weight:600}
+.eyebrow{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--gold-deep);font-weight:600}
 
 /* practice */
 .headrow{display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap}
-.pill{font-family:var(--mono);font-size:13px;border:1px solid var(--accent);color:var(--accent);border-radius:5px;padding:3px 9px;font-weight:600}
-.progress{height:6px;background:repeating-linear-gradient(90deg,#dfe5da 0 8px,#eef1eb 8px 10px);border-radius:3px;overflow:hidden;margin:14px 0 22px}
-.progress div{height:100%;background:var(--accent)}
-#question-card{border-top:3px solid var(--accent);box-shadow:0 6px 20px rgba(15,28,23,.06)}
-.question{font-size:20px;line-height:1.55;margin:14px 0 12px;overflow-wrap:anywhere;font-weight:600}
+.pill{font-family:var(--serif-display);font-size:13.5px;background:var(--wine);color:var(--gold-soft);border:1.5px solid var(--gold);border-radius:999px;padding:4px 14px;font-weight:700}
+.progress{height:6px;background:repeating-linear-gradient(90deg,#e2d3a4 0 9px,#efe4c5 9px 11px);border-radius:0;overflow:hidden;margin:16px 0 22px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.progress div{height:100%;background:linear-gradient(90deg,var(--wine),var(--wine-deep))}
+#question-card{border-top:3px double var(--gold);box-shadow:0 8px 22px rgba(74,14,26,.08)}
+.question{font-family:var(--serif-display);font-size:21px;line-height:1.55;margin:14px 0 12px;overflow-wrap:anywhere;font-weight:600;color:var(--ink)}
 .options{display:grid;gap:2px;margin:16px 0;border-top:1px solid var(--line)}
 .option{display:flex;gap:14px;align-items:center;text-align:left;width:100%;padding:14px 4px;font-weight:450;line-height:1.5;opacity:1!important;background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0}
-.option:hover:not(:disabled){background:var(--panel);border-color:var(--line)}
-.letter{border:1px solid #b9c6bd;flex:0 0 30px;height:30px;display:grid;place-items:center;border-radius:6px;font-weight:600;font-family:var(--mono);font-size:14px;background:#fff}
+.option:hover:not(:disabled){background:#f6efdc}
+.letter{border:1.5px solid var(--gold);flex:0 0 32px;height:32px;display:grid;place-items:center;border-radius:50%;font-weight:700;font-family:var(--serif-display);font-size:15px;background:var(--paper);color:var(--wine)}
 .option .text{flex:1;min-width:0;overflow-wrap:anywhere}
-.option.chosen{background:var(--accent-soft)}
-.option.chosen .letter{background:var(--accent);color:white;border-color:var(--accent)}
+.option.chosen{background:var(--wine-soft)}
+.option.chosen .letter{background:var(--wine);color:var(--gold-soft);border-color:var(--gold)}
 .option.correct{background:var(--good-soft)}
 .option.correct .letter{border-color:var(--good);color:var(--good)}
 .option.wrong{background:var(--bad-soft)}
 .option.wrong .letter{border-color:var(--bad);color:var(--bad)}
-.mark{font-weight:700;white-space:nowrap;font-size:12.5px;font-family:var(--mono)}
-.feedback{padding:16px 18px;background:var(--panel);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;margin-top:16px;overflow-wrap:anywhere}
+.mark{font-weight:700;white-space:nowrap;font-size:12.5px;font-family:var(--serif);font-style:italic}
+.feedback{padding:16px 18px;background:#f6efdc;border-left:3px solid var(--wine);border-radius:0 2px 2px 0;margin-top:16px;overflow-wrap:anywhere}
 .feedback.bad{border-left-color:var(--bad)}
 .feedback p{margin:8px 0}
-.feedback strong{font-family:var(--mono);font-size:14px}
-.source{font-size:12.5px;color:var(--muted);font-family:var(--mono)}
+.feedback strong{font-family:var(--serif-display);font-size:15px;color:var(--wine-deep)}
+.source{font-size:13px;color:var(--muted);font-style:italic}
 .nav{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:6px;margin-top:10px}
-.grid button{padding:4px;min-height:40px;border-radius:5px;font-weight:500;font-family:var(--mono);font-size:13px}
-.grid .ok{background:var(--good-soft);border-color:#9dccae;color:#175c3a}
-.grid .bad{background:var(--bad-soft);border-color:#e3a8a2;color:#8a3129}
-.grid .current{outline:2px solid var(--ink);outline-offset:1px}
-.result{margin-top:22px;scroll-margin-top:20px;border-top:3px solid var(--accent)}
-textarea{width:100%;min-height:80px;border:1px solid #c3cec5;padding:12px;border-radius:6px;background:var(--panel);color:var(--ink);resize:vertical;font-family:var(--mono);font-size:14px}
-.big-score{font-size:38px;line-height:1.2;letter-spacing:-.01em;margin:10px 0;font-family:var(--mono);font-weight:700;color:var(--accent)}
+.grid button{padding:4px;min-height:40px;border-radius:50%;font-weight:600;font-family:var(--serif-display);font-size:13px}
+.grid .ok{background:var(--good-soft);border-color:#9dc4a6;color:#1f4d29}
+.grid .bad{background:var(--bad-soft);border-color:#dba39d;color:#6e1a17}
+.grid .current{outline:2px solid var(--wine);outline-offset:1px}
+.result{margin-top:22px;scroll-margin-top:20px;border-top:3px double var(--gold)}
+textarea{width:100%;min-height:80px;border:1px solid #c9b781;padding:12px;border-radius:2px;background:#f6efdc;color:var(--ink);resize:vertical;font-family:var(--serif);font-size:14.5px}
+.big-score{font-family:var(--serif-display);font-style:italic;font-size:40px;line-height:1.2;letter-spacing:-.01em;margin:10px 0;font-weight:700;color:var(--wine)}
 .small{font-size:13.5px}
 .spaced{margin-top:16px}
 [hidden]{display:none!important}
-.footer{text-align:center;font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:36px}
-code{font-size:13px;overflow-wrap:anywhere;font-family:var(--mono)}
+.footer{text-align:center;font-family:var(--serif);font-style:italic;font-size:13px;color:var(--muted);margin-top:38px}
+code{font-size:13px;overflow-wrap:anywhere;font-family:ui-monospace,monospace}
 @media(max-width:740px){
  .layout{grid-template-columns:1fr}
- .shell{padding-top:28px;padding-left:max(15px,env(safe-area-inset-left));padding-right:max(15px,env(safe-area-inset-right))}
- .panel{padding:20px}
- .question{font-size:18px}
+ .shell{padding-top:30px;padding-left:max(15px,env(safe-area-inset-left));padding-right:max(15px,env(safe-area-inset-right))}
+ .panel{padding:22px}
+ .question{font-size:19px}
  .top{padding-top:16px;padding-bottom:16px}
  .modes{gap:8px}
  .option{padding:13px 2px}
@@ -142,25 +149,27 @@ code{font-size:13px;overflow-wrap:anywhere;font-family:var(--mono)}
 </style>
 </head>
 <body>
-<header class="top"><div class="top-inner"><span class="brand"><b>MMT</b> · phòng ôn tập</span><span class="tag">học từ tài liệu gốc, có trích dẫn</span></div></header>
+<header class="top"><div class="top-inner"><span class="brand"><span class="crest">♛</span><b>MMT</b> · phòng ôn tập</span><span class="tag">học từ tài liệu gốc, có trích dẫn</span></div></header>
 <main class="shell">
 <section id="setup">
-<div class="intro"><p class="kicker">Ôn từng câu, có căn cứ</p><h1>Mỗi lần làm, nhớ thêm một chút.</h1><p class="muted">Chọn bộ đề, bắt đầu ôn. Đáp án và phần giải thích xuất hiện ngay sau khi bạn trả lời.</p></div>
+<div class="intro"><p class="kicker">Ôn từng câu, có căn cứ</p><h1>Mỗi lần làm, nhớ thêm một chút.</h1></div>
+<div class="divider"><span>❧</span></div>
+<p class="muted intro" style="margin-top:-14px">Chọn bộ đề, bắt đầu ôn. Đáp án và phần giải thích xuất hiện ngay sau khi bạn trả lời.</p>
 <div class="layout"><div class="panel">
-<div class="field"><span class="idx">01</span><h2>Bắt đầu buổi ôn</h2></div>
+<div class="field"><span class="idx">I.</span><h2>Bắt đầu buổi ôn</h2></div>
 <label class="label" for="bank">Bộ câu hỏi</label><select id="bank"></select>
 <p id="bank-info" class="message" aria-live="polite"></p>
-<div class="field" style="margin-top:22px"><span class="idx">02</span><h2 style="font-size:16px">Cách luyện tập</h2></div>
+<div class="field" style="margin-top:22px"><span class="idx">II.</span><h2 style="font-size:17px">Cách luyện tập</h2></div>
 <fieldset style="border:0;padding:0;margin:0"><div class="modes"><label class="mode"><input type="radio" name="mode" value="all" checked><strong>Làm toàn bộ</strong><small>Theo thứ tự đề gốc</small></label><label class="mode"><input type="radio" name="mode" value="random"><strong>20 câu ngẫu nhiên</strong><small>Không phân chia mức độ</small></label></div></fieldset>
 <button id="start" class="primary wide" disabled>Bắt đầu làm bài</button>
-<details><summary>03&nbsp; Thêm bộ câu hỏi .md</summary><p class="small muted">Chọn file trên thiết bị, hoặc nạp đường dẫn khi trang đang chạy qua máy chủ web.</p><label class="file wide">＋ Chọn file .md từ thiết bị<input id="file" type="file" accept=".md,.txt,text/markdown,text/plain"></label><label class="label small" for="path">Đường dẫn bộ đề</label><div class="row"><input id="path" type="text" placeholder="questions/chuong-2.md" aria-label="Đường dẫn file Markdown"><button id="load-path" class="wide">Nạp bộ đề từ đường dẫn</button></div><p class="small muted">Có thể thêm đường dẫn cố định vào danh sách QUESTION_FILES trong index.html. File nhập trực tiếp được giữ trong trình duyệt này nếu bộ nhớ trình duyệt cho phép.</p></details>
+<details><summary>Thêm bộ câu hỏi .md</summary><p class="small muted">Chọn file trên thiết bị, hoặc nạp đường dẫn khi trang đang chạy qua máy chủ web.</p><label class="file wide">＋ Chọn file .md từ thiết bị<input id="file" type="file" accept=".md,.txt,text/markdown,text/plain"></label><label class="label small" for="path">Đường dẫn bộ đề</label><div class="row"><input id="path" type="text" placeholder="questions/chuong-2.md" aria-label="Đường dẫn file Markdown"><button id="load-path" class="wide">Nạp bộ đề từ đường dẫn</button></div><p class="small muted">Có thể thêm đường dẫn cố định vào danh sách QUESTION_FILES trong index.html. File nhập trực tiếp được giữ trong trình duyệt này nếu bộ nhớ trình duyệt cho phép.</p></details>
 <p id="load-status" class="message" role="status"></p>
 </div><aside><div class="side lift"><div class="eyebrow">Sẵn sàng để luyện</div><div id="counts" class="stats spaced"></div><p class="small muted spaced">Số câu gốc luôn được giữ nguyên, kể cả khi làm ngẫu nhiên.</p></div><div class="side"><h3>Cách chấm bài</h3><ul class="instructions"><li>Chọn một: chạm là chấm ngay.</li><li>Chọn nhiều: chấm ngay khi chọn đủ số ý yêu cầu. Có thể bỏ chọn trước khi đủ.</li><li>Mỗi câu chỉ trả lời một lần trong lượt làm.</li><li>Chấm theo đáp án đề gốc. Giải thích có tên tài liệu và số trang.</li></ul><p class="notice">Nếu nguồn không đủ căn cứ, chỉ hiển thị "Không có trong tài liệu nguồn".</p></div></aside></div>
 </section>
 <section id="practice" hidden>
 <div class="headrow"><div><div class="eyebrow" id="mode-label"></div><h2 id="quiz-title" style="margin:6px 0 0"></h2></div></div>
-<div class="layout"><div><article class="panel" id="question-card"><div class="headrow"><span id="position" class="pill"></span><span id="progress-text" class="small muted"></span></div><div class="progress" role="progressbar" aria-label="Số câu đã trả lời" aria-valuemin="0" aria-valuenow="0"><div id="progress-fill"></div></div><div class="eyebrow" id="original-id"></div><h2 id="question" class="question" tabindex="-1"></h2><p id="choose-hint" class="small muted"></p><div id="options" class="options"></div><div class="nav"><button id="prev">← Câu trước</button><button id="next">Câu tiếp →</button></div><div id="feedback" aria-live="polite"></div></article>
-<section id="result" class="panel result" hidden tabindex="-1"><div class="eyebrow" id="result-state"></div><h2>Kết quả buổi ôn</h2><div id="score" class="big-score"></div><p id="result-detail" class="muted"></p><label for="wrong-list" class="label">Các câu làm sai · số câu đề gốc</label><textarea id="wrong-list" readonly placeholder="Chưa có câu sai"></textarea><button id="copy" class="primary wide spaced">Sao chép danh sách câu sai</button><p id="copy-status" class="message" role="status"></p><p id="unanswered" class="small muted"></p><p class="small muted">Danh sách chỉ chứa số câu, sắp xếp tăng dần. Câu chưa trả lời không tính là câu sai.</p></section>
+<div class="layout"><div><article class="panel ornate" id="question-card"><div class="headrow"><span id="position" class="pill"></span><span id="progress-text" class="small muted"></span></div><div class="progress" role="progressbar" aria-label="Số câu đã trả lời" aria-valuemin="0" aria-valuenow="0"><div id="progress-fill"></div></div><div class="eyebrow" id="original-id"></div><h2 id="question" class="question" tabindex="-1"></h2><p id="choose-hint" class="small muted"></p><div id="options" class="options"></div><div class="nav"><button id="prev">← Câu trước</button><button id="next">Câu tiếp →</button></div><div id="feedback" aria-live="polite"></div></article>
+<section id="result" class="panel result ornate" hidden tabindex="-1"><div class="eyebrow" id="result-state"></div><h2>Kết quả buổi ôn</h2><div id="score" class="big-score"></div><p id="result-detail" class="muted"></p><label for="wrong-list" class="label">Các câu làm sai · số câu đề gốc</label><textarea id="wrong-list" readonly placeholder="Chưa có câu sai"></textarea><button id="copy" class="primary wide spaced">Sao chép danh sách câu sai</button><p id="copy-status" class="message" role="status"></p><p id="unanswered" class="small muted"></p><p class="small muted">Danh sách chỉ chứa số câu, sắp xếp tăng dần. Câu chưa trả lời không tính là câu sai.</p></section>
 </div><aside><div class="side lift"><h3>Buổi ôn của bạn</h3><div id="live-stats" class="stats"></div><button id="show-result" class="wide spaced">Xem kết quả</button><button id="new" class="wide spaced">Chọn đề / Làm lượt mới</button><details id="question-map"><summary>Đi đến câu hỏi</summary><p class="small muted">Số trong ô là số câu đề gốc. ✓ đúng · × sai · … chưa chấm.</p><div class="grid" id="map"></div></details></div><div class="side side-note"><h3>Ôn có đối chiếu</h3><p class="small muted">Phần giải thích chỉ dựa trên tài liệu đã cung cấp. Những chỗ đề và slide chưa khớp được ghi chú ngay dưới đáp án.</p></div></aside></div>
 </section><footer class="footer">MMT · Tự học theo nhịp của bạn</footer>
 </main>
@@ -170,7 +179,6 @@ code{font-size:13px;overflow-wrap:anywhere;font-family:var(--mono)}
 const QUESTION_FILES = [
   { title: 'Chương 1 · Tổng quan về Mạng máy tính và Internet', path: 'questions/chuong-1.md' },
   { title: 'Chương 2 · Chuyển mạch Ethernet', path: 'questions/chuong-2.md' },
-  { title: 'Chương 3 · Giao thức Internet ', path: 'questions/chuong-3.md' },
   // { title: 'Chương 2 · Ethernet', path: 'questions/chuong-2.md' },
 ];
 const $ = id => document.getElementById(id);
