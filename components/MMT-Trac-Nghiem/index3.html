@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f1c17"><title>Ôn MMT · Trắc nghiệm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:light;
+  --ink:#13201b;--muted:#5b6a62;--line:#d9ddd1;
+  --paper:#fff;--bg:#eef1eb;--panel:#f6f7f2;
+  --accent:#12594a;--accent-2:#0d4238;--accent-soft:#e5efe9;
+  --amber:#a8641b;--amber-soft:#f6ead9;
+  --good:#1f7a4c;--good-soft:#e6f3ea;
+  --bad:#ac3a30;--bad-soft:#fae9e6;
+  --sans:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--sans)}
+button,input,select,textarea{font:inherit;color:inherit}
+button,select,label.file{min-height:48px}
+button,label.file{cursor:pointer;touch-action:manipulation}
+button{border:1px solid var(--line);border-radius:8px;padding:11px 18px;color:var(--ink);background:var(--paper);font-weight:600;font-family:var(--sans);transition:border-color .12s,background .12s}
+button:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
+button:disabled{cursor:default;opacity:.4}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,textarea:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.primary:hover:not(:disabled){background:var(--accent-2);color:#fff}
+
+/* header */
+.top{background:#0f1c17;color:#eef1ea;padding:22px max(20px,env(safe-area-inset-left)) 24px;position:relative}
+.top::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:repeating-linear-gradient(90deg,#3c8a72 0 14px,transparent 14px 22px)}
+.top-inner{max-width:1040px;margin:auto;display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand{font-family:var(--mono);font-size:17px;font-weight:600;letter-spacing:.01em}
+.brand b{color:#7fd2b3;font-weight:700}
+.tag{font-family:var(--mono);font-size:12px;color:#9fb8ac}
+
+.shell{max-width:1040px;margin:0 auto;padding:36px 20px calc(48px + env(safe-area-inset-bottom))}
+h1{font-size:clamp(28px,4.6vw,40px);line-height:1.16;letter-spacing:-.02em;margin:8px 0 14px;font-weight:700}
+h2{font-size:21px;line-height:1.4;margin:0 0 4px;font-weight:700}
+h3{font-size:16px;margin:0 0 10px;font-weight:700}
+p{margin:8px 0 16px}
+.muted{color:var(--muted)}
+.intro{max-width:640px;margin-bottom:8px}
+.kicker{font-family:var(--mono);font-size:13px;color:var(--accent);margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.kicker::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--accent);display:inline-block}
+
+.layout{display:grid;grid-template-columns:1fr 300px;gap:28px;align-items:start;margin-top:28px}
+
+/* panels: document-style, not uniform boxed cards */
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:26px 28px}
+.panel + .panel{margin-top:18px}
+.side{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:20px 22px}
+.side + .side{margin-top:16px}
+.side.lift{background:var(--paper);border-top:3px solid var(--accent)}
+
+.field{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
+.field .idx{font-family:var(--mono);font-size:13px;color:var(--muted);flex:0 0 22px}
+.field h2{margin:0}
+
+select,input[type=text]{width:100%;border:1px solid #c3cec5;border-radius:6px;padding:12px;background:#fff;color:var(--ink);min-width:0;font-family:var(--sans)}
+label.label{display:block;font-weight:600;margin:16px 0 7px;font-size:14px}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0 20px}
+.mode{border:1px solid var(--line);padding:14px;border-radius:6px;display:block;cursor:pointer;line-height:1.5;background:#fff}
+.mode:has(input:checked){border:1.5px solid var(--accent);background:var(--accent-soft)}
+.mode strong{display:block;margin:7px 0 2px;font-size:15px}
+.mode small{color:var(--muted)}
+input[type=radio]{accent-color:var(--accent);width:18px;height:18px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.wide{width:100%}
+details{margin-top:6px;border-top:1px solid var(--line);padding-top:16px}
+summary{cursor:pointer;font-weight:600;padding:4px 0;list-style:none;display:flex;align-items:baseline;gap:12px}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"+";font-family:var(--mono);color:var(--accent);width:14px}
+details[open] summary::before{content:"–"}
+.file{display:inline-flex;align-items:center;justify-content:center;border:1px dashed #9fb6a8;border-radius:6px;padding:10px 14px;background:var(--panel);font-weight:600;position:relative}
+.file input{position:absolute;opacity:0;width:1px;height:1px}
+.file:focus-within{outline:3px solid var(--amber)}
+.message{font-family:var(--mono);font-size:13px;color:var(--muted);margin-top:12px;overflow-wrap:anywhere}
+.error{color:var(--bad)}
+.notice{padding:12px 14px;background:var(--amber-soft);border-radius:6px;font-size:14px;color:#6e4614;border:1px solid #e3c592}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{padding:12px 4px;border-radius:6px;background:var(--bg);text-align:center}
+.stat b{display:block;font-size:24px;line-height:1.3;font-family:var(--mono);font-weight:600}
+.stat span{font-size:11px;color:var(--muted)}
+.instructions{padding-left:18px;color:var(--muted);font-size:14px;margin:0}
+.instructions li{margin-bottom:9px}
+.eyebrow{font-family:var(--mono);font-size:12.5px;color:var(--accent);font-weight:600}
+
+/* practice */
+.headrow{display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap}
+.pill{font-family:var(--mono);font-size:13px;border:1px solid var(--accent);color:var(--accent);border-radius:5px;padding:3px 9px;font-weight:600}
+.progress{height:6px;background:repeating-linear-gradient(90deg,#dfe5da 0 8px,#eef1eb 8px 10px);border-radius:3px;overflow:hidden;margin:14px 0 22px}
+.progress div{height:100%;background:var(--accent)}
+#question-card{border-top:3px solid var(--accent);box-shadow:0 6px 20px rgba(15,28,23,.06)}
+.question{font-size:20px;line-height:1.55;margin:14px 0 12px;overflow-wrap:anywhere;font-weight:600}
+.options{display:grid;gap:2px;margin:16px 0;border-top:1px solid var(--line)}
+.option{display:flex;gap:14px;align-items:center;text-align:left;width:100%;padding:14px 4px;font-weight:450;line-height:1.5;opacity:1!important;background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0}
+.option:hover:not(:disabled){background:var(--panel);border-color:var(--line)}
+.letter{border:1px solid #b9c6bd;flex:0 0 30px;height:30px;display:grid;place-items:center;border-radius:6px;font-weight:600;font-family:var(--mono);font-size:14px;background:#fff}
+.option .text{flex:1;min-width:0;overflow-wrap:anywhere}
+.option.chosen{background:var(--accent-soft)}
+.option.chosen .letter{background:var(--accent);color:white;border-color:var(--accent)}
+.option.correct{background:var(--good-soft)}
+.option.correct .letter{border-color:var(--good);color:var(--good)}
+.option.wrong{background:var(--bad-soft)}
+.option.wrong .letter{border-color:var(--bad);color:var(--bad)}
+.mark{font-weight:700;white-space:nowrap;font-size:12.5px;font-family:var(--mono)}
+.feedback{padding:16px 18px;background:var(--panel);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;margin-top:16px;overflow-wrap:anywhere}
+.feedback.bad{border-left-color:var(--bad)}
+.feedback p{margin:8px 0}
+.feedback strong{font-family:var(--mono);font-size:14px}
+.source{font-size:12.5px;color:var(--muted);font-family:var(--mono)}
+.nav{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:6px;margin-top:10px}
+.grid button{padding:4px;min-height:40px;border-radius:5px;font-weight:500;font-family:var(--mono);font-size:13px}
+.grid .ok{background:var(--good-soft);border-color:#9dccae;color:#175c3a}
+.grid .bad{background:var(--bad-soft);border-color:#e3a8a2;color:#8a3129}
+.grid .current{outline:2px solid var(--ink);outline-offset:1px}
+.result{margin-top:22px;scroll-margin-top:20px;border-top:3px solid var(--accent)}
+textarea{width:100%;min-height:80px;border:1px solid #c3cec5;padding:12px;border-radius:6px;background:var(--panel);color:var(--ink);resize:vertical;font-family:var(--mono);font-size:14px}
+.big-score{font-size:38px;line-height:1.2;letter-spacing:-.01em;margin:10px 0;font-family:var(--mono);font-weight:700;color:var(--accent)}
+.small{font-size:13.5px}
+.spaced{margin-top:16px}
+[hidden]{display:none!important}
+.footer{text-align:center;font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:36px}
+code{font-size:13px;overflow-wrap:anywhere;font-family:var(--mono)}
+@media(max-width:740px){
+ .layout{grid-template-columns:1fr}
+ .shell{padding-top:28px;padding-left:max(15px,env(safe-area-inset-left));padding-right:max(15px,env(safe-area-inset-right))}
+ .panel{padding:20px}
+ .question{font-size:18px}
+ .top{padding-top:16px;padding-bottom:16px}
+ .modes{gap:8px}
+ .option{padding:13px 2px}
+ .side-note{display:none}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-inner"><span class="brand"><b>MMT</b> · phòng ôn tập</span><span class="tag">học từ tài liệu gốc, có trích dẫn</span></div></header>
+<main class="shell">
+<section id="setup">
+<div class="intro"><p class="kicker">Ôn từng câu, có căn cứ</p><h1>Mỗi lần làm, nhớ thêm một chút.</h1><p class="muted">Chọn bộ đề, bắt đầu ôn. Đáp án và phần giải thích xuất hiện ngay sau khi bạn trả lời.</p></div>
+<div class="layout"><div class="panel">
+<div class="field"><span class="idx">01</span><h2>Bắt đầu buổi ôn</h2></div>
+<label class="label" for="bank">Bộ câu hỏi</label><select id="bank"></select>
+<p id="bank-info" class="message" aria-live="polite"></p>
+<div class="field" style="margin-top:22px"><span class="idx">02</span><h2 style="font-size:16px">Cách luyện tập</h2></div>
+<fieldset style="border:0;padding:0;margin:0"><div class="modes"><label class="mode"><input type="radio" name="mode" value="all" checked><strong>Làm toàn bộ</strong><small>Theo thứ tự đề gốc</small></label><label class="mode"><input type="radio" name="mode" value="random"><strong>20 câu ngẫu nhiên</strong><small>Không phân chia mức độ</small></label></div></fieldset>
+<button id="start" class="primary wide" disabled>Bắt đầu làm bài</button>
+<details><summary>03&nbsp; Thêm bộ câu hỏi .md</summary><p class="small muted">Chọn file trên thiết bị, hoặc nạp đường dẫn khi trang đang chạy qua máy chủ web.</p><label class="file wide">＋ Chọn file .md từ thiết bị<input id="file" type="file" accept=".md,.txt,text/markdown,text/plain"></label><label class="label small" for="path">Đường dẫn bộ đề</label><div class="row"><input id="path" type="text" placeholder="questions/chuong-2.md" aria-label="Đường dẫn file Markdown"><button id="load-path" class="wide">Nạp bộ đề từ đường dẫn</button></div><p class="small muted">Có thể thêm đường dẫn cố định vào danh sách QUESTION_FILES trong index.html. File nhập trực tiếp được giữ trong trình duyệt này nếu bộ nhớ trình duyệt cho phép.</p></details>
+<p id="load-status" class="message" role="status"></p>
+</div><aside><div class="side lift"><div class="eyebrow">Sẵn sàng để luyện</div><div id="counts" class="stats spaced"></div><p class="small muted spaced">Số câu gốc luôn được giữ nguyên, kể cả khi làm ngẫu nhiên.</p></div><div class="side"><h3>Cách chấm bài</h3><ul class="instructions"><li>Chọn một: chạm là chấm ngay.</li><li>Chọn nhiều: chấm ngay khi chọn đủ số ý yêu cầu. Có thể bỏ chọn trước khi đủ.</li><li>Mỗi câu chỉ trả lời một lần trong lượt làm.</li><li>Chấm theo đáp án đề gốc. Giải thích có tên tài liệu và số trang.</li></ul><p class="notice">Nếu nguồn không đủ căn cứ, chỉ hiển thị "Không có trong tài liệu nguồn".</p></div></aside></div>
+</section>
+<section id="practice" hidden>
+<div class="headrow"><div><div class="eyebrow" id="mode-label"></div><h2 id="quiz-title" style="margin:6px 0 0"></h2></div></div>
+<div class="layout"><div><article class="panel" id="question-card"><div class="headrow"><span id="position" class="pill"></span><span id="progress-text" class="small muted"></span></div><div class="progress" role="progressbar" aria-label="Số câu đã trả lời" aria-valuemin="0" aria-valuenow="0"><div id="progress-fill"></div></div><div class="eyebrow" id="original-id"></div><h2 id="question" class="question" tabindex="-1"></h2><p id="choose-hint" class="small muted"></p><div id="options" class="options"></div><div class="nav"><button id="prev">← Câu trước</button><button id="next">Câu tiếp →</button></div><div id="feedback" aria-live="polite"></div></article>
+<section id="result" class="panel result" hidden tabindex="-1"><div class="eyebrow" id="result-state"></div><h2>Kết quả buổi ôn</h2><div id="score" class="big-score"></div><p id="result-detail" class="muted"></p><label for="wrong-list" class="label">Các câu làm sai · số câu đề gốc</label><textarea id="wrong-list" readonly placeholder="Chưa có câu sai"></textarea><button id="copy" class="primary wide spaced">Sao chép danh sách câu sai</button><p id="copy-status" class="message" role="status"></p><p id="unanswered" class="small muted"></p><p class="small muted">Danh sách chỉ chứa số câu, sắp xếp tăng dần. Câu chưa trả lời không tính là câu sai.</p></section>
+</div><aside><div class="side lift"><h3>Buổi ôn của bạn</h3><div id="live-stats" class="stats"></div><button id="show-result" class="wide spaced">Xem kết quả</button><button id="new" class="wide spaced">Chọn đề / Làm lượt mới</button><details id="question-map"><summary>Đi đến câu hỏi</summary><p class="small muted">Số trong ô là số câu đề gốc. ✓ đúng · × sai · … chưa chấm.</p><div class="grid" id="map"></div></details></div><div class="side side-note"><h3>Ôn có đối chiếu</h3><p class="small muted">Phần giải thích chỉ dựa trên tài liệu đã cung cấp. Những chỗ đề và slide chưa khớp được ghi chú ngay dưới đáp án.</p></div></aside></div>
+</section><footer class="footer">MMT · Tự học theo nhịp của bạn</footer>
+</main>
+<script>
+'use strict';
+// THÊM BỘ ĐỀ Ở ĐÂY. Đường dẫn tính từ vị trí index.html.
+const QUESTION_FILES = [
+  { title: 'Chương 1 · Tổng quan về Mạng máy tính và Internet', path: 'questions/chuong-1.md' },
+  { title: 'Chương 2 · Chuyển mạch Ethernet', path: 'questions/chuong-2.md' },
+  // { title: 'Chương 2 · Ethernet', path: 'questions/chuong-2.md' },
+];
+const $ = id => document.getElementById(id);
+const banks = new Map(); let active = null, run = [], answered = {}, pending = {}, position = 0, resultVisible = false;
+let loadingVersion = 0;
+function parseMarkdown(raw){
+ const text=raw.replace(/^\uFEFF/,'').replace(/\r/g,'');
+ const title=(text.match(/^# (.+)$/m)||[])[1];
+ if(!title) throw Error('Thiếu tiêu đề bộ đề: dòng đầu cần có # Tên bộ đề.');
+ const chunks=text.split(/^## Câu (\d+)\s*$/m); const questions=[]; const ids=new Set();
+ for(let i=1;i<chunks.length;i+=2){
+  const id=Number(chunks[i]); if(!Number.isSafeInteger(id)||id<1||ids.has(id)) throw Error('Số câu không hợp lệ hoặc trùng: '+id); ids.add(id);
+  const fields={}, options={}; let current=null;
+  for(const line of chunks[i+1].split('\n')){
+   if(!line.trim())continue;
+   let m=line.match(/^([A-Z])\.\s+(.+)$/);
+   if(m){if(options[m[1]])throw Error('Câu '+id+': trùng lựa chọn '+m[1]);options[m[1]]=m[2].trim();current=['option',m[1]];continue;}
+   m=line.match(/^(Câu hỏi|Chọn|Đáp án|Giải thích|Nguồn|Lưu ý|Trang đề):\s*(.*)$/);
+   if(m){if(Object.hasOwn(fields,m[1]))throw Error('Câu '+id+': trùng trường '+m[1]); fields[m[1]]=m[2].trim();current=['field',m[1]];continue;}
+   if(current){const target=current[0]==='option'?options:fields;target[current[1]]+=' '+line.trim();}
+   else throw Error('Câu '+id+': dòng không đúng định dạng: '+line);
+  }
+  const answer=(fields['Đáp án']||'').split(/[,;\s]+/).filter(Boolean);const count=Number(fields['Chọn']);
+  if(!fields['Câu hỏi']||Object.keys(options).length<2||!answer.length||new Set(answer).size!==answer.length||answer.some(a=>!options[a])||count!==answer.length)throw Error('Câu '+id+': kiểm tra câu hỏi, lựa chọn, số ý Chọn và Đáp án.');
+  if(!fields['Giải thích']||!fields['Nguồn'])throw Error('Câu '+id+': cần có Giải thích và Nguồn.');
+  questions.push({id,question:fields['Câu hỏi'],options,answer:answer.sort(),count,explanation:fields['Giải thích'],source:fields['Nguồn'],note:fields['Lưu ý']||'',page:fields['Trang đề']||''});
+ }
+ if(!questions.length)throw Error('Không tìm thấy câu hỏi. Mỗi câu bắt đầu bằng ## Câu 1.');
+ questions.sort((a,b)=>a.id-b.id);return {title,questions,raw};
+}
+function status(message,error=false){$('load-status').textContent=message;$('load-status').className='message'+(error?' error':'');}
+function addBank(key,bank){banks.set(key,bank);if(![...$('bank').options].some(o=>o.value===key)){const o=new Option(bank.title,key);$('bank').add(o);} }
+function activate(key){active=banks.get(key);$('bank').value=key;$('start').disabled=!active;if(!active){$('bank-info').textContent='Chưa nạp được bộ câu hỏi.';$('counts').replaceChildren();return;}const n=active.questions.length;const explained=active.questions.filter(q=>q.explanation!=='Không có trong tài liệu nguồn.').length;$('bank-info').textContent=n+' câu · chấm theo đáp án trong bộ đề';$('counts').replaceChildren(...statNodes([[n,'câu hỏi'],[explained,'có giải thích'],[n-explained,'thiếu nguồn']]));}
+function statNodes(items){return items.map(([n,label])=>{const div=document.createElement('div');div.className='stat';const b=document.createElement('b');b.textContent=n;const s=document.createElement('span');s.textContent=label;div.append(b,s);return div;});}
+function persistImports(){try{localStorage.setItem('mmt-imports-v1',JSON.stringify([...banks].filter(([k])=>k.startsWith('import:')).map(([key,b])=>({key,raw:b.raw}))));return true;}catch(e){return false;}}
+async function loadPath(path,key=path){
+ const ticket=++loadingVersion;$('start').disabled=true;status('Đang đọc bộ đề…');
+ try{const url=new URL(path,location.href);if(!['http:','https:'].includes(url.protocol))throw Error('Đường dẫn cần được mở qua HTTP/HTTPS. Khi mở HTML trực tiếp, hãy dùng nút “Chọn file .md từ thiết bị”.');const res=await fetch(url,{cache:'no-store'});if(!res.ok)throw Error('Không đọc được file (HTTP '+res.status+').');const bank=parseMarkdown(await res.text());if(ticket!==loadingVersion)return;addBank(key,bank);activate(key);status('Đã nạp '+bank.questions.length+' câu.');}
+ catch(e){if(ticket!==loadingVersion)return;activate([...banks.keys()].find(k=>banks.get(k)===active)||$('bank').value);status(e.message,true);}
+}
+$('bank').onchange=()=>{const key=$('bank').value;loadingVersion++;if(banks.has(key)){activate(key);status('');}else loadPath(key,key);};
+$('load-path').onclick=()=>{const path=$('path').value.trim();if(path)loadPath(path);else status('Hãy nhập đường dẫn file .md.',true);};
+$('file').onchange=async e=>{const file=e.target.files[0];if(!file)return;const ticket=++loadingVersion;try{const bank=parseMarkdown(await file.text());if(ticket!==loadingVersion)return;const key='import:'+file.name;addBank(key,bank);activate(key);status(persistImports()?'Đã thêm bộ đề và lưu trong trình duyệt.':'Đã thêm bộ đề cho phiên này. Trình duyệt không cho phép lưu lâu dài.');}catch(err){status(err.message,true);}e.target.value='';};
+function shuffle(items){const a=[...items];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+$('start').onclick=()=>{if(!active)return;const random=document.querySelector('[name=mode]:checked').value==='random';run=random?shuffle(active.questions).slice(0,20):[...active.questions];answered={};pending={};position=0;resultVisible=false;$('result').hidden=true;$('setup').hidden=true;$('practice').hidden=false;$('quiz-title').textContent=active.title;$('mode-label').textContent=random?run.length+' câu ngẫu nhiên · không phân mức độ':'Làm toàn bộ · theo thứ tự đề gốc';render();window.scrollTo(0,0);};
+function stats(){const done=Object.keys(answered).length;const right=Object.values(answered).filter(a=>a.correct).length;return {done,right,wrong:done-right};}
+function choose(letter){const q=run[position];if(answered[q.id])return;const sel=pending[q.id]||[];const at=sel.indexOf(letter);if(at<0)sel.push(letter);else sel.splice(at,1);pending[q.id]=sel;if(sel.length===q.count){answered[q.id]={selected:[...sel].sort(),correct:[...sel].sort().join(',')===q.answer.join(',')};if(stats().done===run.length)resultVisible=true;}render();}
+function render(){const q=run[position],a=answered[q.id],sel=pending[q.id]||[],s=stats();$('position').textContent='Câu '+(position+1)+' / '+run.length;$('progress-text').textContent=s.done+'/'+run.length+' đã làm';$('progress-fill').style.width=(s.done/run.length*100)+'%';const prog=document.querySelector('[role=progressbar]');prog.setAttribute('aria-valuenow',s.done);prog.setAttribute('aria-valuemax',run.length);$('original-id').textContent='Câu gốc #'+q.id+(q.page?' · trang '+q.page+' của đề':'');$('question').textContent=q.question;$('choose-hint').textContent=a?'Đã chấm · đáp án được khóa cho lượt này':q.count===1?'Chọn 1 đáp án · chấm ngay khi chạm':'Chọn '+q.count+' đáp án · đã chọn '+sel.length+'/'+q.count+' · đủ ý sẽ tự chấm';
+ $('options').replaceChildren();for(const [letter,txt] of Object.entries(q.options)){const btn=document.createElement('button');btn.className='option';btn.setAttribute('aria-pressed',String(sel.includes(letter)));const tag=document.createElement('span');tag.className='letter';tag.textContent=letter;const content=document.createElement('span');content.className='text';content.textContent=txt;btn.append(tag,content);if(sel.includes(letter))btn.classList.add('chosen');if(a){btn.disabled=true;const m=document.createElement('span');m.className='mark';if(q.answer.includes(letter)){btn.classList.add('correct');m.textContent='✓ Đúng';}else if(a.selected.includes(letter)){btn.classList.add('wrong');m.textContent='× Sai';}btn.append(m);}btn.onclick=()=>choose(letter);$('options').append(btn);}
+ $('feedback').replaceChildren();if(a){const box=document.createElement('div');box.className='feedback'+(a.correct?'':' bad');const title=document.createElement('strong');title.textContent=a.correct?'✓ Chính xác theo đáp án đề':'× Chưa đúng theo đáp án đề';const ans=document.createElement('p');ans.textContent='Đáp án đề: '+q.answer.join(', ')+' · Bạn chọn: '+a.selected.join(', ');const exp=document.createElement('p');exp.textContent=q.explanation;box.append(title,ans,exp);if(q.source!=='Không có'){const source=document.createElement('p');source.className='source';source.textContent='Nguồn: '+q.source;box.append(source);}if(q.note){const note=document.createElement('p');note.className='notice';note.textContent=q.note;box.append(note);}$('feedback').append(box);}
+ $('prev').disabled=position===0;$('next').disabled=position===run.length-1;$('live-stats').replaceChildren(...statNodes([[s.right,'đúng'],[s.wrong,'sai'],[run.length-s.done,'chưa làm']]));$('map').replaceChildren();run.forEach((item,i)=>{const b=document.createElement('button'),r=answered[item.id];b.textContent=item.id+(r?(r.correct?' ✓':' ×'):'');b.className=(r?(r.correct?'ok':'bad'):'')+(i===position?' current':'');b.setAttribute('aria-label','Câu gốc '+item.id+(r?(r.correct?', đúng':', sai'):', chưa chấm'));if(i===position)b.setAttribute('aria-current','true');b.onclick=()=>go(i);$('map').append(b);});if(resultVisible)renderResult();}
+function go(i){position=i;render();$('question-card').scrollIntoView({block:'start'});$('question').focus({preventScroll:true});}
+$('prev').onclick=()=>go(position-1);$('next').onclick=()=>go(position+1);
+function renderResult(){const s=stats(),wrong=run.filter(q=>answered[q.id]&&!answered[q.id].correct).map(q=>q.id).sort((a,b)=>a-b),left=run.filter(q=>!answered[q.id]).map(q=>q.id).sort((a,b)=>a-b);$('result').hidden=false;$('result-state').textContent=s.done===run.length?'Đã hoàn thành':'Kết quả tạm thời · có thể tiếp tục làm';$('score').textContent=s.right+' / '+run.length+' câu đúng';$('result-detail').textContent=s.wrong+' câu sai · '+left.length+' câu chưa làm. Mỗi câu đúng hoàn toàn tính 1 câu.';$('wrong-list').value=wrong.join(', ');$('copy').disabled=!wrong.length;$('copy-status').textContent=wrong.length?'':s.done===run.length?'Không có câu sai trong lượt này.':'Chưa ghi nhận câu sai.';$('unanswered').textContent=left.length?'Chưa trả lời (số câu gốc): '+left.join(', '):'Bạn đã trả lời toàn bộ các câu trong lượt này.';}
+$('show-result').onclick=()=>{resultVisible=true;renderResult();$('result').scrollIntoView({block:'start'});$('result').focus({preventScroll:true});};
+$('copy').onclick=async()=>{const value=$('wrong-list').value;try{if(!navigator.clipboard?.writeText)throw Error('fallback');await navigator.clipboard.writeText(value);$('copy-status').textContent='Đã sao chép danh sách câu sai.';}catch(e){const t=$('wrong-list');t.focus();t.select();t.setSelectionRange(0,t.value.length);try{if(!document.execCommand('copy'))throw Error('manual');$('copy-status').textContent='Đã sao chép danh sách câu sai.';}catch(e){$('copy-status').textContent='Danh sách đã được chọn. Hãy nhấn giữ và chọn Sao chép trên iPhone, hoặc Ctrl+C trên máy tính.';}}};
+$('new').onclick=()=>{if(stats().done&& !confirm('Bắt đầu lượt mới sẽ xóa kết quả lượt hiện tại. Bạn đã sao chép các câu sai chưa?'))return;$('practice').hidden=true;$('setup').hidden=false;window.scrollTo(0,0);};
+function init(){
+ for(const item of QUESTION_FILES) $('bank').add(new Option(item.title,item.path));
+ try{const saved=JSON.parse(localStorage.getItem('mmt-imports-v1')||'[]');for(const item of saved){try{addBank(item.key,parseMarkdown(item.raw));}catch(e){}}}catch(e){}
+ if(QUESTION_FILES.length){
+  $('bank').value=QUESTION_FILES[0].path;
+  if(['http:','https:'].includes(location.protocol)) loadPath(QUESTION_FILES[0].path);
+  else status('Hãy mở bằng GitHub Pages hoặc máy chủ web để tải file câu hỏi. Bạn cũng có thể chọn file .md từ thiết bị. HTML không chứa bộ câu hỏi nào.',true);
+ }else status('Chưa khai báo bộ đề. Thêm đường dẫn vào QUESTION_FILES hoặc chọn file .md từ thiết bị.');
+}
+init();
+</script>
+</body></html>
