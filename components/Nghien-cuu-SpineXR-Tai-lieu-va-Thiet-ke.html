@@ -1,0 +1,578 @@
+<style>
+.tool-md-preview, .export-container {
+  width: min(100%, 900px);
+  max-width: 900px;
+  min-height: 100%;
+  margin-inline: auto;
+  padding: clamp(32px, 5vw, 68px) clamp(22px, 5vw, 58px);
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+}
+.tool-md-preview img, .export-container img,
+.tool-md-preview video, .export-container video,
+.tool-md-preview svg, .export-container svg { max-width: 100%; height: auto; }
+.tool-md-preview pre, .export-container pre {
+  max-width: 100%;
+  margin: 1.4em 0;
+  padding: 1.05em 1.2em;
+  overflow-x: auto;
+  box-sizing: border-box;
+  color: var(--html-code-text) !important;
+  font-size: 0.9em;
+  line-height: 1.62;
+  tab-size: 2;
+}
+.tool-md-preview pre code, .export-container pre code {
+  display: block;
+  min-width: max-content;
+  border: 0;
+  background: transparent !important;
+  color: var(--html-code-text) !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+.tool-md-preview table, .export-container table { max-width: 100%; overflow-x: auto; }
+@media (max-width: 640px) {
+  .tool-md-preview, .export-container { padding: 28px 20px; }
+  .tool-md-preview pre, .export-container pre { margin-inline: -4px; padding: 0.9em 1em; }
+}
+
+body { margin: 0; background: #f6f8fa; color: #1f2328; }
+.tool-md-preview, .export-container {
+  background: #ffffff;
+  color: #1f2328;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+  --html-code-text: #24292f;
+  --html-code-keyword: #cf222e;
+  --html-code-title: #8250df;
+  --html-code-string: #0a3069;
+  --html-code-number: #0550ae;
+  --html-code-comment: #6e7781;
+}
+h1, h2, h3, h4 { color: #1f2328; font-weight: 650; line-height: 1.25; }
+h1 { margin-bottom: 0.7em; padding-bottom: 0.32em; border-bottom: 1px solid #d8dee4; font-size: 2em; }
+h2 { margin-top: 1.75em; padding-bottom: 0.3em; border-bottom: 1px solid #d8dee4; font-size: 1.5em; }
+h3 { margin-top: 1.5em; font-size: 1.25em; }
+a { color: #0969da; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+blockquote { margin: 1em 0; padding: 0 1em; border-left: 0.25em solid #d0d7de; color: #59636e; }
+code { border-radius: 6px; background: #eff1f3; color: #1f2328; padding: 0.18em 0.38em; font-size: 0.88em; }
+pre { border: 1px solid #d8dee4; border-radius: 8px; background: #f6f8fa; box-shadow: none; }
+pre code { background: transparent; padding: 0; }
+table { display: table; width: 100%; border-spacing: 0; border-collapse: collapse; }
+th { background: #f6f8fa; font-weight: 650; }
+th, td { border: 1px solid #d0d7de; padding: 0.55em 0.8em; }
+tr:nth-child(2n) { background: #f6f8fa; }
+hr { height: 1px; border: 0; background: #d8dee4; }
+img { border-radius: 6px; }
+
+.tool-md-preview pre .hljs-keyword, .export-container pre .hljs-keyword,
+.tool-md-preview pre .hljs-selector-tag, .export-container pre .hljs-selector-tag,
+.tool-md-preview pre .hljs-literal, .export-container pre .hljs-literal { color: var(--html-code-keyword) !important; }
+.tool-md-preview pre .hljs-title, .export-container pre .hljs-title,
+.tool-md-preview pre .hljs-title.function_, .export-container pre .hljs-title.function_,
+.tool-md-preview pre .hljs-built_in, .export-container pre .hljs-built_in { color: var(--html-code-title) !important; }
+.tool-md-preview pre .hljs-string, .export-container pre .hljs-string,
+.tool-md-preview pre .hljs-attr, .export-container pre .hljs-attr,
+.tool-md-preview pre .hljs-name, .export-container pre .hljs-name { color: var(--html-code-string) !important; }
+.tool-md-preview pre .hljs-number, .export-container pre .hljs-number,
+.tool-md-preview pre .hljs-symbol, .export-container pre .hljs-symbol,
+.tool-md-preview pre .hljs-variable, .export-container pre .hljs-variable { color: var(--html-code-number) !important; }
+.tool-md-preview pre .hljs-comment, .export-container pre .hljs-comment,
+.tool-md-preview pre .hljs-quote, .export-container pre .hljs-quote { color: var(--html-code-comment) !important; font-style: italic; }
+.tool-md-preview pre .hljs-params, .export-container pre .hljs-params,
+.tool-md-preview pre .hljs-punctuation, .export-container pre .hljs-punctuation { color: var(--html-code-text) !important; }
+</style>
+<div class="export-container">
+<h2 id="h-s-nghi-n-c-u-spinexr-t-i-li-u-n-i-dung-c-ng-v-thi-t-k-th-c-nghi-m">Hồ sơ nghiên cứu SpineXR: tài liệu, nội dung đề cương và thiết kế thực nghiệm</h2><p><strong>Đề tài:</strong> Phân tích suy giảm hiệu năng của mô hình học sâu dưới dịch chuyển phân phối dữ liệu trong phân loại X-quang cột sống.</p>
+<p><strong>Ngày tổng hợp:</strong> 05/10/2026. <strong>Trạng thái:</strong> bản thiết kế trước thực nghiệm; chưa đọc dữ liệu của người nghiên cứu, chưa huấn luyện mô hình và chưa có kết quả đo. Các tham số thực nghiệm dưới đây là đề xuất để chốt sau kiểm kê dữ liệu và chạy thử. Đây là tổng quan có định hướng, không phải tổng quan hệ thống hay tuyên bố đã bao phủ toàn bộ công trình.</p>
+<h2 id="1-nh-h-ng-v-ph-m-vi-n-n-ch-t">1. Định hướng và phạm vi nên chốt</h2><p>Đóng góp chính nên là một quy trình đánh giá đáng tin cậy: đo hiệu năng khi dữ liệu thay đổi, xác định phần có thể cải thiện bằng đổi ngưỡng và khảo sát các yếu tố liên quan. Không cần đặt mục tiêu phát minh kiến trúc mới để đề tài có giá trị.</p>
+<p>Bài toán chính được đề xuất là phân loại <strong>có phát hiện bất thường theo nhãn dữ liệu / không có phát hiện theo nhãn dữ liệu</strong>, ở mức ảnh. Không đồng nhất bài toán này với phát hiện gãy xương hoặc chẩn đoán mọi bệnh cột sống. Quy tắc chuyển nhãn phải được công bố trước khi chạy.</p>
+<p>Ba nhóm thực nghiệm:</p>
+<ol>
+<li>Đánh giá nội bộ trên dữ liệu sạch và trên ảnh bị biến đổi có kiểm soát: phần cốt lõi.</li>
+<li>Đánh giá giữa các nhóm người gán nhãn: triển khai sau khi kiểm tra quy mô, nhãn và khả năng chia nhóm.</li>
+<li>So sánh nguồn khởi tạo và kiểm toán metadata: thực hiện bằng số cấu hình giới hạn, ưu tiên kiểm soát tốt hơn số lượng mô hình.</li>
+</ol>
+<p>Nếu chỉ dùng một bộ dữ liệu, cần viết rõ đây là đánh giá nội bộ và dịch chuyển mô phỏng/giữa nhóm. Chưa thể kết luận khả năng tổng quát hóa sang bệnh viện hoặc quốc gia mới.</p>
+<h2 id="2-c-c-i-m-x-c-minh-v-c-n-i-chi-u-d-li-u">2. Các điểm đã xác minh và cần đối chiếu dữ liệu</h2><p>Theo trang phát hành PhysioNet v1.0.0, VinDr-SpineXR có 10.466 ảnh thuộc 5.000 studies; chia 8.389 ảnh train và 2.077 ảnh test. Dữ liệu có ba mã bác sĩ; mỗi study được một bác sĩ gán nhãn. CSV có <code>image_id</code>, <code>study_id</code>, <code>rad_id</code>, <code>lesion_type</code>; tuổi và giới được giữ trong DICOM. [1]</p>
+<p>Trong khi đó, tóm tắt bài báo ghi 10.468 ảnh và 2.078 ảnh test. [2] Vì vậy, số lượng trong báo cáo cuối phải dựa trên kiểm kê bản dữ liệu thực tế, kèm phiên bản và lý do loại mẫu.</p>
+<p><strong>Suy luận cho thiết kế:</strong> các nhóm bác sĩ có thể khác cả bệnh nhân, bệnh lý và ảnh. Leave-one-radiologist-out chỉ đo khác biệt giữa những nhóm này; không cô lập tác động của người đọc. Muốn kiểm tra bất đồng người đọc trực tiếp, cần nhiều bác sĩ đọc cùng ảnh và một quy trình tham chiếu chung.</p>
+<h2 id="3-danh-m-c-t-i-li-u-v-m-c-ch-s-d-ng">3. Danh mục tài liệu và mục đích sử dụng</h2><p>Các tóm tắt dưới đây là diễn giải ngắn; khi viết bản thảo cuối cần đọc đầy đủ Methods và Limitations của các bài trọng tâm.</p>
+<table>
+<thead>
+<tr>
+<th>Mã</th>
+<th>Tài liệu</th>
+<th>Nội dung cần lấy cho đề tài</th>
+<th>Giới hạn khi vận dụng</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>[1]</td>
+<td>PhysioNet, VinDr-SpineXR v1.0.0, 2021</td>
+<td>Đối chiếu schema và quy tắc gán nhãn</td>
+<td>Kiểm tra lại bản dữ liệu đang có</td>
+</tr>
+<tr>
+<td>[2]</td>
+<td>Nguyen và cs., VinDr-SpineXR, MICCAI 2021</td>
+<td>Bài báo gốc; định nghĩa nhiệm vụ và baseline</td>
+<td>Kết quả gốc không phải kết quả tái lập của nhóm</td>
+</tr>
+<tr>
+<td>[3]</td>
+<td>Zech và cs., PLOS Medicine 2018</td>
+<td>Ví dụ đánh giá mô hình X-quang giữa cơ sở</td>
+<td>Bối cảnh X-quang ngực, không suy rộng số đo sang cột sống</td>
+</tr>
+<tr>
+<td>[4]</td>
+<td>Cohen và cs., MIDL 2020</td>
+<td>Đánh giá tổng quát hóa giữa các bộ X-quang</td>
+<td>Định nghĩa nhãn giữa nguồn có thể khác</td>
+</tr>
+<tr>
+<td>[5]</td>
+<td>Geirhos và cs., Nature Machine Intelligence 2020</td>
+<td>Cơ sở về shortcut learning</td>
+<td>Không dùng khái niệm này để kết luận shortcut chỉ từ tương quan</td>
+</tr>
+<tr>
+<td>[6]</td>
+<td>Oakden-Rayner và cs., ACM CHIL 2020</td>
+<td>Hidden stratification: nhóm nhỏ có thể bị che khuất bởi chỉ số tổng</td>
+<td>Cần nhãn nhóm và đủ mẫu để kiểm tra</td>
+</tr>
+<tr>
+<td>[7]</td>
+<td>Hendrycks và Dietterich, ICLR 2019</td>
+<td>Thiết kế bộ biến đổi theo loại và mức độ</td>
+<td>Biến đổi ảnh tự nhiên không tự động phù hợp X-quang</td>
+</tr>
+<tr>
+<td>[8]</td>
+<td>Raghu và cs., NeurIPS 2019</td>
+<td>Phân tích vai trò của transfer learning trong ảnh y tế</td>
+<td>Không có kết luận pretraining luôn tốt hoặc luôn vô ích</td>
+</tr>
+<tr>
+<td>[9]</td>
+<td>Ke và cs., ACM CHIL 2021</td>
+<td>So sánh kiến trúc và ImageNet pretraining trên CheXpert</td>
+<td>Kết quả phụ thuộc kiến trúc và nhiệm vụ</td>
+</tr>
+<tr>
+<td>[10]</td>
+<td>Cohen và cs., MIDL 2022; TorchXRayVision</td>
+<td>Nguồn mô hình X-quang ngực huấn luyện sẵn</td>
+<td>Pretraining ngực không đồng nghĩa pretraining cột sống</td>
+</tr>
+<tr>
+<td>[11]</td>
+<td>Guo và cs., ICML 2017</td>
+<td>Phân biệt điểm dự đoán và xác suất được hiệu chỉnh</td>
+<td>Calibration khác điều chỉnh threshold</td>
+</tr>
+<tr>
+<td>[12]</td>
+<td>Ovadia và cs., NeurIPS 2019</td>
+<td>Đánh giá độ tin cậy khi phân phối thay đổi</td>
+<td>Hiệu chỉnh trên nguồn không bảo đảm hiệu chỉnh tốt trên đích</td>
+</tr>
+<tr>
+<td>[13]</td>
+<td>Youden, Cancer 1950</td>
+<td>Cơ sở của chỉ số J</td>
+<td>Không phải nguồn đã xác minh cho công thức J=S+T′</td>
+</tr>
+<tr>
+<td>[14]</td>
+<td>DeLong và cs., Biometrics 1988</td>
+<td>So sánh các AUROC có tương quan</td>
+<td>Cần chú ý tính phụ thuộc giữa nhiều ảnh của một người/study</td>
+</tr>
+<tr>
+<td>[15]</td>
+<td>CLAIM 2024 Update</td>
+<td>Hướng dẫn báo cáo dữ liệu, đánh giá và khả năng tái lập</td>
+<td>Dùng như checklist báo cáo, không thay thế thiết kế nghiên cứu</td>
+</tr>
+</tbody></table>
+<p><strong>Thứ tự đọc:</strong> [1]–[2] để hiểu dữ liệu; [3]–[6] để hiểu vấn đề nghiên cứu; [13], [11]–[12] cho chỉ số và ngưỡng; [7]–[10] để thiết kế thực nghiệm; [14]–[15] khi phân tích và viết báo cáo.</p>
+<p>Với mỗi bài, ghi sáu mục: câu hỏi nghiên cứu; dữ liệu và đơn vị chia tập; phương pháp; cách chọn ngưỡng; kết quả liên quan; giới hạn. Không chỉ chép điểm cao nhất.</p>
+<h2 id="4-n-i-dung-c-ng-vi-t-s-n">4. Nội dung đề cương viết sẵn</h2><h3 id="4-1-l-do-ch-n-t-i">4.1. Lý do chọn đề tài</h3><p>Học sâu tạo điều kiện phát triển các mô hình phân tích ảnh X-quang, trong đó VinDr-SpineXR cung cấp cơ sở dữ liệu và baseline cho nghiên cứu bất thường cột sống [2]. Tuy nhiên, kết quả đạt được trong một thiết lập đánh giá chưa đủ để bảo đảm mô hình duy trì hiệu năng khi điều kiện dữ liệu thay đổi. Các nghiên cứu trên X-quang ngực đã đặt ra vấn đề tổng quát hóa giữa các cơ sở và nguồn dữ liệu [3,4]. Điều này tạo động lực xây dựng những đánh giá tập trung vào độ ổn định của mô hình, bên cạnh hiệu năng trung bình.</p>
+<p>Trong phân loại nhị phân, mô hình sinh ra một điểm dự đoán và sử dụng ngưỡng để chuyển điểm này thành quyết định. Do đó, chỉ số tại một ngưỡng cố định và khả năng xếp hạng các mẫu phản ánh những khía cạnh khác nhau của hiệu năng. Nghiên cứu cần đánh giá đồng thời hai khía cạnh, thay vì sử dụng riêng Accuracy để diễn giải mọi sự thay đổi. Việc điều chỉnh ngưỡng phải được thực hiện trên tập hiệu chỉnh độc lập để tránh đánh giá quá lạc quan.</p>
+<p>Bên cạnh đó, các mô hình có thể khai thác những đặc trưng có ích trong dữ liệu phát triển nhưng kém ổn định ở điều kiện khác; đây là động lực của nghiên cứu shortcut learning [5]. Các nhóm bệnh hoặc nhóm ảnh nhỏ cũng có thể bị che khuất khi chỉ báo cáo một chỉ số tổng hợp [6]. Với đề tài này, tuổi, giới, thông tin kỹ thuật và các thành phần ngoài vùng giải phẫu sẽ được khảo sát bằng những thí nghiệm đối chứng phù hợp, thay vì mặc định xem mọi tín hiệu phụ là sai lệch.</p>
+<p>Từ các vấn đề trên, đề tài xây dựng một quy trình đánh giá tái lập cho phân loại X-quang cột sống dưới các dịch chuyển được xác định rõ, khảo sát phần suy giảm liên quan đến khả năng phân biệt và lựa chọn ngưỡng, đồng thời so sánh nguồn khởi tạo mô hình. Nghiên cứu hướng tới định lượng các thành phần và yếu tố liên quan đến suy giảm hiệu năng, không khẳng định quan hệ nhân quả vượt quá thiết kế thực nghiệm.</p>
+<h3 id="4-2-m-c-ti-u-t-ng-qu-t">4.2. Mục tiêu tổng quát</h3><p>Xây dựng và đánh giá một quy trình tái lập nhằm định lượng sự thay đổi hiệu năng của mô hình phân loại nhị phân X-quang cột sống dưới dịch chuyển mô phỏng trên ảnh và khác biệt giữa các nhóm người gán nhãn; khảo sát vai trò của nguồn pretraining, lựa chọn ngưỡng quyết định và tín hiệu ngoài ảnh.</p>
+<h3 id="4-3-m-c-ti-u-c-th-">4.3. Mục tiêu cụ thể</h3><ol>
+<li>Kiểm kê, chuẩn hóa và xác lập quy tắc nhãn, đơn vị phân tích, quy trình chia tập tránh rò rỉ.</li>
+<li>Xây dựng các mô hình đối chứng có cùng backbone với những nguồn khởi tạo khác nhau.</li>
+<li>Định lượng thay đổi AUROC và Youden’s J tại ngưỡng nguồn dưới các điều kiện dịch chuyển đã định trước.</li>
+<li>Đánh giá khả năng cải thiện J bằng ngưỡng chọn trên tập hiệu chỉnh đích có nhãn, độc lập với tập kiểm tra.</li>
+<li>Khảo sát thông tin dự đoán trong metadata và, nếu khả thi, sự phụ thuộc vào thành phần ngoài vùng giải phẫu.</li>
+<li>Báo cáo độ bất định, phân tích giới hạn và cung cấp cấu hình, mã nguồn, dự đoán cần thiết để tái lập trong điều kiện được phép chia sẻ.</li>
+</ol>
+<h3 id="4-4-c-u-h-i-nghi-n-c-u-v-gi-thuy-t">4.4. Câu hỏi nghiên cứu và giả thuyết</h3><table>
+<thead>
+<tr>
+<th>Câu hỏi</th>
+<th>Giả thuyết cần kiểm chứng</th>
+<th>Đối chứng chính</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>RQ1. Hiệu năng thay đổi thế nào khi ảnh bị biến đổi?</td>
+<td>Một số loại/mức biến đổi làm giảm AUROC hoặc J</td>
+<td>Cùng ảnh gốc, cùng mô hình, khác biến đổi</td>
+</tr>
+<tr>
+<td>RQ2. Đổi ngưỡng cải thiện được bao nhiêu?</td>
+<td>Trong một số điều kiện, J cải thiện dù AUROC không đổi</td>
+<td>Ngưỡng nguồn và ngưỡng đích trên cùng tập test</td>
+</tr>
+<tr>
+<td>RQ3. Nguồn pretraining có liên quan đến độ bền vững?</td>
+<td>Các nguồn khởi tạo tạo ra hiệu năng đích và mức suy giảm khác nhau</td>
+<td>Cùng backbone và ngân sách tinh chỉnh</td>
+</tr>
+<tr>
+<td>RQ4. Kết quả khác nhau giữa các nhóm người gán nhãn không?</td>
+<td>Hiệu năng có thể khác giữa các nhóm</td>
+<td>Phân tích nhóm và leave-one-group-out</td>
+</tr>
+<tr>
+<td>RQ5. Metadata có thông tin dự đoán không?</td>
+<td>Baseline metadata có khả năng dự đoán ngoài ngẫu nhiên trong một số thiết lập</td>
+<td>Tuổi/giới; kỹ thuật; kết hợp; dự đoán hằng</td>
+</tr>
+</tbody></table>
+<p>Các giả thuyết trên chưa phải kết luận. Kết quả không có cải thiện hoặc không có bằng chứng khác biệt vẫn là kết quả nghiên cứu hợp lệ.</p>
+<h3 id="4-5-t-ng-quan-v-kho-ng-tr-ng-d-ki-n">4.5. Tổng quan và khoảng trống dự kiến</h3><p>Tài liệu hiện có cung cấp bốn hướng tham chiếu: mô hình phân tích cột sống [2]; đánh giá tổng quát hóa X-quang [3,4]; phân tích shortcut và nhóm ẩn [5,6]; vai trò của nguồn khởi tạo [8–10]. Những hướng này gợi ý một thiết kế kết hợp đánh giá dịch chuyển, ngưỡng và tín hiệu phụ trên cùng quy trình.</p>
+<p>Khoảng trống đề xuất là thiếu một phân tích được kiểm soát trong chính phạm vi dữ liệu và điều kiện thí nghiệm của nhóm: cùng cách chia tập, cùng nhãn đích, cùng backbone, cùng quy tắc chọn ngưỡng và cùng cách định lượng bất định. Đây là <strong>khoảng trống làm việc cần tiếp tục đối chiếu tài liệu</strong>, chưa phải bằng chứng đề tài là nghiên cứu đầu tiên.</p>
+<p>Một công trình gần chủ đề để đọc bổ sung là <em>Detection and Localization of Spine Disorders from Plain Radiography</em> (2024), tại <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11612062/">https://pmc.ncbi.nlm.nih.gov/articles/PMC11612062/</a>. Cần đối chiếu nhiệm vụ và thiết kế đánh giá của bài này trước khi viết tuyên bố tính mới.</p>
+<h2 id="5-c-s-l-thuy-t-c-n-s-d-ng">5. Cơ sở lý thuyết cần sử dụng</h2><h3 id="5-1-i-m-d-o-n-ng-ng-v-kh-n-ng-ph-n-bi-t">5.1. Điểm dự đoán, ngưỡng và khả năng phân biệt</h3><p>Gọi điểm của ảnh x là s=f(x); điểm cao hơn biểu thị mô hình nghiêng về lớp dương. Với ngưỡng t, dự đoán dương khi s≥t. Ví dụ s=0,42 sẽ được phân loại âm tại t=0,50 nhưng dương tại t=0,35; trọng số mạng không thay đổi.</p>
+<p>AUROC đo khả năng xếp hạng: xác suất một mẫu dương ngẫu nhiên nhận điểm cao hơn một mẫu âm, với quy ước tính một nửa cho trường hợp bằng điểm. AUROC không sử dụng một ngưỡng quyết định riêng lẻ. Đổi ngưỡng trên cùng danh sách điểm không đổi AUROC.</p>
+<p>Calibration trả lời liệu điểm xác suất có phù hợp tần suất quan sát hay không; threshold tuning chọn ranh giới quyết định. Đây là hai thao tác khác nhau. Các nghiên cứu [11,12] là tài liệu nền để đọc về calibration và sự thay đổi độ tin cậy dưới shift. Không gọi điểm sigmoid là xác suất đáng tin cậy nếu chưa kiểm tra.</p>
+<h3 id="5-2-c-c-d-ng-thay-i-ph-n-ph-i">5.2. Các dạng thay đổi phân phối</h3><table>
+<thead>
+<tr>
+<th>Khái niệm</th>
+<th>Định nghĩa lý tưởng</th>
+<th>Cách dùng thận trọng trong đề tài</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Covariate shift</td>
+<td>P(X) đổi, P(Y|X) giữ nguyên</td>
+<td>Biến đổi ảnh là can thiệp lên đầu vào, chưa bảo đảm đầy đủ giả định này</td>
+</tr>
+<tr>
+<td>Label/prior shift</td>
+<td>P(Y) đổi, P(X|Y) giữ nguyên</td>
+<td>Tỷ lệ dương khác nhau chưa đủ chứng minh label shift thuần túy</td>
+</tr>
+<tr>
+<td>Concept shift</td>
+<td>P(Y|X) đổi</td>
+<td>Có thể liên quan đến quy tắc nhãn, nhưng khó tách bằng nhóm ảnh khác nhau</td>
+</tr>
+<tr>
+<td>Annotation-related difference</td>
+<td>Khác biệt gắn với người/quy trình gán nhãn</td>
+<td>Dùng để mô tả nhóm bác sĩ mà không khẳng định tác động nhân quả</td>
+</tr>
+<tr>
+<td>Corruption robustness</td>
+<td>Độ ổn định trước biến đổi ảnh xác định</td>
+<td>Diễn giải trong phạm vi biến đổi đã mô phỏng</td>
+</tr>
+</tbody></table>
+<p>Không dùng “label shift” làm tên chung cho mọi khác biệt người gán nhãn. Các nhóm thực tế có thể đồng thời khác nhiều thành phần phân phối.</p>
+<h3 id="5-3-c-c-ch-s-">5.3. Các chỉ số</h3><p>Với TP, TN, FP, FN từ cùng một tập đánh giá:</p>
+<ul>
+<li>Accuracy=(TP+TN)/(TP+TN+FP+FN).</li>
+<li>Sensitivity=TP/(TP+FN).</li>
+<li>Specificity=TN/(TN+FP).</li>
+<li>Precision=TP/(TP+FP).</li>
+<li>F1=2TP/(2TP+FP+FN).</li>
+<li>J(t)=Sensitivity(t)+Specificity(t)−1=TPR(t)−FPR(t). [13]</li>
+<li>Balanced accuracy=(Sensitivity+Specificity)/2=(J+1)/2.</li>
+</ul>
+<p>Accuracy và F1 chịu ảnh hưởng của thành phần lớp. Trong trường hợp prior shift thuần túy, mô hình cố định và phân phối điểm điều kiện theo lớp không đổi, AUROC và J(t) ở mức quần thể không đổi; không thể quy mọi thay đổi J cho tỷ lệ bệnh.</p>
+<p>Đề xuất hai chỉ số chính: AUROC và J tại ngưỡng nguồn. Chỉ số thứ cấp: Sensitivity, Specificity, F1, Accuracy, cùng số mẫu và tỷ lệ dương. Nếu nghiên cứu calibration, thêm Brier score và reliability plot trong một phân tích riêng. Nhóm chỉ có một lớp không tính được AUROC và không có đủ hai thành phần để tính J; ghi NA và lý do, không gán 0.</p>
+<h2 id="6-l-m-r-c-ng-th-c-j-s-t-">6. Làm rõ công thức J=S+T′</h2><h3 id="6-1-t-nh-tr-ng-ngu-n">6.1. Tình trạng nguồn</h3><p>Trong đợt tìm kiếm này chưa xác minh được bài gốc định nghĩa chính xác S và T′ trong công thức người nghiên cứu cung cấp. Vì vậy không nên dẫn công thức đó như một phương pháp đã được xác thực, cũng không tự mặc định S là AUROC hoặc Sensitivity.</p>
+<p>Phần dưới là <strong>một định nghĩa làm việc đề xuất</strong>, có đẳng thức đại số rõ ràng. Nếu công thức ban đầu đến từ tài liệu khác, phải đối chiếu trước khi thay thế.</p>
+<h3 id="6-2-m-t-c-ch-ph-n-r-c-th-s-d-ng">6.2. Một cách phân rã có thể sử dụng</h3><p>Trên miền d, với điểm của một mô hình cố định, định nghĩa:</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msubsup><mi>J</mi><mi>d</mi><mo>∗</mo></msubsup><mo>=</mo><munder><mrow><mi>sup</mi><mo>⁡</mo></mrow><mi>t</mi></munder><msub><mi>J</mi><mi>d</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="2em"></mspace><msub><mi>L</mi><mi>d</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><msubsup><mi>J</mi><mi>d</mi><mo>∗</mo></msubsup><mo>−</mo><msub><mi>J</mi><mi>d</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>≥</mo><mn>0.</mn></mrow><annotation encoding="application/x-tex">J_d^</annotation></semantics></math><em>=\sup_t J_d(t),\qquad L_d(t)=J_d^</em>-J_d(t)\geq0.</span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9857em;vertical-align:-0.247em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.09618em;">J</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.7387em;"><span style="top:-2.453em;margin-left:-0.0962em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">d</span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mbin mtight">∗</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.6444em;vertical-align:-0.8944em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.4306em;"><span style="top:-2.2056em;margin-left:0em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span><span class="mop">sup</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8944em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.09618em;">J</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0962em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">d</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">d</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.9857em;vertical-align:-0.247em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.09618em;">J</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.7387em;"><span style="top:-2.453em;margin-left:-0.0962em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">d</span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mbin mtight">∗</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.09618em;">J</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0962em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">d</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.</span></span></span></span></span></p>
+<p>Suy ra:</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>J</mi><mi>d</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><msubsup><mi>J</mi><mi>d</mi><mo>∗</mo></msubsup><mo>−</mo><msub><mi>L</mi><mi>d</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">J_d(t)=J_d^*-L_d(t).</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.09618em;">J</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0962em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">d</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.9857em;vertical-align:-0.247em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.09618em;">J</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.7387em;"><span style="top:-2.453em;margin-left:-0.0962em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">d</span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mbin mtight">∗</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">d</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mord">.</span></span></span></span></span></p>
+<p>Nếu cần dạng J=S+T′, có thể <strong>quy ước riêng trong nghiên cứu</strong> S_d=J_d^* và T′_d(t)=−L_d(t). S là mức J tối ưu theo ngưỡng một chiều; không phải AUROC, không mô tả mọi khía cạnh của khả năng phân biệt. T′ không dương theo định nghĩa này.</p>
+<p>Gọi A là miền nguồn, B là miền đích, t_A là ngưỡng đã chọn trên tập hiệu chỉnh nguồn. Với mức suy giảm dương khi hiệu năng đi xuống:</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="normal">Δ</mi><mi>J</mi><mo>=</mo><msub><mi>J</mi><mi>A</mi></msub><mo stretchy="false">(</mo><msub><mi>t</mi><mi>A</mi></msub><mo stretchy="false">)</mo><mo>−</mo><msub><mi>J</mi><mi>B</mi></msub><mo stretchy="false">(</mo><msub><mi>t</mi><mi>A</mi></msub><mo stretchy="false">)</mo><mo>=</mo><mo stretchy="false">(</mo><msubsup><mi>J</mi><mi>A</mi><mo>∗</mo></msubsup><mo>−</mo><msubsup><mi>J</mi><mi>B</mi><mo>∗</mo></msubsup><mo stretchy="false">)</mo><mo>+</mo><mo stretchy="false">[</mo><msub><mi>L</mi><mi>B</mi></msub><mo stretchy="false">(</mo><msub><mi>t</mi><mi>A</mi></msub><mo stretchy="false">)</mo><mo>−</mo><msub><mi>L</mi><mi>A</mi></msub><mo stretchy="false">(</mo><msub><mi>t</mi><mi>A</mi></msub><mo stretchy="false">)</mo><mo stretchy="false">]</mo><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">\Delta J=J_A(t_A)-J_B(t_A)
+=(J_A^</annotation></semantics></math><em>-J_B^</em>)+[L_B(t_A)-L_A(t_A)].</span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">Δ</span><span class="mord mathnormal" style="margin-right:0.09618em;">J</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.09618em;">J</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0962em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">A</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">A</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.09618em;">J</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0962em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05017em;">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">A</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.09618em;">J</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.7387em;"><span style="top:-2.453em;margin-left:-0.0962em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">A</span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mbin mtight">∗</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.09618em;">J</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.7387em;"><span style="top:-2.453em;margin-left:-0.0962em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05017em;">B</span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mbin mtight">∗</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05017em;">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">A</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">A</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">A</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)]</span><span class="mord">.</span></span></span></span></span></p>
+<p>Thành phần thứ nhất là thay đổi J tối ưu; thành phần thứ hai là thay đổi khoảng cách tới J tối ưu khi giữ ngưỡng nguồn. Cả hai thành phần có thể âm hoặc dương khi so sánh hai miền. Đây là phân rã hiệu năng quan sát, không phải tách hai nguyên nhân nhân quả độc lập.</p>
+<p><strong>Ví dụ minh họa, không phải kết quả:</strong> J_A<em>=0,70 và J_A(t_A)=0,68 nên L_A=0,02; J_B</em>=0,60 và J_B(t_A)=0,45 nên L_B=0,15. Tổng suy giảm 0,23=0,10+0,13. Không được từ ví dụ này kết luận thực tế sửa ngưỡng chắc chắn phục hồi 0,15 trên dữ liệu mới.</p>
+<h3 id="6-3-ph-n-bi-t-ph-n-r-m-t-v-i-c-i-thi-n-c-th-ki-m-ch-ng">6.3. Phân biệt phân rã mô tả với cải thiện có thể kiểm chứng</h3><p>J* tính bằng cách tối ưu trực tiếp trên test là mức tốt nhất quan sát được trong mẫu đó, có thiên lệch lạc quan. Nếu báo cáo, đặt trong phân tích hậu nghiệm/oracle, không coi đó là hiệu năng triển khai hay cận trên bảo đảm của quần thể.</p>
+<p>Đánh giá cải thiện thực tế bằng:</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>G</mi><mi>B</mi></msub><mo>=</mo><msub><mi>J</mi><mrow><mi>B</mi><mo separator="true">,</mo><mrow><mi mathvariant="normal">t</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">s</mi><mi mathvariant="normal">t</mi></mrow></mrow></msub><mo stretchy="false">(</mo><msub><mover accent="true"><mi>t</mi><mo>^</mo></mover><mrow><mi>B</mi><mo separator="true">,</mo><mrow><mi mathvariant="normal">c</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">l</mi></mrow></mrow></msub><mo stretchy="false">)</mo><mo>−</mo><msub><mi>J</mi><mrow><mi>B</mi><mo separator="true">,</mo><mrow><mi mathvariant="normal">t</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">s</mi><mi mathvariant="normal">t</mi></mrow></mrow></msub><mo stretchy="false">(</mo><msub><mover accent="true"><mi>t</mi><mo>^</mo></mover><mrow><mi>A</mi><mo separator="true">,</mo><mrow><mi mathvariant="normal">c</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">l</mi></mrow></mrow></msub><mo stretchy="false">)</mo><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">G_B=J_{B,\mathrm{test}}(\hat t_{B,\mathrm{cal}})-J_{B,\mathrm{test}}(\hat t_{A,\mathrm{cal}}).</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">G</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05017em;">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1646em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.09618em;">J</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0962em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05017em;">B</span><span class="mpunct mtight">,</span><span class="mord mtight"><span class="mord mathrm mtight">test</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8785em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">t</span></span><span style="top:-3.1841em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">^</span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05017em;">B</span><span class="mpunct mtight">,</span><span class="mord mtight"><span class="mord mathrm mtight">cal</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.1646em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.09618em;">J</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0962em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05017em;">B</span><span class="mpunct mtight">,</span><span class="mord mtight"><span class="mord mathrm mtight">test</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8785em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">t</span></span><span style="top:-3.1841em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">^</span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">A</span><span class="mpunct mtight">,</span><span class="mord mtight"><span class="mord mathrm mtight">cal</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mord">.</span></span></span></span></span></p>
+<p>Hai ngưỡng được chọn trên hai tập hiệu chỉnh; đánh giá trên cùng test đích độc lập. G_B có thể âm do sai số chọn ngưỡng hoặc khác biệt calibration/test. Không cắt giá trị âm về 0. Việc dùng nhãn calibration đích là thích nghi có giám sát ở mức ngưỡng, không phải zero-shot.</p>
+<p>Không thay J* bằng J tại ngưỡng chọn trên calibration rồi vẫn mặc định L≥0: tính không âm chỉ được bảo đảm khi J* đúng là cực đại trên cùng đối tượng đánh giá.</p>
+<h2 id="7-quy-tr-nh-d-li-u">7. Quy trình dữ liệu</h2><h3 id="7-1-ki-m-k-v-t-o-manifest">7.1. Kiểm kê và tạo manifest</h3><p>Tạo bảng một dòng/một ảnh, gợi ý gồm <code>image_id</code>, đường dẫn, <code>study_id</code>, patient group nếu có, <code>rad_id</code>, nhãn nhị phân, nhãn phát hiện gốc, tuổi, giới, kích thước ảnh và các metadata đã kiểm chứng. Các trường này là schema đầu ra đề xuất; không mặc định tất cả có sẵn.</p>
+<p>Kiểm tra ảnh thiếu, file lỗi, ảnh trùng, ID trùng và ảnh cùng study. CSV nhiều dòng tổn thương phải gộp ở mức ảnh trước khi chia tập. Không biến mỗi dòng bounding box thành một mẫu ảnh độc lập.</p>
+<p>Quy tắc nhãn dự kiến: ảnh có phát hiện hợp lệ được gán 1; ảnh được xác nhận “No finding” được gán 0. Ảnh không có bản ghi nhãn không tự động là âm. Dòng mâu thuẫn hoặc thiếu phải được kiểm tra hoặc loại theo quy tắc ghi trước. Cần giải thích cách xử lý implant/foreign body vì chúng có thể tạo nhóm dương dễ nhận biết.</p>
+<h3 id="7-2-chia-nh-m-tr-nh-r-r-">7.2. Chia nhóm để tránh rò rỉ</h3><p>Ưu tiên tách theo bệnh nhân nếu có ID đáng tin cậy; nếu không, theo study và công bố giới hạn không bảo đảm tách được mọi lần chụp của cùng người. Ảnh gốc và tất cả biến thể của nó chỉ thuộc một vai trò dữ liệu.</p>
+<p>Không để train, validation, calibration và test chồng nhóm. Chỉ fit chuẩn hóa metadata, điền khuyết và chọn đặc trưng trên train. Thống kê phục vụ kiểm kê khác với việc sử dụng test để chọn mô hình.</p>
+<h3 id="7-3-ti-n-x-l-nh">7.3. Tiền xử lý ảnh</h3><p>Đề xuất quy trình DICOM cố định: đọc pixel và kiểm tra thông tin biểu diễn; xử lý phép biến đổi cường độ phù hợp; xử lý ảnh MONOCHROME1 nếu có; xác định chính sách windowing/chuẩn hóa; resize giữ tỷ lệ và padding. Kiểm tra bằng mắt một tập mẫu trước khi khóa quy trình.</p>
+<p>Không chuyển DICOM sang 8-bit bằng ép kiểu trực tiếp. Không cắt giữa ảnh máy móc nếu có nguy cơ mất cột sống. Ghi rõ độ sâu bit của ảnh xuất, quy tắc cường độ và cấu hình resize. Không dùng bounding box bệnh lý từ nhãn test để crop ảnh đưa vào mô hình chính.</p>
+<h2 id="8-thi-t-k-th-c-nghi-m-c-th-">8. Thiết kế thực nghiệm cụ thể</h2><h3 id="8-1-n-m-vai-tr-d-li-u">8.1. Năm vai trò dữ liệu</h3><table>
+<thead>
+<tr>
+<th>Tập</th>
+<th>Công dụng</th>
+<th>Điều không được làm</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Train</td>
+<td>Học trọng số và fit xử lý metadata</td>
+<td>Đưa nhóm test vào train</td>
+</tr>
+<tr>
+<td>Validation nguồn</td>
+<td>Chọn siêu tham số, checkpoint, early stopping</td>
+<td>Chọn mô hình theo test đích</td>
+</tr>
+<tr>
+<td>Calibration nguồn</td>
+<td>Chọn t_A</td>
+<td>Báo cáo chính trên chính tập chọn ngưỡng</td>
+</tr>
+<tr>
+<td>Calibration đích</td>
+<td>Chọn t_B với nhãn đích</td>
+<td>Trộn vào test đích</td>
+</tr>
+<tr>
+<td>Test</td>
+<td>Đo kết quả cuối</td>
+<td>Tối ưu ngưỡng rồi gọi kết quả là đánh giá độc lập</td>
+</tr>
+</tbody></table>
+<p>Calibration trong bảng là tập chọn ngưỡng, không hàm ý đã thực hiện probability calibration. Nếu ít dữ liệu, có thể dùng một phần phát triển chung để chọn checkpoint và ngưỡng, nhưng phải mô tả và vẫn giữ test độc lập. Thiết kế tách riêng giúp dễ diễn giải hơn.</p>
+<h3 id="8-2-e1-nh-gi-s-ch-v-corruption">8.2. E1 — Đánh giá sạch và corruption</h3><p>Giữ official test cho benchmark nội bộ nếu việc kiểm tra nhóm không phát hiện rò rỉ. Tách train thành train/validation/calibration theo nhóm; tỷ lệ chỉ chốt sau khi biết số mẫu dương/âm.</p>
+<p>Tạo biến đổi trên calibration và test độc lập với nhau nhưng dùng cùng cấu hình. Các biến đổi đầu tiên: Gaussian noise, blur, thay đổi contrast, giảm độ phân giải. Mỗi loại ba mức, cộng ảnh sạch: 13 điều kiện đánh giá mỗi mô hình. Cách tổ chức theo loại/mức được gợi ý từ [7]; tham số X-quang phải kiểm tra riêng.</p>
+<p>Khóa tham số sau pilot trên dữ liệu phát triển. Định nghĩa chính xác cường độ theo thang pixel, thứ tự biến đổi và seed. Với biến đổi ngẫu nhiên, dùng cùng ảnh biến đổi cho các mô hình để so sánh công bằng. Các mức quá mạnh có thể làm mất dấu hiệu cần đọc; chỉ gọi là stress test, không mặc định đại diện một máy chụp cụ thể.</p>
+<p>Ở mỗi điều kiện, báo cáo AUROC, J tại t_A, J tại t_B và G_B trên test. Trường hợp sạch và biến đổi có cùng ảnh nên có thể so sánh ghép cặp theo nhóm. Không huấn luyện lại cho từng corruption trong phân tích cốt lõi. Augmentation để tăng robustness là thí nghiệm mở rộng riêng.</p>
+<h3 id="8-3-e2-c-c-nh-m-ng-i-g-n-nh-n">8.3. E2 — Các nhóm người gán nhãn</h3><p>Trước hết báo cáo số study, tỷ lệ dương và phân bố đặc trưng của từng nhóm. Nếu đủ dữ liệu, tạo ba vòng leave-one-radiologist-group-out: hai nhóm làm nguồn, nhóm còn lại làm đích. Mỗi vòng có train/validation/calibration nguồn; calibration/test đích tách theo nhóm bệnh nhân/study.</p>
+<p>Khi xây dựng protocol riêng này, không gộp kết quả với official-split benchmark như cùng một phép thử. Nếu sử dụng toàn bộ dataset để lập lại split, phải ghi rõ và không còn gọi official test là untouched đối với protocol đó.</p>
+<p>Thêm đối chứng chia ngẫu nhiên theo study, giữ quy mô train tương đương khi khả thi. Nếu nhóm quá nhỏ hoặc thiếu một lớp, giới hạn thành phân tích mô tả, không cố báo cáo metric không xác định. Có thể phân tầng hoặc matching theo tuổi/giới/vùng chụp nếu các biến đủ tin cậy; đây là phân tích nhạy cảm, không loại bỏ mọi nhiễu.</p>
+<h3 id="8-4-e3-pretraining">8.4. E3 — Pretraining</h3><p>Đề xuất backbone chính DenseNet121 để thuận tiện tìm checkpoint ImageNet và X-quang ngực qua TorchXRayVision [10]. Đây là lựa chọn triển khai, chưa phải kết luận mô hình tốt nhất.</p>
+<table>
+<thead>
+<tr>
+<th>Cấu hình</th>
+<th>Khởi tạo</th>
+<th>Vai trò</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>M0</td>
+<td>Ngẫu nhiên</td>
+<td>Đối chứng không pretraining</td>
+</tr>
+<tr>
+<td>M1</td>
+<td>ImageNet</td>
+<td>Transfer learning thông dụng</td>
+</tr>
+<tr>
+<td>M2</td>
+<td>Checkpoint X-quang ngực được xác minh</td>
+<td>Khảo sát nguồn ảnh y tế</td>
+</tr>
+</tbody></table>
+<p>Thay head bằng một đầu ra nhị phân mới. Không dùng trực tiếp các đầu ra bệnh ngực làm nhãn cột sống. Kiểm tra kênh đầu vào, cấu trúc tầng, phép chuẩn hóa và lớp hậu xử lý của checkpoint. Nếu chuyển convolution 3 kênh thành 1 kênh, mô tả phép chuyển và áp dụng nhất quán. Nếu preprocessing không thể đồng nhất, phải ghi đó là yếu tố cùng thay đổi và thực hiện đối chứng khi có thể.</p>
+<p>Mỗi cấu hình chạy ba seed ban đầu. Cùng tập chia và ngân sách tìm siêu tham số; không buộc cùng learning rate nếu điều đó gây bất lợi có hệ thống cho huấn luyện từ đầu. Ghi ngân sách, tiêu chí early stopping, độ phân giải và thời gian. Bảo đảm mô hình từ đầu có cơ hội hội tụ trong phạm vi tài nguyên.</p>
+<p>Không khẳng định sự khác biệt hoàn toàn do miền pretraining: checkpoint còn khác dữ liệu, mục tiêu và quy trình huấn luyện trước. Diễn giải chính là so sánh <strong>các nguồn khởi tạo đã chọn</strong>. Không sử dụng checkpoint đã học từ test SpineXR trong đối chứng chính.</p>
+<h3 id="8-5-e4-metadata-v-th-nh-ph-n-ngo-i-gi-i-ph-u">8.5. E4 — Metadata và thành phần ngoài giải phẫu</h3><p>Phân biệt ba câu hỏi: metadata có dự đoán nhãn không; mô hình ảnh có dựa vào tín hiệu ngoài giải phẫu không; thêm metadata có cải thiện mô hình không. Ba câu hỏi cần các thí nghiệm khác nhau.</p>
+<table>
+<thead>
+<tr>
+<th>Baseline/thí nghiệm</th>
+<th>Đầu vào</th>
+<th>Câu hỏi trả lời</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>B0</td>
+<td>Dự đoán hằng theo train</td>
+<td>Mức tham chiếu cơ bản</td>
+</tr>
+<tr>
+<td>B1</td>
+<td>Tuổi, giới nếu đủ dữ liệu</td>
+<td>Thông tin dự đoán từ nhân khẩu học</td>
+</tr>
+<tr>
+<td>B2</td>
+<td>Metadata kỹ thuật đã kiểm tra</td>
+<td>Thông tin từ quy trình tạo ảnh</td>
+</tr>
+<tr>
+<td>B3</td>
+<td>B1+B2</td>
+<td>Tín hiệu kết hợp ngoài pixel</td>
+</tr>
+<tr>
+<td>A1, tùy chọn</td>
+<td>Ảnh đầy đủ và ảnh che viền/chữ theo quy tắc cố định</td>
+<td>Độ nhạy với vùng ngoài giải phẫu</td>
+</tr>
+</tbody></table>
+<p>Dùng logistic regression có regularization làm baseline dễ diễn giải. Có thể bổ sung mô hình cây sau khi B1–B3 hoạt động đúng. Điền khuyết và mã hóa chỉ fit trên train; báo cáo tỷ lệ thiếu theo nhóm. Không dùng tên file, ID study/patient, số bounding box, tên tổn thương hoặc trường sinh ra sau gán nhãn để dự đoán nhãn. <code>rad_id</code> dùng xác định nhóm/kiểm toán, không mặc định là đầu vào có sẵn khi triển khai.</p>
+<p>Metadata dự đoán tốt chưa chứng minh CNN dùng shortcut. Tuổi có thể liên quan thật tới bệnh lý. Che viền làm hiệu năng giảm cũng có thể do tạo ảnh ngoài phân phối; nên có đối chứng mask diện tích tương tự ở vị trí phù hợp và kiểm tra không che giải phẫu. Không tạo mask khác nhau giữa ảnh dương và âm bằng nhãn bệnh. Nếu đủ nguồn lực, huấn luyện và đánh giá riêng trên ảnh đã loại thành phần phụ giúp bổ sung bằng chứng.</p>
+<h2 id="9-ph-n-t-ch-th-ng-k-v-tr-nh-b-y-k-t-qu-">9. Phân tích thống kê và trình bày kết quả</h2><p>Đề xuất bootstrap theo cụm bệnh nhân, hoặc study nếu không có patient group. Giữ mọi ảnh cùng cụm khi lấy mẫu lại. Với ảnh sạch/biến đổi hoặc hai mô hình trên cùng test, dùng cùng cụm bootstrap cho cả hai nhánh để tính khoảng tin cậy của chênh lệch. Với hai nhóm test không ghép cặp, resample từng nhóm riêng.</p>
+<p>Có thể bắt đầu 2.000 lần bootstrap cho CI 95%, tăng nếu cần kiểm tra độ ổn định. Ghi số lần bootstrap, seed và cách xử lý lần lấy mẫu thiếu lớp. CI chỉ resample test là CI có điều kiện theo mô hình và ngưỡng đã học. Nếu cần bao gồm bất định chọn ngưỡng, resample calibration riêng, chọn lại ngưỡng rồi đánh giá trên test resample; vẫn giữ hai vai trò tách biệt.</p>
+<p>Ba seed phản ánh một phần biến thiên huấn luyện; không thay thế CI theo mẫu đánh giá. Báo cáo mean±SD giữa seed và CI theo mẫu với cách kết hợp được nêu rõ. Không coi các seed là ba bộ bệnh nhân độc lập. Nếu dùng ensemble, phải ghi rõ đó là mô hình ensemble, không âm thầm gộp dự đoán seed.</p>
+<p>DeLong [14] là tham chiếu so sánh AUROC trên mẫu tương quan. Với nhiều ảnh/study, nên ưu tiên cách bootstrap cụm phù hợp cấu trúc dữ liệu thay vì áp dụng mặc định kiểm định cho các ảnh độc lập.</p>
+<p>Chọn trước so sánh chính: M1 so với M2 về AUROC đích và J tại ngưỡng nguồn; t_A so với t_B về J trên cùng test. Các so sánh còn lại là thứ cấp/thăm dò. Nếu kiểm định nhiều giả thuyết, xác định họ kiểm định và quy tắc điều chỉnh, chẳng hạn Holm. Báo cáo chênh lệch và CI thay vì chỉ p-value.</p>
+<p><strong>Các bảng/hình cần có:</strong></p>
+<ol>
+<li>Luồng số mẫu: ban đầu, loại, train, validation, calibration, test.</li>
+<li>Đặc điểm dữ liệu theo split và nhóm bác sĩ.</li>
+<li>Kết quả sạch theo mô hình, ngưỡng và seed.</li>
+<li>Đường AUROC/J theo mức corruption; nêu rõ từng loại biến đổi.</li>
+<li>ROC và phân bố điểm theo lớp để hỗ trợ diễn giải.</li>
+<li>G_B và CI của cải thiện ngưỡng; J* hậu nghiệm đặt riêng.</li>
+<li>Kết quả metadata và đối chứng ảnh nếu có.</li>
+</ol>
+<p>Mẫu bảng chính, <strong>chưa có số liệu</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Điều kiện</th>
+<th>Số study/ảnh</th>
+<th>Tỷ lệ dương</th>
+<th>AUROC</th>
+<th>J(t_A)</th>
+<th>J(t_B)</th>
+<th>G_B</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>M1</td>
+<td>Sạch</td>
+<td>Chưa đo</td>
+<td>Chưa đo</td>
+<td>Chưa đo</td>
+<td>Chưa đo</td>
+<td>Chưa đo</td>
+<td>Chưa đo</td>
+</tr>
+<tr>
+<td>M1</td>
+<td>Blur mức 1</td>
+<td>Chưa đo</td>
+<td>Chưa đo</td>
+<td>Chưa đo</td>
+<td>Chưa đo</td>
+<td>Chưa đo</td>
+<td>Chưa đo</td>
+</tr>
+<tr>
+<td>M2</td>
+<td>Blur mức 1</td>
+<td>Chưa đo</td>
+<td>Chưa đo</td>
+<td>Chưa đo</td>
+<td>Chưa đo</td>
+<td>Chưa đo</td>
+<td>Chưa đo</td>
+</tr>
+</tbody></table>
+<p>Luôn báo cáo cả hiệu năng đích tuyệt đối và mức suy giảm. Mô hình có điểm nguồn thấp có thể suy giảm ít nhưng vẫn kém hơn ở đích. Không xếp hạng robustness chỉ bằng mức giảm.</p>
+<h2 id="10-k-ho-ch-th-c-hi-n-v-s-n-ph-m">10. Kế hoạch thực hiện và sản phẩm</h2><table>
+<thead>
+<tr>
+<th>Giai đoạn</th>
+<th>Việc làm</th>
+<th>Điều kiện hoàn thành</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Tuần 1</td>
+<td>Đọc [1,2], kiểm kê, chốt nhãn và nhóm</td>
+<td>Manifest, bảng dữ liệu, danh sách lỗi</td>
+</tr>
+<tr>
+<td>Tuần 2</td>
+<td>Tiền xử lý, split, baseline đầu tiên</td>
+<td>Pipeline chạy được; kiểm tra không trùng nhóm</td>
+</tr>
+<tr>
+<td>Tuần 3</td>
+<td>M0–M2 trên split sạch</td>
+<td>Checkpoint, log, dự đoán và bảng kết quả</td>
+</tr>
+<tr>
+<td>Tuần 4</td>
+<td>Corruption và ngưỡng</td>
+<td>Kết quả ghép cặp; ngưỡng chọn ngoài test</td>
+</tr>
+<tr>
+<td>Tuần 5</td>
+<td>Nhóm bác sĩ và metadata</td>
+<td>Kết quả hoặc lý do không đủ điều kiện</td>
+</tr>
+<tr>
+<td>Tuần 6</td>
+<td>CI, ablation cần thiết, báo cáo</td>
+<td>Bảng/hình tái lập và bản thảo</td>
+</tr>
+</tbody></table>
+<p>Đây là lịch làm việc đề xuất, không phải ước lượng thời gian GPU. Chạy pilot để đo thời gian/epoch và bộ nhớ trước khi cam kết toàn bộ ma trận. Bộ tối thiểu E1+E3 là 3 nguồn khởi tạo × 3 seed = 9 lượt train; corruption chỉ cần suy luận lại. Nếu thêm đầy đủ E2 với 3 vòng, cùng 3 nguồn và 3 seed sẽ thêm 27 lượt train. Có thể giảm phạm vi E2 xuống các đối chứng chính nếu tài nguyên hạn chế, nhưng phải chọn trước khi xem test.</p>
+<p><strong>Sản phẩm dự kiến viết lại:</strong> Một bộ quy tắc dữ liệu và chia tập có thể kiểm tra; pipeline huấn luyện/đánh giá; bảng định lượng thay đổi hiệu năng và lợi ích điều chỉnh ngưỡng; so sánh các nguồn khởi tạo; kiểm toán tín hiệu phụ; báo cáo NCKH và bản thảo hội thảo. Không cam kết trước mô hình cải thiện hoặc nguyên nhân suy giảm đã được chứng minh.</p>
+<p>Mã nguồn dự kiến gồm các chức năng kiểm kê, tiền xử lý, tạo split, huấn luyện, suy luận, sinh corruption, chọn ngưỡng, tính metric và bootstrap. Lưu config, phiên bản thư viện, seed, checksum checkpoint, manifest split và dự đoán từng ảnh. Checklist CLAIM [15] hỗ trợ rà soát báo cáo. Chỉ chia sẻ ảnh và dữ liệu nhạy cảm theo điều kiện sử dụng của bộ dữ liệu; không đưa ảnh gốc vào repository mã nguồn mặc định.</p>
+<h2 id="11-khung-b-o-c-o-v-c-ch-di-n-gi-i">11. Khung báo cáo và cách diễn giải</h2><p><strong>Chương 1 — Giới thiệu:</strong> bối cảnh; vấn đề tổng quát hóa; mục tiêu; câu hỏi; đóng góp dự kiến; giới hạn.</p>
+<p><strong>Chương 2 — Cơ sở và nghiên cứu liên quan:</strong> phân loại nhị phân; shift; pretraining; AUROC/J; threshold/calibration; shortcut; các nghiên cứu trong danh mục.</p>
+<p><strong>Chương 3 — Phương pháp:</strong> dữ liệu thực tế; nhãn; split; tiền xử lý; mô hình; corruption; nhóm bác sĩ; ngưỡng; metadata; thống kê.</p>
+<p><strong>Chương 4 — Kết quả:</strong> theo RQ1–RQ5, kèm CI; không trộn diễn giải chủ quan vào số đo.</p>
+<p><strong>Chương 5 — Thảo luận:</strong> đối chiếu tài liệu; các thành phần suy giảm; điều kiện ngưỡng hữu ích; giới hạn của nhãn và nguồn dữ liệu; khả năng mở rộng.</p>
+<p><strong>Chương 6 — Kết luận:</strong> những gì thí nghiệm chứng minh trong phạm vi đã xét, hạn chế và hướng tiếp theo.</p>
+<p>Mẫu diễn giải sau khi có số liệu:</p>
+<ul>
+<li>Nếu AUROC gần như ổn định và J(t_A) giảm, nhưng J(t_B) tăng: “Kết quả phù hợp với giả thuyết ngưỡng nguồn kém phù hợp trong điều kiện này; ngưỡng chọn từ calibration đích cải thiện J trên test độc lập.” Không nói AUROC bằng nhau chứng minh toàn bộ khả năng phân biệt không đổi.</li>
+<li>Nếu AUROC giảm và điều chỉnh ngưỡng ít cải thiện: “Chỉ điều chỉnh ngưỡng chưa đủ khôi phục hiệu năng trong điều kiện đã xét.” Không gọi phần còn lại là tổn thất không thể phục hồi bằng mọi phương pháp.</li>
+<li>Nếu metadata dự đoán tốt: “Metadata chứa thông tin liên quan đến nhãn.” Chưa đủ nói CNN gian lận hoặc phụ thuộc metadata.</li>
+<li>Nếu kết quả khác giữa các bác sĩ: “Hiệu năng khác giữa các nhóm người gán nhãn.” Chưa đủ nói bác sĩ là nguyên nhân hoặc nhóm nào gán nhãn sai.</li>
+</ul>
+<h2 id="12-th-ng-tin-c-n-cung-c-p-chuy-n-sang-tri-n-khai">12. Thông tin cần cung cấp để chuyển sang triển khai</h2><p>Không cần gửi toàn bộ ảnh trước. Giai đoạn tiếp theo chỉ cần:</p>
+<ol>
+<li><code>train.csv</code>, <code>test.csv</code> hoặc tên cột kèm 10–20 dòng mẫu đã loại thông tin nhận dạng.</li>
+<li>Cấu trúc thư mục, định dạng DICOM/PNG/JPG, số ảnh đang có.</li>
+<li>Thông tin có/không về study ID, patient grouping, tuổi, giới và <code>rad_id</code>.</li>
+<li>Một vài ảnh đã khử định danh hoặc thông tin kỹ thuật mẫu nếu cần kiểm tra tiền xử lý.</li>
+<li>Nguồn hoặc định nghĩa đầy đủ của J=S+T′, nếu công thức lấy từ bài báo/giảng viên.</li>
+<li>GPU có thể sử dụng và thời hạn hoàn thành.</li>
+</ol>
+<p>Từ đó có thể chốt protocol theo dữ liệu thật, tạo script audit, split và baseline đầu tiên. Trước khi có những thông tin này, không nên viết code giả định schema hoặc công bố cỡ mẫu, phân bố bệnh, hiệu năng của bản dữ liệu người nghiên cứu đang giữ.</p>
+<h2 id="t-i-li-u-tham-kh-o-v-li-n-k-t">Tài liệu tham khảo và liên kết</h2><p>[1] Pham HH, Nguyen Trung H, Nguyen HQ. <strong>VinDr-SpineXR: A large annotated medical image dataset for spinal lesions detection and classification from radiographs</strong>, v1.0.0. PhysioNet, 2021. DOI: 10.13026/q45h-5h59. <a href="https://physionet.org/content/vindr-spinexr/1.0.0/">https://physionet.org/content/vindr-spinexr/1.0.0/</a></p>
+<p>[2] Nguyen HT và cs. <strong>VinDr-SpineXR: A Deep Learning Framework for Spinal Lesions Detection and Classification from Radiographs</strong>. MICCAI, 2021, pp. 291–301. <a href="https://arxiv.org/abs/2106.12930">https://arxiv.org/abs/2106.12930</a> . Mã nguồn tác giả: <a href="https://github.com/vinbigdata-medical/vindr-spinexr">https://github.com/vinbigdata-medical/vindr-spinexr</a></p>
+<p>[3] Zech JR, Badgeley MA, Liu M, Costa AB, Titano JJ, Oermann EK. <strong>Variable generalization performance of a deep learning model to detect pneumonia in chest radiographs: A cross-sectional study</strong>. PLOS Medicine, 2018;15(11):e1002683. <a href="https://doi.org/10.1371/journal.pmed.1002683">https://doi.org/10.1371/journal.pmed.1002683</a></p>
+<p>[4] Cohen JP, Hashir M, Brooks R, Bertrand H. <strong>On the limits of cross-domain generalization in automated X-ray prediction</strong>. MIDL, 2020. <a href="https://proceedings.mlr.press/v121/cohen20a.html">https://proceedings.mlr.press/v121/cohen20a.html</a> . Mã nguồn: <a href="https://github.com/ieee8023/xray-generalization">https://github.com/ieee8023/xray-generalization</a></p>
+<p>[5] Geirhos R và cs. <strong>Shortcut learning in deep neural networks</strong>. Nature Machine Intelligence, 2020. <a href="https://doi.org/10.1038/s42256-020-00257-z">https://doi.org/10.1038/s42256-020-00257-z</a> . Bản arXiv: <a href="https://arxiv.org/abs/2004.07780">https://arxiv.org/abs/2004.07780</a></p>
+<p>[6] Oakden-Rayner L, Dunnmon J, Carneiro G, Ré C. <strong>Hidden Stratification Causes Clinically Meaningful Failures in Machine Learning for Medical Imaging</strong>. ACM CHIL, 2020; preprint 2019. <a href="https://arxiv.org/abs/1909.12475">https://arxiv.org/abs/1909.12475</a> . Toàn văn: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7665161/">https://pmc.ncbi.nlm.nih.gov/articles/PMC7665161/</a></p>
+<p>[7] Hendrycks D, Dietterich T. <strong>Benchmarking Neural Network Robustness to Common Corruptions and Perturbations</strong>. ICLR, 2019. <a href="https://arxiv.org/abs/1903.12261">https://arxiv.org/abs/1903.12261</a> . Tài nguyên tác giả: <a href="https://danhendrycks.com/robustness/">https://danhendrycks.com/robustness/</a></p>
+<p>[8] Raghu M, Zhang C, Kleinberg J, Bengio S. <strong>Transfusion: Understanding Transfer Learning for Medical Imaging</strong>. NeurIPS, 2019. <a href="https://papers.nips.cc/paper/2019/hash/eb1e78328c46506b46a4ac4a1e378b91-Abstract.html">https://papers.nips.cc/paper/2019/hash/eb1e78328c46506b46a4ac4a1e378b91-Abstract.html</a></p>
+<p>[9] Ke A, Ellsworth W, Banerjee O, Ng AY, Rajpurkar P. <strong>CheXtransfer: Performance and Parameter Efficiency of ImageNet Models for Chest X-Ray Interpretation</strong>. ACM CHIL, 2021. DOI: 10.1145/3450439.3451867. <a href="https://arxiv.org/abs/2101.06871">https://arxiv.org/abs/2101.06871</a></p>
+<p>[10] Cohen JP và cs. <strong>TorchXRayVision: A library of chest X-ray datasets and models</strong>. MIDL, PMLR 172:231–249, 2022. <a href="https://proceedings.mlr.press/v172/cohen22a.html">https://proceedings.mlr.press/v172/cohen22a.html</a> . Mã nguồn và checkpoint: <a href="https://github.com/mlmed/torchxrayvision">https://github.com/mlmed/torchxrayvision</a></p>
+<p>[11] Guo C, Pleiss G, Sun Y, Weinberger KQ. <strong>On Calibration of Modern Neural Networks</strong>. ICML, 2017. <a href="https://proceedings.mlr.press/v70/guo17a.html">https://proceedings.mlr.press/v70/guo17a.html</a> . Bản arXiv: <a href="https://arxiv.org/abs/1706.04599">https://arxiv.org/abs/1706.04599</a></p>
+<p>[12] Ovadia Y và cs. <strong>Can You Trust Your Model’s Uncertainty? Evaluating Predictive Uncertainty Under Dataset Shift</strong>. NeurIPS, 2019. <a href="https://research.google/pubs/can-you-trust-your-models-uncertainty-evaluating-predictive-uncertainty-under-dataset-shift/">https://research.google/pubs/can-you-trust-your-models-uncertainty-evaluating-predictive-uncertainty-under-dataset-shift/</a></p>
+<p>[13] Youden WJ. <strong>Index for rating diagnostic tests</strong>. Cancer, 1950;3(1):32–35. <a href="https://pubmed.ncbi.nlm.nih.gov/15405679/">https://pubmed.ncbi.nlm.nih.gov/15405679/</a></p>
+<p>[14] DeLong ER, DeLong DM, Clarke-Pearson DL. <strong>Comparing the areas under two or more correlated receiver operating characteristic curves: a nonparametric approach</strong>. Biometrics, 1988;44(3):837–845. <a href="https://pubmed.ncbi.nlm.nih.gov/3203132/">https://pubmed.ncbi.nlm.nih.gov/3203132/</a></p>
+<p>[15] <strong>Checklist for Artificial Intelligence in Medical Imaging (CLAIM): 2024 Update</strong>. Radiology: Artificial Intelligence, 2024. DOI: 10.1148/ryai.240300. <a href="https://pubs.rsna.org/doi/10.1148/ryai.240300">https://pubs.rsna.org/doi/10.1148/ryai.240300</a> . Trang checklist: <a href="https://pubs.rsna.org/page/ai/claim">https://pubs.rsna.org/page/ai/claim</a></p>
+
+</div>
